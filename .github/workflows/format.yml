@@ -1,5 +1,5 @@
 on: push
-name: Format check
+name: Format
 jobs:
   format_check:
     runs-on: ubuntu-latest
