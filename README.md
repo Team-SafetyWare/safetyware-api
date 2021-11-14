@@ -9,7 +9,7 @@ Follow these steps if you need to run the API without making code changes.
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop).
 2. Run the API.
    ```
-   docker-compose up -d --build
+   docker-compose up --build
    ```
 3. Navigate to http://localhost:3001.
 
