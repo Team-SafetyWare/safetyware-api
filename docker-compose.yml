@@ -12,6 +12,7 @@ services:
       dockerfile: "api.Dockerfile"
     environment:
       SW_DB_URI: "mongodb://mongo:27017"
+      RUST_LOG: "info"
     ports:
       - "3001:3001"
     depends_on:

@@ -15,6 +15,7 @@ struct ViewCount {
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
     let settings = Settings::read();
     let db = Client::with_uri_str(&settings.db_uri)
         .await
