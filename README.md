@@ -1,7 +1,7 @@
 # SafetyWare API
 
-This repository contains the API of the SafetyWare application. [CLion](https://www.jetbrains.com/clion/) is
-recommended for development. CLI commands are also supported.
+This repository contains the API of the SafetyWare application. [CLion](https://www.jetbrains.com/clion/) is recommended
+for development. CLI commands are also supported.
 
 ## Prerequisites
 
