@@ -1,3 +1,6 @@
+mod settings;
+
+use crate::settings::Settings;
 use mongodb::options::{FindOneAndUpdateOptions, ReturnDocument};
 use mongodb::{Client, Database};
 use serde::{Deserialize, Serialize};
@@ -12,7 +15,8 @@ struct ViewCount {
 
 #[tokio::main]
 async fn main() {
-    let db = Client::with_uri_str("mongodb://localhost:42781")
+    let settings = Settings::read();
+    let db = Client::with_uri_str(&settings.db_uri)
         .await
         .unwrap()
         .database("sw");

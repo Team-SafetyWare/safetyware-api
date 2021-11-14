@@ -25,7 +25,7 @@ for development. CLI commands are also supported.
 ### CLion (recommended)
 
 1. Execute the "Run" configuration. Docker containers are started automatically.
-2. Navigate to http://localhost:3001/hello/alice.
+2. Navigate to http://localhost:3001.
 3. Stop the Docker containers in the Services tab when your sitting is over.
 
 ### CLI
@@ -34,12 +34,16 @@ for development. CLI commands are also supported.
    ```
    docker-compose up -d
    ```
-2. Build and run the API server.
+2. Set configuration variables (assumes PowerShell).
+   ```
+   $env:SW_DB_URI="mongodb://localhost:42781"
+   ```
+3. Build and run the API server.
    ```
    cargo run -p api
    ```
-3. Navigate to http://localhost:3001.
-4. Stop the Docker containers when your sitting is over.
+4. Navigate to http://localhost:3001.
+5. Stop the Docker containers when your sitting is over.
    ```
    docker-compose down
    ```
