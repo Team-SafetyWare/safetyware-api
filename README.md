@@ -7,7 +7,8 @@ recommended for development. CLI commands are also supported.
 
 ### Install tools
 
-1. Install [Rust Programming Language](https://www.rust-lang.org/).
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop).
+2. Install [Rust Programming Language](https://www.rust-lang.org/).
 
 ### Install CLion (optional)
 
@@ -21,15 +22,24 @@ recommended for development. CLI commands are also supported.
 
 ## Run locally
 
+### CLion (recommended)
+
+1. Execute the "Run" configuration. Docker containers are started automatically.
+2. Navigate to http://localhost:3001/hello/alice.
+3. Stop the Docker containers in the services tab when your sitting is over.
+
 ### CLI
 
-1. Build and run the API server.
+1. Start the Docker containers once per sitting.
+   ```
+   docker-compose up -d
+   ```
+2. Build and run the API server.
    ```
    cargo run -p api
    ```
-2. Navigate to http://localhost:3001/hello/alice.
-
-### CLion
-
-1. Execute the "Run" configuration.
-2. Navigate to http://localhost:3001/hello/alice.
+3. Navigate to http://localhost:3001.
+4. Stop the Docker containers when your sitting is over.
+   ```
+   docker-compose down
+   ```
