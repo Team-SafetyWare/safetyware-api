@@ -26,7 +26,7 @@ recommended for development. CLI commands are also supported.
 
 1. Execute the "Run" configuration. Docker containers are started automatically.
 2. Navigate to http://localhost:3001/hello/alice.
-3. Stop the Docker containers in the services tab when your sitting is over.
+3. Stop the Docker containers in the Services tab when your sitting is over.
 
 ### CLI
 
