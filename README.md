@@ -31,5 +31,5 @@ recommended for development. CLI commands are also supported.
 
 ### CLion
 
-1. Execute the "Run api" configuration.
+1. Execute the "Run" configuration.
 2. Navigate to http://localhost:3001/hello/alice.
