@@ -48,6 +48,7 @@ Follow this section if you need to make code changes.
 2. Set environmental variables (assumes PowerShell).
    ```
    $env:SW_DB_URI="mongodb://localhost:42781"
+   $env:RUST_LOG="info"
    ```
 3. Build and run.
    ```
