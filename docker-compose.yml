@@ -6,5 +6,15 @@ services:
       - "42781:27017"
     volumes:
       - "mongo-volume:/data/db"
+  api:
+    build:
+      context: "."
+      dockerfile: "api.Dockerfile"
+    environment:
+      SW_DB_URI: "mongodb://mongo:27017"
+    ports:
+      - "3001:3001"
+    depends_on:
+      - "mongo"
 volumes:
   mongo-volume:
