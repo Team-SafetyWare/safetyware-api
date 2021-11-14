@@ -22,12 +22,14 @@ async fn main() {
         .unwrap()
         .database("sw");
 
-    let route = warp::any()
+    let count = warp::any()
         .and(with_clone(db))
         .and_then(move |db: Database| async move {
             let view_count = view_count(&db).await;
             Result::<_, Infallible>::Ok(format!("View count: {}", view_count))
         });
+
+    let route = count.with(warp::log("api"));
 
     warp::serve(route).run((Ipv4Addr::UNSPECIFIED, 3001)).await;
 }
