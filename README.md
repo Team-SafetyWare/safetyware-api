@@ -32,7 +32,7 @@ for development. CLI commands are also supported.
 
 1. Start the Docker containers once per sitting.
    ```
-   docker-compose up -d
+   docker-compose up -d --build mongo
    ```
 2. Set configuration variables (assumes PowerShell).
    ```
