@@ -5,6 +5,7 @@ use mongodb::options::{FindOneAndUpdateOptions, ReturnDocument};
 use mongodb::{Client, Database};
 use serde::{Deserialize, Serialize};
 use std::convert::Infallible;
+use std::env;
 use std::net::Ipv4Addr;
 use warp::Filter;
 
@@ -30,14 +31,23 @@ async fn main() {
         });
 
     let route = count.with(warp::log("api"));
+    let port = get_port();
 
-    warp::serve(route).run((Ipv4Addr::UNSPECIFIED, 3001)).await;
+    warp::serve(route).run((Ipv4Addr::UNSPECIFIED, port)).await;
 }
 
 pub fn with_clone<T: Clone + Send>(
     item: T,
 ) -> impl Filter<Extract = (T,), Error = Infallible> + Clone {
     warp::any().map(move || item.clone())
+}
+
+pub fn get_port() -> u16 {
+    // When running as an Azure Function use the supplied port, otherwise use the default.
+    match env::var("FUNCTIONS_CUSTOMHANDLER_PORT") {
+        Ok(port) => port.parse().expect("Custom Handler port is not a number"),
+        Err(_) => 3001,
+    }
 }
 
 pub async fn view_count(db: &Database) -> i64 {
