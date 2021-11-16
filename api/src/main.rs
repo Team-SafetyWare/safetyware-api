@@ -32,7 +32,7 @@ async fn main() {
 
     let health = warp::path("v1")
         .and(warp::path("health"))
-        .map(|| warp::reply());
+        .map(warp::reply);
 
     let route = health.or(count).with(warp::log("api"));
     let port = get_port();
