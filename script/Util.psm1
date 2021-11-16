@@ -159,8 +159,8 @@ function Get-AtlasCluster {
 
     Process {
         $clusters = mongocli atlas cluster list `
-        --output json `
-        --projectId $ProjectId `
+            --output json `
+            --projectId $ProjectId `
         | ConvertFrom-JSON
         Confirm-LastExitCode
 
@@ -170,5 +170,62 @@ function Get-AtlasCluster {
         Confirm-LastExitCode
 
         return $cluster
+    }
+}
+
+function Get-StringHash {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Plain,
+        [Parameter(Mandatory = $true)]
+        [int] $Length
+    )
+
+    Process {
+        $hash_array = (new-object System.Security.Cryptography.SHA512Managed).ComputeHash($Plain.ToCharArray())
+        -Join ($hash_array[1..$Length] | ForEach-Object { [char]($_ % 26 + [byte][char]'a') })
+    }
+}
+
+function Publish-AzureResourceGroup {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    Process {
+        $rg = az group create `
+            --name $Name `
+            --location canadacentral `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+        return $rg
+    }
+}
+
+function Publish-AzureTemplate {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $ResourceGroup,
+        [Parameter(Mandatory = $true)]
+        [string] $EnvHash
+    )
+
+    Process {
+        Push-Location "$(Get-ProjectLocation)\infrastructure"
+
+        $deploy = az deployment group create `
+            --name deploy `
+            --resource-group $ResourceGroup `
+            --template-file azuredeploy.bicep `
+            --parameters envHash="$EnvHash" `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+
+        Pop-Location
+        return $deploy
     }
 }
