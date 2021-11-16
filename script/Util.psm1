@@ -150,6 +150,13 @@ function New-AtlasCluster {
             --tier M0 `
         | ConvertFrom-JSON
         Confirm-LastExitCode
+
+        mongocli atlas clusters watch $cluster.name `
+            --output json `
+            --projectId $ProjectId `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+
         return $cluster
     }
 }
