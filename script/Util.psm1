@@ -87,3 +87,88 @@ function Stop-DockerContainer {
         Pop-Location
     }
 }
+
+function New-AtlasProject {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    Process {
+        $project = mongocli iam project create $Name `
+            --output json `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+        return $project
+    }
+}
+
+function Get-AtlasProject {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    Process {
+        $projects = mongocli iam project list `
+            --output json `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+
+        $project = $projects.results `
+        | Where-Object { $_.name -eq $Name } `
+        | Select-Object -First 1
+        Confirm-LastExitCode
+
+        return $project
+    }
+}
+
+function New-AtlasCluster {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name,
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId
+    )
+
+    Process {
+        $cluster = mongocli atlas cluster create $Name `
+            --output json `
+            --projectId $ProjectId `
+            --provider AZURE `
+            --region CANADA_CENTRAL `
+            --tier M0 `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+        return $cluster
+    }
+}
+
+function Get-AtlasCluster {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name,
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId
+    )
+
+    Process {
+        $clusters = mongocli atlas cluster list `
+        --output json `
+        --projectId $ProjectId `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+
+        $cluster = $clusters.results `
+        | Where-Object { $_.name -eq $Name } `
+        | Select-Object -First 1
+        Confirm-LastExitCode
+
+        return $cluster
+    }
+}
