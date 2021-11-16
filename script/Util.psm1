@@ -151,10 +151,10 @@ function New-AtlasCluster {
         | ConvertFrom-JSON
         Confirm-LastExitCode
 
+        Write-Host "Waiting for new Atlas cluster to be ready."
+
         mongocli atlas clusters watch $cluster.name `
-            --output json `
-            --projectId $ProjectId `
-        | ConvertFrom-JSON
+            --projectId $ProjectId
         Confirm-LastExitCode
 
         return $cluster
