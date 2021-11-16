@@ -199,6 +199,98 @@ function Get-AtlasCluster {
     }
 }
 
+function Add-AtlasDatabaseUser {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId,
+        [Parameter(Mandatory = $true)]
+        [string] $Username,
+        [Parameter(Mandatory = $true)]
+        [string] $Password
+    )
+
+    Process {
+        Write-Host "Creating new Atlas database user '$Username'."
+
+        $user = mongocli atlas dbuser create `
+            --output json `
+            --password $Password `
+            --projectId $ProjectId `
+            --role readWriteAnyDatabase `
+            --username $Username `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+        return $user
+    }
+}
+
+function Get-AtlasDatabaseUser {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId,
+        [Parameter(Mandatory = $true)]
+        [string] $Username
+    )
+
+    Process {
+        $users = mongocli atlas dbuser list `
+            --output json `
+            --projectId $ProjectId `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+
+        $user = $users `
+        | Where-Object { $_.username -eq $Username } `
+        | Select-Object -First 1
+        Confirm-LastExitCode
+
+        return $user
+    }
+}
+
+function Remove-AtlasDatabaseUser {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId,
+        [Parameter(Mandatory = $true)]
+        [string] $Username
+    )
+
+    Process {
+        Write-Host "Removing Atlas database user '$Username'."
+
+        mongocli atlas dbuser delete $Username `
+            --force `
+            --projectId $ProjectId
+        Confirm-LastExitCode
+    }
+}
+
+function New-RandomPassword {
+    param(
+        [int]
+        $Length
+    )
+
+    $symbols = '!@#$%^&*'.ToCharArray()
+    $character_list = 'a'..'z' + 'A'..'Z' + '0'..'9' + $symbols
+
+    do {
+        $password = -join (0..$Length | ForEach-Object { $character_list | Get-Random })
+        [int]$has_lower_char = $password -cmatch '[a-z]'
+        [int]$has_upper_char = $password -cmatch '[A-Z]'
+        [int]$has_digit = $password -match '[0-9]'
+        [int]$has_symbol = $password.IndexOfAny($symbols) -ne -1
+
+    }
+    until (($has_lower_char + $has_upper_char + $has_digit + $has_symbol) -ge 3)
+
+    $password
+}
+
 function Publish-Database {
     [CmdletBinding()]
     Param(
