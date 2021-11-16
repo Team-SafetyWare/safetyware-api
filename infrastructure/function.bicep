@@ -78,6 +78,7 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
           value: 'info'
         }
         {
+          // Todo: Fix in SAF-39.
           name: 'SW_DB_URI'
           value: 'mongodb://missing:11111'
         }
