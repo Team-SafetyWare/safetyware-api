@@ -39,6 +39,8 @@ function Build-ApiFunc {
     )
 
     Process {
+        Write-Host "Building API Azure Function."
+
         Build-Api
 
         Push-Location $(Get-ProjectLocation)
@@ -96,6 +98,8 @@ function New-AtlasProject {
     )
 
     Process {
+        Write-Host "Creating new Atlas project '$Name'."
+
         $project = mongocli iam project create $Name `
             --output json `
         | ConvertFrom-JSON
@@ -136,6 +140,8 @@ function New-AtlasCluster {
     )
 
     Process {
+        Write-Host "Creating new Atlas cluster."
+
         $cluster = mongocli atlas cluster create $Name `
             --output json `
             --projectId $ProjectId `
@@ -219,6 +225,8 @@ function Publish-AzureResourceGroup {
     )
 
     Process {
+        Write-Host "Publishing Azure resource group '$Name'."
+
         $rg = az group create `
             --name $Name `
             --location canadacentral `
@@ -238,6 +246,8 @@ function Publish-AzureTemplate {
     )
 
     Process {
+        Write-Host "Publishing Azure template."
+
         Push-Location "$(Get-ProjectLocation)\infrastructure"
 
         $deploy = az deployment group create `
@@ -261,6 +271,8 @@ function Publish-ApiFunc {
     )
 
     Process {
+        Write-Host "Publishing API Azure Function."
+
         Push-Location "$(Get-ProjectLocation)\api\func"
 
         func azure functionapp publish "func-api-$EnvHash"
