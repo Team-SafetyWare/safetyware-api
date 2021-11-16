@@ -150,10 +150,23 @@ function New-AtlasCluster {
             --tier M0 `
         | ConvertFrom-JSON
         Confirm-LastExitCode
+        return $cluster
+    }
+}
 
+function Watch-AtlasCluster {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name,
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId
+    )
+
+    Process {
         Write-Host "Waiting for new Atlas cluster to be ready."
 
-        mongocli atlas clusters watch $cluster.name `
+        mongocli atlas clusters watch $Name `
             --projectId $ProjectId
         Confirm-LastExitCode
 
@@ -204,6 +217,8 @@ function Publish-Database {
 
         $cluster = (Get-AtlasCluster $cluster_name -ProjectId $project.id) `
             ?? (New-AtlasCluster $cluster_name -ProjectId $project.id)
+
+        Watch-AtlasCluster $cluster_name -ProjectId $project.id
 
         return $cluster
     }
