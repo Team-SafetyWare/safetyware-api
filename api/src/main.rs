@@ -30,7 +30,11 @@ async fn main() {
             Result::<_, Infallible>::Ok(format!("View count: {}", view_count))
         });
 
-    let route = count.with(warp::log("api"));
+    let health = warp::path("v1")
+        .and(warp::path("health"))
+        .map(|| warp::reply());
+
+    let route = health.or(count).with(warp::log("api"));
     let port = get_port();
 
     warp::serve(route).run((Ipv4Addr::UNSPECIFIED, port)).await;
