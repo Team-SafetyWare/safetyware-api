@@ -291,6 +291,41 @@ function New-AtlasCidrWhitelist {
     }
 }
 
+function Get-AtlasDatabaseUri {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Cluster,
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId
+    )
+
+    Process {
+        $uri = mongocli atlas cluster connectionString describe $Cluster `
+            --output json `
+            --projectId $ProjectId `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+        return $uri
+    }
+}
+
+function ConvertTo-DatabaseUriWithCredentials {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $SrvUri,
+        [Parameter(Mandatory = $true)]
+        [string] $Username,
+        [Parameter(Mandatory = $true)]
+        [string] $Password
+    )
+
+    Process {
+        return $SrvUri.Insert(14, "${Username}:$([uri]::EscapeDataString($Password))@")
+    }
+}
+
 function New-RandomPassword {
     param(
         [int]

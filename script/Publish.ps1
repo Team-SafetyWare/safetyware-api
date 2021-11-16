@@ -36,6 +36,11 @@ if ( $null -ne (Get-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $at
 }
 Add-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $atlas_db_username -Password $atlas_db_password
 New-AtlasCidrWhitelist "0.0.0.0/0" -ProjectId $atlas_project.id
+$atlas_db_uri_no_cred = Get-AtlasDatabaseUri -Cluster "db" -ProjectId $atlas_project.id
+$atlas_db_uri = ConvertTo-DatabaseUriWithCredentials `
+    -SrvUri $atlas_db_uri_no_cred.standardSrv `
+    -Username $atlas_db_username `
+    -Password $atlas_db_password
 
 Build-ApiFunc
 Publish-Database -App $app -EnvName $env_name
