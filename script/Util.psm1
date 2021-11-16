@@ -173,6 +173,29 @@ function Get-AtlasCluster {
     }
 }
 
+function Publish-Database {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $App,
+        [Parameter(Mandatory = $true)]
+        [string] $EnvName
+    )
+
+    Process {
+        $project_name = "$App-$EnvName"
+        $cluster_name = "db"
+
+        $project = (Get-AtlasProject $project_name) `
+            ?? (New-AtlasProject $project_name)
+
+        $cluster = (Get-AtlasCluster $cluster_name -ProjectId $project.id) `
+            ?? (New-AtlasCluster $cluster_name -ProjectId $project.id)
+
+        return $cluster
+    }
+}
+
 function Get-StringHash {
     [CmdletBinding()]
     Param(
@@ -240,7 +263,7 @@ function Publish-ApiFunc {
     Process {
         Push-Location "$(Get-ProjectLocation)\api\func"
 
-        func azure functionapp publish "func-api-$EnvHash" `
+        func azure functionapp publish "func-api-$EnvHash"
         Confirm-LastExitCode
 
         Pop-Location
