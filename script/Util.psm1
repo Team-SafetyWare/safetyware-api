@@ -229,3 +229,21 @@ function Publish-AzureTemplate {
         return $deploy
     }
 }
+
+function Publish-ApiFunc {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $EnvHash
+    )
+
+    Process {
+        Push-Location "$(Get-ProjectLocation)\api\func"
+
+        func azure functionapp publish "func-api-$EnvHash" `
+        Confirm-LastExitCode
+
+        Pop-Location
+        return $func
+    }
+}
