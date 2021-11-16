@@ -35,6 +35,7 @@ if ( $null -ne (Get-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $at
     Remove-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $atlas_db_username
 }
 Add-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $atlas_db_username -Password $atlas_db_password
+New-AtlasCidrWhitelist "0.0.0.0/0" -ProjectId $atlas_project.id
 
 Build-ApiFunc
 Publish-Database -App $app -EnvName $env_name

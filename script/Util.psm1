@@ -269,6 +269,28 @@ function Remove-AtlasDatabaseUser {
     }
 }
 
+function New-AtlasCidrWhitelist {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $CidrBlock,
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId
+    )
+
+    Process {
+        Write-Host "Whitelisting CIDR block '$CidrBlock'."
+
+        $rule = mongocli atlas whitelist create "$CidrBlock" `
+            --output json `
+            --projectId $ProjectId `
+            --type cidrBlock `
+        | ConvertFrom-JSON
+        Confirm-LastExitCode
+        return $rule
+    }
+}
+
 function New-RandomPassword {
     param(
         [int]
