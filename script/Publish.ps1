@@ -1,13 +1,13 @@
 param(
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [System.String]
     $Org,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [System.String]
     $App,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [System.String]
     $Env
 )
