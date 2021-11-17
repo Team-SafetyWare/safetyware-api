@@ -1,6 +1,8 @@
 param name string
 param envHash string
 param scaleLimit int
+// Todo: Remove this as part of SAF-41.
+param dbUri string
 
 var functionAppName = 'func-${name}-${envHash}'
 var applicationInsightsName = 'appi-${name}-${envHash}'
@@ -78,9 +80,9 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
           value: 'info'
         }
         {
-          // Todo: Fix in SAF-39.
+          // Todo: Remove this as part of SAF-41.
           name: 'SW_DB_URI'
-          value: 'mongodb://missing:11111'
+          value: dbUri
         }
       ]
     }
