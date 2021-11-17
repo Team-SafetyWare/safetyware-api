@@ -32,21 +32,21 @@ Publish-Database -App $app -EnvName $env_name
 
 # Todo: Do not delete and re-create the database user on every deploy. Part of SAF-41.
 $atlas_project = Get-AtlasProject -Name "$app-$env_name"
-$atlas_db_username = "app-api"
-$atlas_db_password = New-RandomPassword -Length 32
-if ( $null -ne (Get-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $atlas_db_username) ) {
-    Remove-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $atlas_db_username
+$db_username = "app-api"
+$db_password = New-RandomPassword -Length 32
+if ( $null -ne (Get-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $db_username) ) {
+    Remove-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $db_username
 }
-New-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $atlas_db_username -Password $atlas_db_password
+New-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $db_username -Password $db_password
 New-AtlasCidrWhitelist "0.0.0.0/0" -ProjectId $atlas_project.id
-$atlas_db_uri_no_cred = Get-AtlasDatabaseUri -Cluster "db" -ProjectId $atlas_project.id
-$atlas_db_uri = ConvertTo-DatabaseUriWithCredentials `
-    -SrvUri $atlas_db_uri_no_cred.standardSrv `
-    -Username $atlas_db_username `
-    -Password $atlas_db_password
+$db_uri_no_cred = Get-AtlasDatabaseUri -Cluster "db" -ProjectId $atlas_project.id
+$db_uri = ConvertTo-DatabaseUriWithCredentials `
+    -SrvUri $db_uri_no_cred.standardSrv `
+    -Username $db_username `
+    -Password $db_password
 
 New-AzureResourceGroup -Name $rg_name
-Publish-AzureTemplate -ResourceGroup $rg_name -EnvHash $env_hash -DbUri $atlas_db_uri
+Publish-AzureTemplate -ResourceGroup $rg_name -EnvHash $env_hash -DbUri $db_uri
 Publish-ApiFunc -EnvHash $env_hash
 
 $elapsed_time = $(get-date) - $start_time
