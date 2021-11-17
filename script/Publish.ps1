@@ -27,6 +27,9 @@ $rg_name = "rg-$app-$env_name"
 
 $start_time = $(get-date)
 
+Build-ApiFunc
+Publish-Database -App $app -EnvName $env_name
+
 # Todo: Do not delete and re-create the database user on every deploy. Part of SAF-41.
 $atlas_project = Get-AtlasProject -Name "$app-$env_name"
 $atlas_db_username = "app-api"
@@ -42,8 +45,6 @@ $atlas_db_uri = ConvertTo-DatabaseUriWithCredentials `
     -Username $atlas_db_username `
     -Password $atlas_db_password
 
-Build-ApiFunc
-Publish-Database -App $app -EnvName $env_name
 Publish-AzureResourceGroup -Name $rg_name
 Publish-AzureTemplate -ResourceGroup $rg_name -EnvHash $env_hash -DbUri $atlas_db_uri
 Publish-ApiFunc -EnvHash $env_hash
