@@ -30,6 +30,7 @@ $start_time = $(get-date)
 $vault_name = "kv-$env_hash"
 Remove-AzureResourceGroup $rg_name
 Remove-AzureDeletedKeyVault $vault_name
+Remove-Database -App $app -EnvName $env_name
 
 $elapsed_time = $(get-date) - $start_time
 

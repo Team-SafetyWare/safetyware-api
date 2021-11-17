@@ -199,6 +199,25 @@ function Get-AtlasCluster {
     }
 }
 
+function Remove-AtlasCluster {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name,
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId
+    )
+
+    Process {
+        Write-Host "Removing Atlas database '$Name' in project '$ProjectId'."
+
+        mongocli atlas cluster delete $Name `
+            --force `
+            --projectId $ProjectId
+        Confirm-LastExitCode
+    }
+}
+
 function New-AtlasDatabaseUser {
     [CmdletBinding()]
     Param(
@@ -370,6 +389,30 @@ function Publish-Database {
         Watch-AtlasCluster $cluster_name -ProjectId $project.id
 
         return $cluster
+    }
+}
+
+function Remove-Database {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $App,
+        [Parameter(Mandatory = $true)]
+        [string] $EnvName
+    )
+
+    Process {
+        $project_name = "$App-$EnvName"
+        $cluster_name = "db"
+
+        $project = Get-AtlasProject $project_name
+
+        Remove-AtlasCluster $cluster_name -ProjectId $project.id
+        try {
+            # The watch will throw an error once the cluster is deleted.
+            Watch-AtlasCluster $cluster_name -ProjectId $project.id   
+        }
+        catch {}
     }
 }
 
