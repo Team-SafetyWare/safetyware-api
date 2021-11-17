@@ -95,15 +95,16 @@ Follow this section to deploy the API in the cloud.
 
 This will deploy the API to the specified environment. It will be publicly acessable.
 
-1. ```
+   ```
    .\script\Publish.ps1 -Org cap -App sw -Env dev
    ```
-    - You can pick something other than `dev` as the environment name, such as your name, to avoid name conflicts.
+
+- You can pick something other than `dev` as the environment name, such as your name, to avoid name conflicts.
 
 ### Unpublish the API
 
 This will undeploy the API and delete all cloud resources.
 
-1. ```
+   ```
    .\script\Unpublish.ps1 -Org cap -App sw -Env dev
    ```
