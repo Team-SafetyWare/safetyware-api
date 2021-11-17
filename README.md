@@ -46,7 +46,7 @@ Follow this section if you need to make code changes.
    ```
    docker-compose up -d --build mongo
    ```
-2. Set environmental variables (assumes PowerShell).
+2. Set environmental variables.
    ```
    $env:SW_DB_URI="mongodb://localhost:42781"
    $env:RUST_LOG="info"
@@ -59,4 +59,51 @@ Follow this section if you need to make code changes.
 5. Stop the Docker containers before leaving.
    ```
    docker-compose down
+   ```
+
+## Deployment
+
+Follow this section to deploy the API in the cloud.
+
+### Install tools
+
+1. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+2. Install [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local).
+3. Install [Docker Desktop](https://www.docker.com/products/docker-desktop).
+6. Install [MongoDB CLI for Cloud](https://www.mongodb.com/try/download/mongocli).
+5. Install [PowerShell Core](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell) (not
+   preinstalled PowerShell).
+6. Install [Rust Programming Language](https://www.rust-lang.org/).
+
+### Sign up for cloud providers
+
+1. Create a [Microsoft Azure](https://azure.microsoft.com/en-ca/free/) account.
+2. Create a [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register) account.
+
+### Configure CLI tools
+
+1. Connect the Azure CLI to your Azure account.
+   ```
+   az login
+   ```
+2. Connect the MongoDB Cloud CLI to your MongoDB Atlas account.
+   ```
+   mongocli config
+   ```
+
+### Publish the API
+
+This will deploy the API to the specified environment. It will be publicly acessable.
+
+1. ```
+   .\script\Publish.ps1 -Org cap -App sw -Env dev
+   ```
+    - You can pick something other than `dev` as the environment name, such as your name, to avoid name conflicts.
+
+### Unpublish the API
+
+This will undeploy the API and delete all cloud resources.
+
+1. ```
+   .\script\Unpublish.ps1 -Org cap -App sw -Env dev
    ```
