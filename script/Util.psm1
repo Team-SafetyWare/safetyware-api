@@ -124,9 +124,24 @@ function Get-AtlasProject {
         $project = $projects.results `
         | Where-Object { $_.name -eq $Name } `
         | Select-Object -First 1
-        Confirm-LastExitCode
 
         return $project
+    }
+}
+
+function Remove-AtlasProject {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId
+    )
+
+    Process {
+        Write-Host "Removing Atlas project '$ProjectId'."
+
+        mongocli iam project delete $ProjectId `
+            --force
+        Confirm-LastExitCode
     }
 }
 
@@ -193,14 +208,33 @@ function Get-AtlasCluster {
         $cluster = $clusters.results `
         | Where-Object { $_.name -eq $Name } `
         | Select-Object -First 1
-        Confirm-LastExitCode
 
         return $cluster
     }
 }
 
-function Add-AtlasDatabaseUser {
+function Remove-AtlasCluster {
     [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name,
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId
+    )
+
+    Process {
+        Write-Host "Removing Atlas database '$Name' in project '$ProjectId'."
+
+        mongocli atlas cluster delete $Name `
+            --force `
+            --projectId $ProjectId
+        Confirm-LastExitCode
+    }
+}
+
+function New-AtlasDatabaseUser {
+    [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Scope='Function')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $ProjectId,
@@ -244,7 +278,6 @@ function Get-AtlasDatabaseUser {
         $user = $users `
         | Where-Object { $_.username -eq $Username } `
         | Select-Object -First 1
-        Confirm-LastExitCode
 
         return $user
     }
@@ -312,6 +345,7 @@ function Get-AtlasDatabaseUri {
 
 function ConvertTo-DatabaseUriWithCredentials {
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Scope='Function')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $SrvUri,
@@ -373,6 +407,38 @@ function Publish-Database {
     }
 }
 
+function Remove-Database {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $App,
+        [Parameter(Mandatory = $true)]
+        [string] $EnvName
+    )
+
+    Process {
+        $project_name = "$App-$EnvName"
+        $cluster_name = "db"
+
+        $project = Get-AtlasProject $project_name
+
+        if ($null -ne $project){
+            $cluster = Get-AtlasCluster $cluster_name -ProjectId $project.id
+
+            if ($null -ne $cluster) {
+                Remove-AtlasCluster $cluster_name -ProjectId $project.id
+                try {
+                    # The watch will throw an error once the cluster is deleted.
+                    Watch-AtlasCluster $cluster_name -ProjectId $project.id   
+                }
+                catch {}
+            }
+
+            Remove-AtlasProject -ProjectId $project.id
+        }
+    }
+}
+
 function Get-StringHash {
     [CmdletBinding()]
     Param(
@@ -388,7 +454,7 @@ function Get-StringHash {
     }
 }
 
-function Publish-AzureResourceGroup {
+function New-AzureResourceGroup {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]
@@ -404,6 +470,67 @@ function Publish-AzureResourceGroup {
         | ConvertFrom-JSON
         Confirm-LastExitCode
         return $rg
+    }
+}
+
+function Remove-AzureResourceGroup {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    Process {
+        $exists = az group exists `
+            --name $Name
+        Confirm-LastExitCode
+
+        if ([boolean]::Parse($exists)) {
+            Write-Host "Removing Azure resource group '$Name'."
+
+            az group delete `
+                --name $Name `
+                --yes 
+            Confirm-LastExitCode
+        }
+    }
+}
+
+function Get-AzureDeletedKeyVault {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    Process {
+        $vaults = az keyvault list-deleted `
+        | ConvertFrom-Json
+        Confirm-LastExitCode
+
+        $vault = $vaults `
+        | Where-Object { $_.name -eq $Name } `
+        | Select-Object -First 1
+
+        return $vault
+    }
+}
+
+function Remove-AzureDeletedKeyVault {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    Process {
+        if ($null -ne (Get-AzureDeletedKeyVault $Name)) {
+            Write-Host "Purging Azure KeyVault '$Name'."
+
+            az keyvault purge `
+                --name $Name
+            Confirm-LastExitCode
+        }
     }
 }
 
