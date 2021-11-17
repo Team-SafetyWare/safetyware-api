@@ -407,6 +407,39 @@ function New-AzureResourceGroup {
     }
 }
 
+function Remove-AzureResourceGroup {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    Process {
+        Write-Host "Removing Azure resource group '$Name'."
+
+        az group delete `
+            --name $Name `
+            --yes 
+        Confirm-LastExitCode
+    }
+}
+
+function Remove-AzureDeletedKeyVault {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    Process {
+        Write-Host "Purging Azure KeyVault '$Name'."
+
+        az keyvault purge `
+            --name $Name
+        Confirm-LastExitCode
+    }
+}
+
 function Publish-AzureTemplate {
     [CmdletBinding()]
     Param(

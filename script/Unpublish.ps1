@@ -27,7 +27,9 @@ $rg_name = "rg-$app-$env_name"
 
 $start_time = $(get-date)
 
-# Todo: Unpublish.
+$vault_name = "kv-$env_hash"
+Remove-AzureResourceGroup $rg_name
+Remove-AzureDeletedKeyVault $vault_name
 
 $elapsed_time = $(get-date) - $start_time
 
