@@ -124,7 +124,6 @@ function Get-AtlasProject {
         $project = $projects.results `
         | Where-Object { $_.name -eq $Name } `
         | Select-Object -First 1
-        Confirm-LastExitCode
 
         return $project
     }
@@ -207,7 +206,6 @@ function Get-AtlasCluster {
         $cluster = $clusters.results `
         | Where-Object { $_.name -eq $Name } `
         | Select-Object -First 1
-        Confirm-LastExitCode
 
         return $cluster
     }
@@ -278,7 +276,6 @@ function Get-AtlasDatabaseUser {
         $user = $users `
         | Where-Object { $_.username -eq $Username } `
         | Select-Object -First 1
-        Confirm-LastExitCode
 
         return $user
     }
@@ -477,10 +474,36 @@ function Remove-AzureResourceGroup {
     Process {
         Write-Host "Removing Azure resource group '$Name'."
 
-        az group delete `
-            --name $Name `
-            --yes 
+        $exists = az group exists `
+            --name $Name
         Confirm-LastExitCode
+
+        if ([boolean]::Parse($exists)) {
+            az group delete `
+                --name $Name `
+                --yes 
+            Confirm-LastExitCode
+        }
+    }
+}
+
+function Get-AzureDeletedKeyVault {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    Process {
+        $vaults = az keyvault list-deleted `
+        | ConvertFrom-Json
+        Confirm-LastExitCode
+
+        $vault = $vaults `
+        | Where-Object { $_.name -eq $Name } `
+        | Select-Object -First 1
+
+        return $vault
     }
 }
 
@@ -494,9 +517,11 @@ function Remove-AzureDeletedKeyVault {
     Process {
         Write-Host "Purging Azure KeyVault '$Name'."
 
-        az keyvault purge `
-            --name $Name
-        Confirm-LastExitCode
+        if ($null -ne (Get-AzureDeletedKeyVault $Name)) {
+            az keyvault purge `
+                --name $Name
+            Confirm-LastExitCode
+        }
     }
 }
 
