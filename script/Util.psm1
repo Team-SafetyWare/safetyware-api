@@ -199,7 +199,7 @@ function Get-AtlasCluster {
     }
 }
 
-function Add-AtlasDatabaseUser {
+function New-AtlasDatabaseUser {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]
@@ -388,7 +388,7 @@ function Get-StringHash {
     }
 }
 
-function Publish-AzureResourceGroup {
+function New-AzureResourceGroup {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]

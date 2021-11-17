@@ -37,7 +37,7 @@ $atlas_db_password = New-RandomPassword -Length 32
 if ( $null -ne (Get-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $atlas_db_username) ) {
     Remove-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $atlas_db_username
 }
-Add-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $atlas_db_username -Password $atlas_db_password
+New-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $atlas_db_username -Password $atlas_db_password
 New-AtlasCidrWhitelist "0.0.0.0/0" -ProjectId $atlas_project.id
 $atlas_db_uri_no_cred = Get-AtlasDatabaseUri -Cluster "db" -ProjectId $atlas_project.id
 $atlas_db_uri = ConvertTo-DatabaseUriWithCredentials `
@@ -45,7 +45,7 @@ $atlas_db_uri = ConvertTo-DatabaseUriWithCredentials `
     -Username $atlas_db_username `
     -Password $atlas_db_password
 
-Publish-AzureResourceGroup -Name $rg_name
+New-AzureResourceGroup -Name $rg_name
 Publish-AzureTemplate -ResourceGroup $rg_name -EnvHash $env_hash -DbUri $atlas_db_uri
 Publish-ApiFunc -EnvHash $env_hash
 
