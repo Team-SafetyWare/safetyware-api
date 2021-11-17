@@ -13,7 +13,7 @@ Follow these steps if you need to run the API without making code changes.
    ```
 3. Navigate to http://localhost:3001.
 
-## Development
+## Develop
 
 Follow this section if you need to make code changes.
 
@@ -61,7 +61,7 @@ Follow this section if you need to make code changes.
    docker-compose down
    ```
 
-## Deployment
+## Deploy
 
 Follow this section to deploy the API in the cloud.
 
