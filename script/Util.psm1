@@ -137,6 +137,8 @@ function Remove-AtlasProject {
     )
 
     Process {
+        Write-Host "Removing Atlas project '$ProjectId'."
+
         mongocli iam project delete $ProjectId `
             --force
         Confirm-LastExitCode
@@ -420,13 +422,20 @@ function Remove-Database {
 
         $project = Get-AtlasProject $project_name
 
-        Remove-AtlasCluster $cluster_name -ProjectId $project.id
-        try {
-            # The watch will throw an error once the cluster is deleted.
-            Watch-AtlasCluster $cluster_name -ProjectId $project.id   
+        if ($null -ne $project){
+            $cluster = Get-AtlasCluster $cluster_name -ProjectId $project.id
+
+            if ($null -ne $cluster) {
+                Remove-AtlasCluster $cluster_name -ProjectId $project.id
+                try {
+                    # The watch will throw an error once the cluster is deleted.
+                    Watch-AtlasCluster $cluster_name -ProjectId $project.id   
+                }
+                catch {}
+            }
+
+            Remove-AtlasProject -ProjectId $project.id
         }
-        catch {}
-        Remove-AtlasProject -ProjectId $project.id
     }
 }
 
@@ -472,13 +481,13 @@ function Remove-AzureResourceGroup {
     )
 
     Process {
-        Write-Host "Removing Azure resource group '$Name'."
-
         $exists = az group exists `
             --name $Name
         Confirm-LastExitCode
 
         if ([boolean]::Parse($exists)) {
+            Write-Host "Removing Azure resource group '$Name'."
+
             az group delete `
                 --name $Name `
                 --yes 
@@ -515,9 +524,9 @@ function Remove-AzureDeletedKeyVault {
     )
 
     Process {
-        Write-Host "Purging Azure KeyVault '$Name'."
-
         if ($null -ne (Get-AzureDeletedKeyVault $Name)) {
+            Write-Host "Purging Azure KeyVault '$Name'."
+
             az keyvault purge `
                 --name $Name
             Confirm-LastExitCode
