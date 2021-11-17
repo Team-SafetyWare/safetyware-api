@@ -234,6 +234,7 @@ function Remove-AtlasCluster {
 
 function New-AtlasDatabaseUser {
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $ProjectId,
@@ -345,6 +346,7 @@ function Get-AtlasDatabaseUri {
 
 function ConvertTo-DatabaseUriWithCredentials {
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $SrvUri,
