@@ -45,7 +45,7 @@ $atlas_db_uri = ConvertTo-DatabaseUriWithCredentials `
 Build-ApiFunc
 Publish-Database -App $app -EnvName $env_name
 Publish-AzureResourceGroup -Name $rg_name
-Publish-AzureTemplate -ResourceGroup $rg_name -EnvHash $env_hash
+Publish-AzureTemplate -ResourceGroup $rg_name -EnvHash $env_hash -DbUri $atlas_db_uri
 Publish-ApiFunc -EnvHash $env_hash
 
 $elapsed_time = $(get-date) - $start_time

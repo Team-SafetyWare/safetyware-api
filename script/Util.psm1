@@ -413,7 +413,10 @@ function Publish-AzureTemplate {
         [Parameter(Mandatory = $true)]
         [string] $ResourceGroup,
         [Parameter(Mandatory = $true)]
-        [string] $EnvHash
+        [string] $EnvHash,
+        # Todo: Remove this as part of SAF-41.
+        [Parameter(Mandatory = $true)]
+        [string] $DbUri
     )
 
     Process {
@@ -425,7 +428,7 @@ function Publish-AzureTemplate {
             --name deploy `
             --resource-group $ResourceGroup `
             --template-file azuredeploy.bicep `
-            --parameters envHash="$EnvHash" `
+            --parameters envHash="$EnvHash" dbUri="$DbUri" `
         | ConvertFrom-JSON
         Confirm-LastExitCode
 

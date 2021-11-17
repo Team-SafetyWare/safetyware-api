@@ -4,6 +4,10 @@ param envHash string
 @description('Maximum number of workers functions can scale out to.')
 param scaleLimit int = 1
 
+// Todo: Remove this as part of SAF-41.
+@description('Database URI with credentials.')
+param dbUri string
+
 var location = resourceGroup().location
 
 module apiFunctionModule 'function.bicep' = {
@@ -12,6 +16,7 @@ module apiFunctionModule 'function.bicep' = {
     envHash: envHash
     name: 'api'
     scaleLimit: scaleLimit
+    dbUri: dbUri
   }
 }
 
