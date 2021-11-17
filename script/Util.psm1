@@ -130,6 +130,20 @@ function Get-AtlasProject {
     }
 }
 
+function Remove-AtlasProject {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $ProjectId
+    )
+
+    Process {
+        mongocli iam project delete $ProjectId `
+            --force
+        Confirm-LastExitCode
+    }
+}
+
 function New-AtlasCluster {
     [CmdletBinding()]
     Param(
@@ -413,6 +427,7 @@ function Remove-Database {
             Watch-AtlasCluster $cluster_name -ProjectId $project.id   
         }
         catch {}
+        Remove-AtlasProject -ProjectId $project.id
     }
 }
 
