@@ -28,8 +28,7 @@ Follow this section if you need to make code changes.
 
 1. Open this repository in CLion.
 2. Install required plugins when prompted.
-3. Confirm the "Start containers" configuration is able to run.
-4. Configure CLion to use Rustfmt.
+3. Configure CLion to use Rustfmt.
     1. Press **Ctrl + Shift + A** to search actions.
     2. Search "Rustfmt" and open the first result.
     3. Enable "Use Rustfmt instead of built-in formatter" and "Run rustfmt on Save".
