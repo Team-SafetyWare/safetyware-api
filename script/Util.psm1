@@ -544,9 +544,7 @@ function Publish-AzureTemplate {
         [string] $ResourceGroup,
         [Parameter(Mandatory = $true)]
         [string] $EnvHash,
-        # Todo: Remove this as part of SAF-41.
-        [Parameter(Mandatory = $true)]
-        [string] $DbUri
+
     )
 
     Process {

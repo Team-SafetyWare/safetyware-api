@@ -30,7 +30,7 @@ $start_time = $(get-date)
 Build-ApiFunc
 Publish-Database -App $app -EnvName $env_name
 New-AzureResourceGroup -Name $rg_name
-Publish-AzureTemplate -ResourceGroup $rg_name -EnvHash $env_hash -DbUri $db_uri
+Publish-AzureTemplate -ResourceGroup $rg_name -EnvHash $env_hash
 Publish-DatabaseUri -ResourceGroup $rg_name -App $app -EnvName $env_name -EnvHash $env_hash
 Publish-ApiFunc -EnvHash $env_hash
 
