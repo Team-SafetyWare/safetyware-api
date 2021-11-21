@@ -403,6 +403,9 @@ function Publish-Database {
 
         Watch-AtlasCluster $cluster_name -ProjectId $project.id
 
+        $atlas_project = Get-AtlasProject -Name $project_name
+        New-AtlasCidrWhitelist "0.0.0.0/0" -ProjectId $atlas_project.id
+
         return $cluster
     }
 }
@@ -653,20 +656,40 @@ function Publish-DatabaseUri {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]
-        [string] $DbUri,
-        [Parameter(Mandatory = $true)]
         [string] $ResourceGroup,
+        [Parameter(Mandatory = $true)]
+        [string] $App,
+        [Parameter(Mandatory = $true)]
+        [string] $EnvName,
         [Parameter(Mandatory = $true)]
         [string] $EnvHash
     )
 
     Process {
+        $project_name = "$App-$EnvName"
+        $cluster_name = "db"
+        $atlas_project = Get-AtlasProject -Name $project_name
+        $db_username = "app-api"
+
+        if ( $null -ne (Get-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $db_username) ) {
+            return;
+        }
+
         Write-Host "Publishing database URI."
+
+        $db_password = New-RandomPassword -Length 32
+        
+        New-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $db_username -Password $db_password
+        $db_uri_no_cred = Get-AtlasDatabaseUri -Cluster $cluster_name -ProjectId $atlas_project.id
+        $db_uri = ConvertTo-DatabaseUriWithCredentials `
+            -SrvUri $db_uri_no_cred.standardSrv `
+            -Username $db_username `
+            -Password $db_password
 
         $vault_name = "kv-$EnvHash"
         Set-AzureKeyVaultSecret `
             -Name "db-uri" `
-            -Value $DbUri `
+            -Value $db_uri `
             -VaultName $vault_name `
             -ResourceGroup $ResourceGroup `
         | Out-Null
