@@ -555,7 +555,7 @@ function Publish-AzureTemplate {
             --name deploy `
             --resource-group $ResourceGroup `
             --template-file azuredeploy.bicep `
-            --parameters envHash="$EnvHash" dbUri="$DbUri" `
+            --parameters envHash="$EnvHash" `
         | ConvertFrom-JSON
         Confirm-LastExitCode
 

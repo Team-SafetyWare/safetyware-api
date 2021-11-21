@@ -1,8 +1,7 @@
 param name string
 param envHash string
 param scaleLimit int
-// Todo: Remove this as part of SAF-41.
-param dbUri string
+param keyVaultName string
 
 var functionAppName = 'func-${name}-${envHash}'
 var applicationInsightsName = 'appi-${name}-${envHash}'
@@ -80,9 +79,8 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
           value: 'info'
         }
         {
-          // Todo: Remove this as part of SAF-41.
           name: 'SW_DB_URI'
-          value: dbUri
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=db-uri)'
         }
       ]
     }
