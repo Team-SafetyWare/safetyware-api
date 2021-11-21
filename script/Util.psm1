@@ -39,7 +39,7 @@ function Build-ApiFunc {
     )
 
     Process {
-        Write-Host "Building API Azure Function."
+        Write-Output "Building API Azure Function."
 
         Build-Api
 
@@ -55,7 +55,7 @@ function Invoke-ApiFunc {
     )
 
     Process {
-        Write-Host "Starting API Azure Function. Press Ctrl + C to stop."
+        Write-Output "Starting API Azure Function. Press Ctrl + C to stop."
 
         Push-Location "$(Get-ProjectLocation)\api\func"
         func start --port 3001
@@ -98,7 +98,7 @@ function New-AtlasProject {
     )
 
     Process {
-        Write-Host "Creating new Atlas project '$Name'."
+        Write-Output "Creating new Atlas project '$Name'."
 
         $project = mongocli iam project create $Name `
             --output json `
@@ -137,7 +137,7 @@ function Remove-AtlasProject {
     )
 
     Process {
-        Write-Host "Removing Atlas project '$ProjectId'."
+        Write-Output "Removing Atlas project '$ProjectId'."
 
         mongocli iam project delete $ProjectId `
             --force
@@ -155,7 +155,7 @@ function New-AtlasCluster {
     )
 
     Process {
-        Write-Host "Creating new Atlas cluster."
+        Write-Output "Creating new Atlas cluster."
 
         $cluster = mongocli atlas cluster create $Name `
             --output json `
@@ -179,7 +179,7 @@ function Watch-AtlasCluster {
     )
 
     Process {
-        Write-Host "Waiting for new Atlas cluster to be ready."
+        Write-Output "Waiting for new Atlas cluster to be ready."
 
         mongocli atlas clusters watch $Name `
             --projectId $ProjectId
@@ -223,7 +223,7 @@ function Remove-AtlasCluster {
     )
 
     Process {
-        Write-Host "Removing Atlas database '$Name' in project '$ProjectId'."
+        Write-Output "Removing Atlas database '$Name' in project '$ProjectId'."
 
         mongocli atlas cluster delete $Name `
             --force `
@@ -245,7 +245,7 @@ function New-AtlasDatabaseUser {
     )
 
     Process {
-        Write-Host "Creating new Atlas database user '$Username'."
+        Write-Output "Creating new Atlas database user '$Username'."
 
         $user = mongocli atlas dbuser create `
             --output json `
@@ -293,7 +293,7 @@ function Remove-AtlasDatabaseUser {
     )
 
     Process {
-        Write-Host "Removing Atlas database user '$Username'."
+        Write-Output "Removing Atlas database user '$Username'."
 
         mongocli atlas dbuser delete $Username `
             --force `
@@ -312,7 +312,7 @@ function New-AtlasCidrWhitelist {
     )
 
     Process {
-        Write-Host "Whitelisting CIDR block '$CidrBlock'."
+        Write-Output "Whitelisting CIDR block '$CidrBlock'."
 
         $rule = mongocli atlas whitelist create "$CidrBlock" `
             --output json `
@@ -465,7 +465,7 @@ function New-AzureResourceGroup {
     )
 
     Process {
-        Write-Host "Publishing Azure resource group '$Name'."
+        Write-Output "Publishing Azure resource group '$Name'."
 
         $rg = az group create `
             --name $Name `
@@ -489,7 +489,7 @@ function Remove-AzureResourceGroup {
         Confirm-LastExitCode
 
         if ([boolean]::Parse($exists)) {
-            Write-Host "Removing Azure resource group '$Name'."
+            Write-Output "Removing Azure resource group '$Name'."
 
             az group delete `
                 --name $Name `
@@ -528,7 +528,7 @@ function Remove-AzureDeletedKeyVault {
 
     Process {
         if ($null -ne (Get-AzureDeletedKeyVault $Name)) {
-            Write-Host "Purging Azure KeyVault '$Name'."
+            Write-Output "Purging Azure KeyVault '$Name'."
 
             az keyvault purge `
                 --name $Name
@@ -547,7 +547,7 @@ function Publish-AzureTemplate {
     )
 
     Process {
-        Write-Host "Publishing Azure template."
+        Write-Output "Publishing Azure template."
 
         Push-Location "$(Get-ProjectLocation)\infrastructure"
 
@@ -572,7 +572,7 @@ function Publish-ApiFunc {
     )
 
     Process {
-        Write-Host "Publishing API Azure Function."
+        Write-Output "Publishing API Azure Function."
 
         Push-Location "$(Get-ProjectLocation)\api\func"
 
@@ -672,7 +672,7 @@ function Publish-DatabaseUri {
             return;
         }
 
-        Write-Host "Publishing database URI."
+        Write-Output "Publishing database URI."
 
         $db_password = New-RandomPassword -Length 32
         

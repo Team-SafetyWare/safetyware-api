@@ -34,6 +34,6 @@ Remove-Database -App $app -EnvName $env_name
 
 $elapsed_time = $(get-date) - $start_time
 
-Write-Host "Unpublish finished in $($elapsed_time.TotalSeconds) s." 
+Write-Output "Unpublish finished in $($elapsed_time.TotalSeconds) s."
 
 Pop-Location

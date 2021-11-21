@@ -36,6 +36,6 @@ Publish-ApiFunc -EnvHash $env_hash
 
 $elapsed_time = $(get-date) - $start_time
 
-Write-Host "Publish finished in $($elapsed_time.TotalSeconds) s." 
+Write-Output "Publish finished in $($elapsed_time.TotalSeconds) s."
 
 Pop-Location
