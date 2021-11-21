@@ -47,6 +47,7 @@ $db_uri = ConvertTo-DatabaseUriWithCredentials `
 
 New-AzureResourceGroup -Name $rg_name
 Publish-AzureTemplate -ResourceGroup $rg_name -EnvHash $env_hash -DbUri $db_uri
+Publish-DatabaseUri -DbUri $db_uri -ResourceGroup $rg_name -EnvHash $env_hash
 Publish-ApiFunc -EnvHash $env_hash
 
 $elapsed_time = $(get-date) - $start_time
