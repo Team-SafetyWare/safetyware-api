@@ -110,6 +110,7 @@ function New-AtlasProject {
 
 function Get-AtlasProject {
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Name')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $Name
@@ -191,6 +192,7 @@ function Watch-AtlasCluster {
 
 function Get-AtlasCluster {
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Name')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $Name,
@@ -262,6 +264,7 @@ function New-AtlasDatabaseUser {
 
 function Get-AtlasDatabaseUser {
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Username')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $ProjectId,
@@ -504,6 +507,7 @@ function Remove-AzureResourceGroup {
 
 function Get-AzureDeletedKeyVault {
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Name')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $Name
