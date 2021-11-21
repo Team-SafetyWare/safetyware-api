@@ -234,7 +234,7 @@ function Remove-AtlasCluster {
 
 function New-AtlasDatabaseUser {
     [CmdletBinding()]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Scope = 'Function')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $ProjectId,
@@ -345,7 +345,7 @@ function Get-AtlasDatabaseUri {
 
 function ConvertTo-DatabaseUriWithCredentials {
     [CmdletBinding()]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Scope = 'Function')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $SrvUri,
@@ -412,6 +412,7 @@ function Publish-Database {
 
 function Remove-Database {
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingEmptyCatchBlock', '')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $App,
@@ -432,7 +433,7 @@ function Remove-Database {
                 Remove-AtlasCluster $cluster_name -ProjectId $project.id
                 try {
                     # The watch will throw an error once the cluster is deleted.
-                    Watch-AtlasCluster $cluster_name -ProjectId $project.id   
+                    Watch-AtlasCluster $cluster_name -ProjectId $project.id
                 }
                 catch {}
             }
@@ -493,7 +494,7 @@ function Remove-AzureResourceGroup {
 
             az group delete `
                 --name $Name `
-                --yes 
+                --yes
             Confirm-LastExitCode
         }
     }
@@ -612,7 +613,7 @@ function Update-AzureAppConfig {
             --resource-group $ResourceGroup `
             --setting-names nonexistant`
         | Out-Null
-        Confirm-LastExitCode 
+        Confirm-LastExitCode
     }
 }
 
@@ -631,7 +632,7 @@ function Set-AzureKeyVaultSecret {
 
     Process {
         $user_info = Get-AzureUserInfo
-        
+
         az keyvault set-policy `
             --name $VaultName `
             --object-id $user_info.objectId `
@@ -675,7 +676,7 @@ function Publish-DatabaseUri {
         Write-Output "Publishing database URI."
 
         $db_password = New-RandomPassword -Length 32
-        
+
         New-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $db_username -Password $db_password
         $db_uri_no_cred = Get-AtlasDatabaseUri -Cluster $cluster_name -ProjectId $atlas_project.id
         $db_uri = ConvertTo-DatabaseUriWithCredentials `
