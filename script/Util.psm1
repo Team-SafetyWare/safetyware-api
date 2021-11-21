@@ -234,7 +234,7 @@ function Remove-AtlasCluster {
 
 function New-AtlasDatabaseUser {
     [CmdletBinding()]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Scope='Function')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Scope = 'Function')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $ProjectId,
@@ -345,7 +345,7 @@ function Get-AtlasDatabaseUri {
 
 function ConvertTo-DatabaseUriWithCredentials {
     [CmdletBinding()]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Scope='Function')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Scope = 'Function')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $SrvUri,
@@ -403,6 +403,9 @@ function Publish-Database {
 
         Watch-AtlasCluster $cluster_name -ProjectId $project.id
 
+        $atlas_project = Get-AtlasProject -Name $project_name
+        New-AtlasCidrWhitelist "0.0.0.0/0" -ProjectId $atlas_project.id
+
         return $cluster
     }
 }
@@ -422,7 +425,7 @@ function Remove-Database {
 
         $project = Get-AtlasProject $project_name
 
-        if ($null -ne $project){
+        if ($null -ne $project) {
             $cluster = Get-AtlasCluster $cluster_name -ProjectId $project.id
 
             if ($null -ne $cluster) {
@@ -540,10 +543,7 @@ function Publish-AzureTemplate {
         [Parameter(Mandatory = $true)]
         [string] $ResourceGroup,
         [Parameter(Mandatory = $true)]
-        [string] $EnvHash,
-        # Todo: Remove this as part of SAF-41.
-        [Parameter(Mandatory = $true)]
-        [string] $DbUri
+        [string] $EnvHash
     )
 
     Process {
@@ -555,7 +555,7 @@ function Publish-AzureTemplate {
             --name deploy `
             --resource-group $ResourceGroup `
             --template-file azuredeploy.bicep `
-            --parameters envHash="$EnvHash" dbUri="$DbUri" `
+            --parameters envHash="$EnvHash" `
         | ConvertFrom-JSON
         Confirm-LastExitCode
 
@@ -581,5 +581,120 @@ function Publish-ApiFunc {
 
         Pop-Location
         return $func
+    }
+}
+
+function Get-AzureUserInfo {
+    [CmdletBinding()]
+    Param(
+    )
+
+    Process {
+        $user_info = az ad signed-in-user show `
+        | ConvertFrom-Json
+        Confirm-LastExitCode
+        return $user_info
+    }
+}
+
+function Update-AzureAppConfig {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $AppName,
+        [Parameter(Mandatory = $true)]
+        [string] $ResourceGroup
+    )
+
+    Process {
+        az webapp config appsettings delete `
+            --name $AppName `
+            --resource-group $ResourceGroup `
+            --setting-names nonexistant`
+        | Out-Null
+        Confirm-LastExitCode 
+    }
+}
+
+function Set-AzureKeyVaultSecret {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name,
+        [Parameter(Mandatory = $true)]
+        [string] $Value,
+        [Parameter(Mandatory = $true)]
+        [string] $VaultName,
+        [Parameter(Mandatory = $true)]
+        [string] $ResourceGroup
+    )
+
+    Process {
+        $user_info = Get-AzureUserInfo
+        
+        az keyvault set-policy `
+            --name $VaultName `
+            --object-id $user_info.objectId `
+            --resource-group $ResourceGroup `
+            --secret-permissions set `
+        | Out-Null
+        Confirm-LastExitCode
+
+        az keyvault secret set `
+            --name $Name `
+            --vault-name $VaultName `
+            --value $Value `
+        | Out-Null
+        Confirm-LastExitCode
+    }
+}
+
+function Publish-DatabaseUri {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $ResourceGroup,
+        [Parameter(Mandatory = $true)]
+        [string] $App,
+        [Parameter(Mandatory = $true)]
+        [string] $EnvName,
+        [Parameter(Mandatory = $true)]
+        [string] $EnvHash
+    )
+
+    Process {
+        $project_name = "$App-$EnvName"
+        $cluster_name = "db"
+        $atlas_project = Get-AtlasProject -Name $project_name
+        $db_username = "app-api"
+
+        if ( $null -ne (Get-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $db_username) ) {
+            return;
+        }
+
+        Write-Host "Publishing database URI."
+
+        $db_password = New-RandomPassword -Length 32
+        
+        New-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $db_username -Password $db_password
+        $db_uri_no_cred = Get-AtlasDatabaseUri -Cluster $cluster_name -ProjectId $atlas_project.id
+        $db_uri = ConvertTo-DatabaseUriWithCredentials `
+            -SrvUri $db_uri_no_cred.standardSrv `
+            -Username $db_username `
+            -Password $db_password
+
+        $vault_name = "kv-$EnvHash"
+        Set-AzureKeyVaultSecret `
+            -Name "db-uri" `
+            -Value $db_uri `
+            -VaultName $vault_name `
+            -ResourceGroup $ResourceGroup `
+        | Out-Null
+
+        $func_name = "func-api-$EnvHash"
+        Update-AzureAppConfig `
+            -AppName $func_name `
+            -ResourceGroup $ResourceGroup `
+        | Out-Null
     }
 }
