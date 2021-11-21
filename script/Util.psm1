@@ -1,3 +1,6 @@
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+param()
+
 function Confirm-LastExitCode {
     [CmdletBinding()]
     Param(
