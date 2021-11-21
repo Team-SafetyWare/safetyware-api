@@ -543,8 +543,7 @@ function Publish-AzureTemplate {
         [Parameter(Mandatory = $true)]
         [string] $ResourceGroup,
         [Parameter(Mandatory = $true)]
-        [string] $EnvHash,
-
+        [string] $EnvHash
     )
 
     Process {
