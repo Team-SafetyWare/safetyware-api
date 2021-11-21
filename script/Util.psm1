@@ -1,3 +1,6 @@
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+param()
+
 function Confirm-LastExitCode {
     [CmdletBinding()]
     Param(
@@ -39,7 +42,7 @@ function Build-ApiFunc {
     )
 
     Process {
-        Write-Host "Building API Azure Function."
+        Write-Output "Building API Azure Function."
 
         Build-Api
 
@@ -55,7 +58,7 @@ function Invoke-ApiFunc {
     )
 
     Process {
-        Write-Host "Starting API Azure Function. Press Ctrl + C to stop."
+        Write-Output "Starting API Azure Function. Press Ctrl + C to stop."
 
         Push-Location "$(Get-ProjectLocation)\api\func"
         func start --port 3001
@@ -98,7 +101,7 @@ function New-AtlasProject {
     )
 
     Process {
-        Write-Host "Creating new Atlas project '$Name'."
+        Write-Output "Creating new Atlas project '$Name'."
 
         $project = mongocli iam project create $Name `
             --output json `
@@ -110,6 +113,7 @@ function New-AtlasProject {
 
 function Get-AtlasProject {
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Name')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $Name
@@ -137,7 +141,7 @@ function Remove-AtlasProject {
     )
 
     Process {
-        Write-Host "Removing Atlas project '$ProjectId'."
+        Write-Output "Removing Atlas project '$ProjectId'."
 
         mongocli iam project delete $ProjectId `
             --force
@@ -155,7 +159,7 @@ function New-AtlasCluster {
     )
 
     Process {
-        Write-Host "Creating new Atlas cluster."
+        Write-Output "Creating new Atlas cluster."
 
         $cluster = mongocli atlas cluster create $Name `
             --output json `
@@ -179,7 +183,7 @@ function Watch-AtlasCluster {
     )
 
     Process {
-        Write-Host "Waiting for new Atlas cluster to be ready."
+        Write-Output "Waiting for new Atlas cluster to be ready."
 
         mongocli atlas clusters watch $Name `
             --projectId $ProjectId
@@ -191,6 +195,7 @@ function Watch-AtlasCluster {
 
 function Get-AtlasCluster {
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Name')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $Name,
@@ -223,7 +228,7 @@ function Remove-AtlasCluster {
     )
 
     Process {
-        Write-Host "Removing Atlas database '$Name' in project '$ProjectId'."
+        Write-Output "Removing Atlas database '$Name' in project '$ProjectId'."
 
         mongocli atlas cluster delete $Name `
             --force `
@@ -234,7 +239,8 @@ function Remove-AtlasCluster {
 
 function New-AtlasDatabaseUser {
     [CmdletBinding()]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Scope = 'Function')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingUsernameAndPasswordParams', '')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $ProjectId,
@@ -245,7 +251,7 @@ function New-AtlasDatabaseUser {
     )
 
     Process {
-        Write-Host "Creating new Atlas database user '$Username'."
+        Write-Output "Creating new Atlas database user '$Username'."
 
         $user = mongocli atlas dbuser create `
             --output json `
@@ -261,6 +267,7 @@ function New-AtlasDatabaseUser {
 
 function Get-AtlasDatabaseUser {
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Username')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $ProjectId,
@@ -293,7 +300,7 @@ function Remove-AtlasDatabaseUser {
     )
 
     Process {
-        Write-Host "Removing Atlas database user '$Username'."
+        Write-Output "Removing Atlas database user '$Username'."
 
         mongocli atlas dbuser delete $Username `
             --force `
@@ -312,7 +319,7 @@ function New-AtlasCidrWhitelist {
     )
 
     Process {
-        Write-Host "Whitelisting CIDR block '$CidrBlock'."
+        Write-Output "Whitelisting CIDR block '$CidrBlock'."
 
         $rule = mongocli atlas whitelist create "$CidrBlock" `
             --output json `
@@ -343,9 +350,10 @@ function Get-AtlasDatabaseUri {
     }
 }
 
-function ConvertTo-DatabaseUriWithCredentials {
+function ConvertTo-DatabaseUriWithCredential {
     [CmdletBinding()]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Scope = 'Function')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingUsernameAndPasswordParams', '')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $SrvUri,
@@ -412,6 +420,7 @@ function Publish-Database {
 
 function Remove-Database {
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingEmptyCatchBlock', '')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $App,
@@ -432,7 +441,7 @@ function Remove-Database {
                 Remove-AtlasCluster $cluster_name -ProjectId $project.id
                 try {
                     # The watch will throw an error once the cluster is deleted.
-                    Watch-AtlasCluster $cluster_name -ProjectId $project.id   
+                    Watch-AtlasCluster $cluster_name -ProjectId $project.id
                 }
                 catch {}
             }
@@ -465,7 +474,7 @@ function New-AzureResourceGroup {
     )
 
     Process {
-        Write-Host "Publishing Azure resource group '$Name'."
+        Write-Output "Publishing Azure resource group '$Name'."
 
         $rg = az group create `
             --name $Name `
@@ -489,11 +498,11 @@ function Remove-AzureResourceGroup {
         Confirm-LastExitCode
 
         if ([boolean]::Parse($exists)) {
-            Write-Host "Removing Azure resource group '$Name'."
+            Write-Output "Removing Azure resource group '$Name'."
 
             az group delete `
                 --name $Name `
-                --yes 
+                --yes
             Confirm-LastExitCode
         }
     }
@@ -501,6 +510,7 @@ function Remove-AzureResourceGroup {
 
 function Get-AzureDeletedKeyVault {
     [CmdletBinding()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Name')]
     Param(
         [Parameter(Mandatory = $true)]
         [string] $Name
@@ -528,7 +538,7 @@ function Remove-AzureDeletedKeyVault {
 
     Process {
         if ($null -ne (Get-AzureDeletedKeyVault $Name)) {
-            Write-Host "Purging Azure KeyVault '$Name'."
+            Write-Output "Purging Azure KeyVault '$Name'."
 
             az keyvault purge `
                 --name $Name
@@ -547,7 +557,7 @@ function Publish-AzureTemplate {
     )
 
     Process {
-        Write-Host "Publishing Azure template."
+        Write-Output "Publishing Azure template."
 
         Push-Location "$(Get-ProjectLocation)\infrastructure"
 
@@ -572,7 +582,7 @@ function Publish-ApiFunc {
     )
 
     Process {
-        Write-Host "Publishing API Azure Function."
+        Write-Output "Publishing API Azure Function."
 
         Push-Location "$(Get-ProjectLocation)\api\func"
 
@@ -612,7 +622,7 @@ function Update-AzureAppConfig {
             --resource-group $ResourceGroup `
             --setting-names nonexistant`
         | Out-Null
-        Confirm-LastExitCode 
+        Confirm-LastExitCode
     }
 }
 
@@ -631,7 +641,7 @@ function Set-AzureKeyVaultSecret {
 
     Process {
         $user_info = Get-AzureUserInfo
-        
+
         az keyvault set-policy `
             --name $VaultName `
             --object-id $user_info.objectId `
@@ -672,13 +682,13 @@ function Publish-DatabaseUri {
             return;
         }
 
-        Write-Host "Publishing database URI."
+        Write-Output "Publishing database URI."
 
         $db_password = New-RandomPassword -Length 32
-        
+
         New-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $db_username -Password $db_password
         $db_uri_no_cred = Get-AtlasDatabaseUri -Cluster $cluster_name -ProjectId $atlas_project.id
-        $db_uri = ConvertTo-DatabaseUriWithCredentials `
+        $db_uri = ConvertTo-DatabaseUriWithCredential `
             -SrvUri $db_uri_no_cred.standardSrv `
             -Username $db_username `
             -Password $db_password
