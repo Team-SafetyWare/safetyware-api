@@ -347,7 +347,7 @@ function Get-AtlasDatabaseUri {
     }
 }
 
-function ConvertTo-DatabaseUriWithCredentials {
+function ConvertTo-DatabaseUriWithCredential {
     [CmdletBinding()]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingUsernameAndPasswordParams', '')]
@@ -685,7 +685,7 @@ function Publish-DatabaseUri {
 
         New-AtlasDatabaseUser -ProjectId $atlas_project.id -Username $db_username -Password $db_password
         $db_uri_no_cred = Get-AtlasDatabaseUri -Cluster $cluster_name -ProjectId $atlas_project.id
-        $db_uri = ConvertTo-DatabaseUriWithCredentials `
+        $db_uri = ConvertTo-DatabaseUriWithCredential `
             -SrvUri $db_uri_no_cred.standardSrv `
             -Username $db_username `
             -Password $db_password
