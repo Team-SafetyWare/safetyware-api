@@ -69,14 +69,14 @@ Follow these steps to load or save sample data.
 
 1. Load sample data. Your existing database contents will be dropped.
    ```
-   .\script\LoadSampleData.ps1
+   .\script\LoadSampleData.ps1 sample-data.gz
    ```
 
 ### Save sample data
 
 1. Save database contents as sample data.
    ```
-   .\script\SaveSampleData.ps1
+   .\script\SaveSampleData.ps1 sample-data.gz
    ```
 
 ## Deploy

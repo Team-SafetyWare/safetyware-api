@@ -1,7 +1,7 @@
 param(
-    [Parameter(Mandatory = $False)]
+    [Parameter(Mandatory = $True)]
     [System.String]
-    $File='sample-data.gz'
+    $File
 )
 
 Set-StrictMode -Version 3
