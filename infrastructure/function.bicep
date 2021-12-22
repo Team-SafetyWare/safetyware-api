@@ -64,7 +64,7 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
         }
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~3'
+          value: '~4'
         }
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
