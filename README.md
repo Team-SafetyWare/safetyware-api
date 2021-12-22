@@ -9,7 +9,7 @@ Follow these steps if you need to run the API without making code changes.
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop).
 2. Run the API.
    ```
-   docker-compose up --build
+   docker compose up --build
    ```
 3. Navigate to http://localhost:3001.
 
@@ -44,7 +44,7 @@ Follow this section if you need to make code changes.
 
 1. Start the Docker containers once per sitting.
    ```
-   docker-compose up -d --build mongo
+   docker compose up -d --build mongo
    ```
 2. Set environmental variables.
    ```
@@ -58,7 +58,7 @@ Follow this section if you need to make code changes.
 4. Navigate to http://localhost:3001.
 5. Stop the Docker containers before leaving.
    ```
-   docker-compose down
+   docker compose down
    ```
 
 ## Sample data
