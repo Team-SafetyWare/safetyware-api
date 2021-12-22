@@ -61,6 +61,24 @@ Follow this section if you need to make code changes.
    docker-compose down
    ```
 
+## Sample data
+
+Follow these steps to load or save sample data.
+
+### Load sample data
+
+1. Load sample data. Your existing database contents will be dropped.
+   ```
+   .\script\LoadSampleData.ps1 sample-data.gz
+   ```
+
+### Save sample data
+
+1. Save database contents as sample data.
+   ```
+   .\script\SaveSampleData.ps1 sample-data.gz
+   ```
+
 ## Deploy
 
 Follow this section to deploy the API in the cloud.
