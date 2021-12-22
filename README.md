@@ -67,34 +67,16 @@ Follow these steps to load or save sample data.
 
 ### Load sample data
 
-Loading sample data will replace your database contents.
-
-1. Start the MongoDB container.
+1. Load sample data. Your existing database contents will be dropped.
    ```
-   docker-compose up -d mongo
-   ```
-2. Copy the sample data into the MongoDB container.
-   ```
-   docker compose cp sample-data.gz mongo:sample-data.gz
-   ```
-3. Replace the database contents with the sample data.
-   ```
-   docker compose exec mongo mongorestore --drop --gzip --archive=sample-data.gz
+   .\script\LoadSampleData.ps1
    ```
 
 ### Save sample data
 
-1. Start the MongoDB container.
+1. Save database contents as sample data.
    ```
-   docker-compose up -d mongo
-   ```
-2. Export the database contents as sample data.
-   ```
-   docker compose exec mongo mongodump --db sw --gzip --archive=sample-data.gz
-   ```
-3. Copy the sample data into the repository directory.
-   ```
-   docker compose cp mongo:sample-data.gz sample-data.gz
+   .\script\SaveSampleData.ps1
    ```
 
 ## Deploy
