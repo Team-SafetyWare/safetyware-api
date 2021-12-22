@@ -12,7 +12,7 @@ Import-Module .\Util.psm1 -Force
 
 Push-Location $(Get-ProjectLocation)
 
-Start-Containers mongo
+Start-Container mongo
 
 docker compose cp $File mongo:$File
 Confirm-LastExitCode

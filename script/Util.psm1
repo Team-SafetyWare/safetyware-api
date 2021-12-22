@@ -709,7 +709,7 @@ function Publish-DatabaseUri {
     }
 }
 
-function Start-Containers {
+function Start-Container {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]
