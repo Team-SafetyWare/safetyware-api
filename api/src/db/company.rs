@@ -41,4 +41,13 @@ impl Company {
         coll.replace_one(query, self, options).await?;
         Ok(())
     }
+
+    // Todo: Disallow dead code once used.
+    #[allow(dead_code)]
+    pub async fn delete(&self, db: &Database) -> anyhow::Result<()> {
+        let coll = Self::collection(db);
+        let query = bson::doc! {"_id": self.id};
+        coll.delete_one(query, None).await?;
+        Ok(())
+    }
 }
