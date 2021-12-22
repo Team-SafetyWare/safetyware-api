@@ -15,6 +15,8 @@ impl Company {
         db.collection("company")
     }
 
+    // Todo: Disallow dead code once used.
+    #[allow(dead_code)]
     pub async fn find_one(id: ObjectId, db: &Database) -> anyhow::Result<Option<Company>> {
         let coll = Self::collection(db);
         let filter = bson::doc! {"_id": id};
@@ -22,12 +24,16 @@ impl Company {
         Ok(opt)
     }
 
+    // Todo: Disallow dead code once used.
+    #[allow(dead_code)]
     pub async fn list(db: &Database) -> anyhow::Result<Cursor<Company>> {
         let coll = Self::collection(db);
         let cursor = coll.find(None, None).await?;
         Ok(cursor)
     }
 
+    // Todo: Disallow dead code once used.
+    #[allow(dead_code)]
     pub async fn upsert(&self, db: &Database) -> anyhow::Result<()> {
         let coll = Self::collection(db);
         let query = bson::doc! {"_id": self.id};
