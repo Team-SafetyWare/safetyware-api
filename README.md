@@ -61,6 +61,42 @@ Follow this section if you need to make code changes.
    docker-compose down
    ```
 
+## Sample data
+
+Follow these steps to load or save sample data.
+
+### Load sample data
+
+Loading sample data will replace your database contents.
+
+1. Start the MongoDB container.
+   ```
+   docker-compose up -d mongo
+   ```
+2. Copy the sample data into the MongoDB container.
+   ```
+   docker compose cp sample-data.gz mongo:sample-data.gz
+   ```
+3. Replace the database contents with the sample data.
+   ```
+   docker compose exec mongo mongorestore --drop --gzip --archive=sample-data.gz
+   ```
+
+### Save sample data
+
+1. Start the MongoDB container.
+   ```
+   docker-compose up -d mongo
+   ```
+2. Export the database contents as sample data.
+   ```
+   docker compose exec mongo mongodump --db sw --gzip --archive=sample-data.gz
+   ```
+3. Copy the sample data into the repository directory.
+   ```
+   docker compose cp mongo:sample-data.gz sample-data.gz
+   ```
+
 ## Deploy
 
 Follow this section to deploy the API in the cloud.
