@@ -1,3 +1,4 @@
+mod db;
 mod settings;
 
 use crate::settings::Settings;
