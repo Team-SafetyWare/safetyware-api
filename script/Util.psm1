@@ -708,3 +708,18 @@ function Publish-DatabaseUri {
         | Out-Null
     }
 }
+
+function Start-Containers {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string[]] $Containers
+    )
+
+    Process {
+        Write-Output "Starting containers: $Containers"
+
+        docker compose up -d $Containers
+        Confirm-LastExitCode
+    }
+}
