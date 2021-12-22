@@ -6,11 +6,11 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bson = "2.0"
+bson = "2.1"
 config = "0.11"
 env_logger = "0.9"
 log = "0.4"
-mongodb = "2.0"
+mongodb = "2.1"
 serde = { version = "1.0", features = ["derive"] }
-tokio = { version = "1.13", features = ["full"] }
+tokio = { version = "1.15", features = ["full"] }
 warp = "0.3"
