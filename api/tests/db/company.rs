@@ -1,21 +1,22 @@
 use crate::db;
-use api::db::company::Company;
+use api::db::company::{Company, CompanyRepo, MongoCompanyRepo};
 use uuid::Uuid;
 
 #[tokio::test]
-async fn test_upsert_insert() {
+async fn test_insert_one() {
     let db = db::db().await;
-    let name = Uuid::new_v4().to_string();
+    let repo = MongoCompanyRepo::new(db);
     let company = Company {
         id: Default::default(),
-        name,
+        name: Uuid::new_v4().to_string(),
     };
 
-    company.upsert(&db).await.unwrap();
+    repo.insert_one(&company).await.unwrap();
 
-    let found = Company::find_one(company.id, &db).await.unwrap();
+    let found = repo.find_one(company.id).await.unwrap();
     assert!(found.is_some());
     let found = found.unwrap();
+    assert_eq!(found.id, company.id);
     assert_eq!(found.name, company.name);
-    found.delete(&db).await.unwrap();
+    repo.delete_one(found.id).await.unwrap();
 }

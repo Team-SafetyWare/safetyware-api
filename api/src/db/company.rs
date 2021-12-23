@@ -1,6 +1,6 @@
 use bson::oid::ObjectId;
-use mongodb::options::ReplaceOptions;
-use mongodb::{Collection, Cursor, Database};
+use futures_util::stream::TryStreamExt;
+use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -10,36 +10,62 @@ pub struct Company {
     pub name: String,
 }
 
-impl Company {
-    pub fn collection(db: &Database) -> Collection<Company> {
-        db.collection("company")
+#[async_trait::async_trait]
+pub trait CompanyRepo {
+    async fn insert_one(&self, company: &Company) -> anyhow::Result<()>;
+    async fn replace_one(&self, company: &Company) -> anyhow::Result<()>;
+    async fn find_one(&self, id: ObjectId) -> anyhow::Result<Option<Company>>;
+    // Todo: Return a stream rather than a vector.
+    async fn find(&self) -> anyhow::Result<Vec<Company>>;
+    async fn delete_one(&self, id: ObjectId) -> anyhow::Result<()>;
+}
+
+pub struct MongoCompanyRepo {
+    pub db: Database,
+}
+
+impl MongoCompanyRepo {
+    pub fn new(db: Database) -> Self {
+        Self { db }
     }
 
-    pub async fn find_one(id: ObjectId, db: &Database) -> anyhow::Result<Option<Company>> {
-        let coll = Self::collection(db);
-        let filter = bson::doc! {"_id": id};
-        let opt = coll.find_one(filter, None).await?;
-        Ok(opt)
+    pub fn collection(&self) -> Collection<Company> {
+        self.db.collection("company")
     }
+}
 
-    pub async fn list(db: &Database) -> anyhow::Result<Cursor<Company>> {
-        let coll = Self::collection(db);
-        let cursor = coll.find(None, None).await?;
-        Ok(cursor)
-    }
-
-    pub async fn upsert(&self, db: &Database) -> anyhow::Result<()> {
-        let coll = Self::collection(db);
-        let query = bson::doc! {"_id": self.id};
-        let options = ReplaceOptions::builder().upsert(true).build();
-        coll.replace_one(query, self, options).await?;
+#[async_trait::async_trait]
+impl CompanyRepo for MongoCompanyRepo {
+    async fn insert_one(&self, company: &Company) -> anyhow::Result<()> {
+        self.collection().insert_one(company, None).await?;
         Ok(())
     }
 
-    pub async fn delete(&self, db: &Database) -> anyhow::Result<()> {
-        let coll = Self::collection(db);
-        let query = bson::doc! {"_id": self.id};
-        coll.delete_one(query, None).await?;
+    async fn replace_one(&self, company: &Company) -> anyhow::Result<()> {
+        self.collection()
+            .replace_one(bson::doc! {"_id": company.id}, company, None)
+            .await?;
+        Ok(())
+    }
+
+    async fn find_one(&self, id: ObjectId) -> anyhow::Result<Option<Company>> {
+        let found = self
+            .collection()
+            .find_one(bson::doc! {"_id": id}, None)
+            .await?;
+        Ok(found)
+    }
+
+    async fn find(&self) -> anyhow::Result<Vec<Company>> {
+        let cursor = self.collection().find(None, None).await?;
+        let all = cursor.try_collect().await?;
+        Ok(all)
+    }
+
+    async fn delete_one(&self, id: ObjectId) -> anyhow::Result<()> {
+        self.collection()
+            .delete_one(bson::doc! {"_id": id}, None)
+            .await?;
         Ok(())
     }
 }

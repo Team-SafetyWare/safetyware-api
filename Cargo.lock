@@ -33,9 +33,11 @@ name = "api"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bson",
  "config",
  "env_logger",
+ "futures-util",
  "lazy_static",
  "log",
  "mongodb",
