@@ -1,3 +1,4 @@
+use crate::repo::ItemStream;
 use bson::oid::ObjectId;
 use futures_util::stream::TryStreamExt;
 use mongodb::{Collection, Database};
@@ -15,8 +16,7 @@ pub trait CompanyRepo {
     async fn insert_one(&self, company: &Company) -> anyhow::Result<()>;
     async fn replace_one(&self, company: &Company) -> anyhow::Result<()>;
     async fn find_one(&self, id: ObjectId) -> anyhow::Result<Option<Company>>;
-    // Todo: Return a stream rather than a vector.
-    async fn find(&self) -> anyhow::Result<Vec<Company>>;
+    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Company>>>;
     async fn delete_one(&self, id: ObjectId) -> anyhow::Result<()>;
 }
 
@@ -56,10 +56,10 @@ impl CompanyRepo for MongoCompanyRepo {
         Ok(found)
     }
 
-    async fn find(&self) -> anyhow::Result<Vec<Company>> {
+    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Company>>> {
         let cursor = self.collection().find(None, None).await?;
-        let all = cursor.try_collect().await?;
-        Ok(all)
+        let stream = cursor.map_err(|e| e.into());
+        Ok(Box::new(stream))
     }
 
     async fn delete_one(&self, id: ObjectId) -> anyhow::Result<()> {
