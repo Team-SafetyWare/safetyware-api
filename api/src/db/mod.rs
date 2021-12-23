@@ -1,1 +1,1 @@
-mod company;
+pub mod company;

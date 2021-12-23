@@ -1,5 +1,5 @@
-mod db;
-mod settings;
+pub mod db;
+pub mod settings;
 
 use crate::settings::Settings;
 use mongodb::options::{FindOneAndUpdateOptions, ReturnDocument};

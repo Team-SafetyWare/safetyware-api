@@ -36,10 +36,12 @@ dependencies = [
  "bson",
  "config",
  "env_logger",
+ "lazy_static",
  "log",
  "mongodb",
  "serde 1.0.132",
  "tokio",
+ "uuid",
  "warp",
 ]
 
