@@ -1,11 +1,11 @@
 use crate::repo;
 use api::repo::company::{Company, CompanyRepo, MongoCompanyRepo};
+use api::repo::Repo;
 use uuid::Uuid;
 
 #[tokio::test]
 async fn test_insert_one() {
-    let db = repo::db().await;
-    let repo = MongoCompanyRepo::new(db);
+    let repo = repo().await;
     let company = Company {
         id: Default::default(),
         name: Uuid::new_v4().to_string(),
@@ -19,4 +19,10 @@ async fn test_insert_one() {
     assert_eq!(found.id, company.id);
     assert_eq!(found.name, company.name);
     repo.delete_one(found.id).await.unwrap();
+}
+
+async fn repo() -> impl CompanyRepo {
+    let db = repo::db().await;
+    let repo = MongoCompanyRepo::new(db);
+    repo
 }
