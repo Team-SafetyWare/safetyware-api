@@ -33,13 +33,16 @@ name = "api"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "bson",
  "config",
  "env_logger",
+ "futures-util",
  "log",
  "mongodb",
  "serde 1.0.132",
  "tokio",
+ "uuid",
  "warp",
 ]
 
