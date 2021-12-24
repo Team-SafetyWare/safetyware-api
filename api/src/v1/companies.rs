@@ -53,7 +53,7 @@ fn get<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
         .and(warp_ext::with_clone(repo))
         .and_then(move |id: String, repo: R| async move {
             let oid = id.parse().unwrap();
-            let found = repo.find_one(oid).await.unwrap();
+            let found = repo.find_one(oid).await.unwrap().map(Company::from);
             if let Some(company) = found {
                 let reply = company.as_json_reply();
                 Box::new(reply) as Box<dyn warp::Reply>
