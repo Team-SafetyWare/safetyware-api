@@ -83,7 +83,7 @@ async fn test_find() {
             })
             .collect();
         for company in &companies {
-            repo.insert_one(&company).await.unwrap();
+            repo.insert_one(company).await.unwrap();
         }
 
         // Act.
