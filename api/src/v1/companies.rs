@@ -112,11 +112,13 @@ fn update<R: CompanyRepo>(_: R) -> BoxedFilter<(impl Reply,)> {
         .boxed()
 }
 
-fn delete<R: CompanyRepo>(_: R) -> BoxedFilter<(impl Reply,)> {
+fn delete<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
     warp::delete()
-        .and_then(move || async move {
-            todo!();
-            #[allow(unreachable_code)]
+        .and(warp::path::param())
+        .and(warp_ext::with_clone(repo))
+        .and_then(move |id: String, repo: R| async move {
+            let oid = id.parse().unwrap();
+            repo.delete_one(oid).await.unwrap();
             warp::reply().into_infallible()
         })
         .boxed()
