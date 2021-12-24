@@ -12,7 +12,7 @@ pub struct Company {
 }
 
 #[async_trait::async_trait]
-pub trait CompanyRepo: Clone + Send + Sync + 'static {
+pub trait CompanyRepo {
     async fn insert_one(&self, company: &Company) -> anyhow::Result<()>;
     async fn replace_one(&self, company: &Company) -> anyhow::Result<()>;
     async fn find_one(&self, id: ObjectId) -> anyhow::Result<Option<Company>>;

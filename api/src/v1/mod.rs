@@ -1,18 +1,26 @@
 use crate::db;
 use crate::repo::company::CompanyRepo;
+use crate::v1::companies::CompanyApi;
 use crate::warp_ext;
 use crate::warp_ext::IntoInfallible;
 use mongodb::Database;
+use std::sync::Arc;
 use warp::filters::BoxedFilter;
 use warp::http::StatusCode;
 use warp::{Filter, Rejection, Reply};
 
 mod companies;
 
-pub fn filter(db: Database, company_repo: impl CompanyRepo) -> BoxedFilter<(impl Reply,)> {
-    warp::path("v1")
-        .and(health(db).or(companies::filter(company_repo)))
-        .boxed()
+pub fn all(
+    db: Database,
+    company_repo: impl CompanyRepo + Send + Sync + 'static,
+) -> BoxedFilter<(impl Reply,)> {
+    let company = CompanyApi {
+        repo: Arc::new(company_repo),
+    }
+    .all();
+
+    warp::path("v1").and(health(db).or(company)).boxed()
 }
 
 fn health(db: Database) -> BoxedFilter<(impl Reply,)> {
