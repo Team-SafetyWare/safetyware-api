@@ -6,6 +6,7 @@ use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use warp::filters::BoxedFilter;
+use warp::http::StatusCode;
 use warp::{Filter, Reply};
 
 pub const PREFIX: &str = "companies";
@@ -37,7 +38,27 @@ impl TryFrom<Company> for RepoCompany {
 }
 
 pub fn filter(repo: impl CompanyRepo) -> BoxedFilter<(impl Reply,)> {
-    warp::path(PREFIX).and(list(repo.clone())).boxed()
+    let filters = get(repo.clone()).or(list(repo.clone()));
+    warp::path(PREFIX).and(filters).boxed()
+}
+
+fn get<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
+    warp::get()
+        .and(warp::path::param())
+        .and(warp_ext::with_clone(repo))
+        .and_then(move |id: String, repo: R| async move {
+            let oid = id.parse().unwrap();
+            let found = repo.find_one(oid).await.unwrap();
+            if let Some(company) = found {
+                let reply = company.as_json_reply();
+                Box::new(reply) as Box<dyn warp::Reply>
+            } else {
+                let reply = warp::reply::with_status(warp::reply(), StatusCode::NOT_FOUND);
+                Box::new(reply) as Box<dyn warp::Reply>
+            }
+            .into_infallible()
+        })
+        .boxed()
 }
 
 fn list<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
