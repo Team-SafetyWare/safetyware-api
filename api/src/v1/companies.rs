@@ -124,11 +124,21 @@ fn delete<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
         .boxed()
 }
 
-fn replace<R: CompanyRepo>(_: R) -> BoxedFilter<(impl Reply,)> {
+fn replace<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
+    #[derive(Debug, Deserialize, Serialize)]
+    struct Req {
+        name: String,
+    }
     warp::put()
-        .and_then(move || async move {
-            todo!();
-            #[allow(unreachable_code)]
+        .and(warp::path::param())
+        .and(warp::body::json())
+        .and(warp_ext::with_clone(repo))
+        .and_then(move |id: String, req: Req, repo: R| async move {
+            let company = RepoCompany {
+                id: id.parse().unwrap(),
+                name: req.name,
+            };
+            repo.replace_one(&company).await.unwrap();
             warp::reply().into_infallible()
         })
         .boxed()
