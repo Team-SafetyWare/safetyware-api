@@ -8,7 +8,7 @@ use warp::{Filter, Reply};
 
 mod companies;
 
-pub fn filter<CR: CompanyRepo>(db: Database, company_repo: CR) -> BoxedFilter<(impl Reply,)> {
+pub fn filter(db: Database, company_repo: impl CompanyRepo) -> BoxedFilter<(impl Reply,)> {
     warp::path("v1")
         .and(health(db).or(companies::filter(company_repo)))
         .boxed()

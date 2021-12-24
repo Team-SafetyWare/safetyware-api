@@ -36,7 +36,7 @@ impl TryFrom<Company> for RepoCompany {
     }
 }
 
-pub fn filter<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
+pub fn filter(repo: impl CompanyRepo) -> BoxedFilter<(impl Reply,)> {
     warp::path(PREFIX).and(list(repo.clone())).boxed()
 }
 

@@ -35,7 +35,7 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn filter<CR: CompanyRepo>(db: Database, company_repo: CR) -> BoxedFilter<(impl Reply,)> {
+fn filter(db: Database, company_repo: impl CompanyRepo) -> BoxedFilter<(impl Reply,)> {
     let v1 = v1::filter(db, company_repo);
     let robots = robots();
     v1.or(robots).boxed()
