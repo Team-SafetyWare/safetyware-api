@@ -18,7 +18,6 @@ fn health(db: Database) -> BoxedFilter<(impl Reply,)> {
     warp::path("health")
         .and(warp_ext::with_clone(db))
         .and_then(move |db: Database| async move {
-            // Todo: Do not unwrap.
             db::test_connection(&db).await.unwrap();
             warp::reply().into_infallible()
         })

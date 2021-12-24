@@ -15,7 +15,6 @@ fn list<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
     warp::get()
         .and(warp_ext::with_clone(repo))
         .and_then(move |repo: R| async move {
-            // Todo: Do not unwrap.
             let companies: Vec<_> = repo.find().await.unwrap().try_collect().await.unwrap();
             companies.as_json_reply().into_infallible()
         })
