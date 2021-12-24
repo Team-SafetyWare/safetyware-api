@@ -38,7 +38,12 @@ impl TryFrom<Company> for RepoCompany {
 }
 
 pub fn filter(repo: impl CompanyRepo) -> BoxedFilter<(impl Reply,)> {
-    let filters = get(repo.clone()).or(list(repo.clone()));
+    let filters = get(repo.clone())
+        .or(list(repo.clone()))
+        .or(create(repo.clone()))
+        .or(update(repo.clone()))
+        .or(delete(repo.clone()))
+        .or(replace(repo.clone()));
     warp::path(PREFIX).and(filters).boxed()
 }
 
@@ -74,6 +79,55 @@ fn list<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
                 .await
                 .unwrap();
             companies.as_json_reply().into_infallible()
+        })
+        .boxed()
+}
+
+fn create<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
+    #[derive(Debug, Deserialize, Serialize)]
+    struct Req {
+        name: String,
+    }
+    warp::post()
+        .and(warp::body::json())
+        .and(warp_ext::with_clone(repo))
+        .and_then(move |req: Req, repo: R| async move {
+            let company = RepoCompany {
+                id: Default::default(),
+                name: req.name,
+            };
+            repo.insert_one(&company).await.unwrap();
+            warp::reply().into_infallible()
+        })
+        .boxed()
+}
+
+fn update<R: CompanyRepo>(_: R) -> BoxedFilter<(impl Reply,)> {
+    warp::patch()
+        .and_then(move || async move {
+            todo!();
+            #[allow(unreachable_code)]
+            warp::reply().into_infallible()
+        })
+        .boxed()
+}
+
+fn delete<R: CompanyRepo>(_: R) -> BoxedFilter<(impl Reply,)> {
+    warp::delete()
+        .and_then(move || async move {
+            todo!();
+            #[allow(unreachable_code)]
+            warp::reply().into_infallible()
+        })
+        .boxed()
+}
+
+fn replace<R: CompanyRepo>(_: R) -> BoxedFilter<(impl Reply,)> {
+    warp::put()
+        .and_then(move || async move {
+            todo!();
+            #[allow(unreachable_code)]
+            warp::reply().into_infallible()
         })
         .boxed()
 }
