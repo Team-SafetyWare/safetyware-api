@@ -1,6 +1,5 @@
 use crate::repo;
 use api::repo::company::{Company, CompanyRepo, MongoCompanyRepo};
-use api::repo::Repo;
 use uuid::Uuid;
 
 #[tokio::test]
