@@ -56,10 +56,10 @@ fn get<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
             let found = repo.find_one(oid).await.unwrap().map(Company::from);
             if let Some(company) = found {
                 let reply = company.as_json_reply();
-                Box::new(reply) as Box<dyn warp::Reply>
+                Box::new(reply) as Box<dyn Reply>
             } else {
                 let reply = warp::reply::with_status(warp::reply(), StatusCode::NOT_FOUND);
-                Box::new(reply) as Box<dyn warp::Reply>
+                Box::new(reply) as Box<dyn Reply>
             }
             .into_infallible()
         })
