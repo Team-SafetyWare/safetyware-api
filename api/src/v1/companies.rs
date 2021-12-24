@@ -102,7 +102,7 @@ impl ResourceApi for CompanyApi {
                     name: req.name,
                 };
                 s.repo.insert_one(&company).await.unwrap();
-                let reply = Box::new(warp::reply()) as Box<dyn Reply>;
+                let reply = Box::new(Company::from(company).as_json_reply()) as Box<dyn Reply>;
                 reply.into_infallible()
             })
             .boxed()
@@ -138,7 +138,7 @@ impl ResourceApi for CompanyApi {
                     name: req.name,
                 };
                 s.repo.replace_one(&company).await.unwrap();
-                let reply = Box::new(warp::reply()) as Box<dyn Reply>;
+                let reply = Box::new(Company::from(company).as_json_reply()) as Box<dyn Reply>;
                 reply.into_infallible()
             })
             .boxed()
