@@ -25,5 +25,4 @@ tokio = { version = "1.15", features = ["full"] }
 warp = "0.3"
 
 [dev-dependencies]
-lazy_static = "1.4"
 uuid = { version = "0.8", features = ["serde", "v4"] }
