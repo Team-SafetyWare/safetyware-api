@@ -1,22 +1,28 @@
 use mongodb::{Client, Database};
-use std::sync::Mutex;
+use tokio::sync::Mutex;
+use uuid::Uuid;
 
 mod company;
 
 lazy_static::lazy_static! {
-    static ref DB: Mutex<Option<Database>> = Mutex::new(None);
+    static ref DB_CLIENT: Mutex<Option<Client>> = Mutex::new(None);
 }
 
-pub async fn db() -> Database {
-    let mut db_static = DB.lock().unwrap();
-    if let Some(db) = &*db_static {
-        db.clone()
+pub async fn new_db() -> anyhow::Result<Database> {
+    let client = db_client().await?;
+    let name = format!("test-{}", Uuid::new_v4());
+    let db = client.database(&name);
+    Ok(db)
+}
+
+pub async fn db_client() -> anyhow::Result<Client> {
+    let mut client_shared = DB_CLIENT.lock().await;
+    let client = if let Some(client) = &*client_shared {
+        client.clone()
     } else {
-        let db = Client::with_uri_str("mongodb://localhost:42781")
-            .await
-            .unwrap()
-            .database("sw");
-        *db_static = Some(db.clone());
-        db
-    }
+        let client = Client::with_uri_str("mongodb://localhost:42781").await?;
+        *client_shared = Some(client.clone());
+        client
+    };
+    Ok(client)
 }

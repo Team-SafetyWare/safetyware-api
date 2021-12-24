@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 #[tokio::test]
 async fn test_insert_one() {
-    let repo = repo().await;
+    let repo = repo().await.unwrap();
     let company = Company {
         id: Default::default(),
         name: Uuid::new_v4().to_string(),
@@ -17,11 +17,10 @@ async fn test_insert_one() {
     let found = found.unwrap();
     assert_eq!(found.id, company.id);
     assert_eq!(found.name, company.name);
-    repo.delete_one(found.id).await.unwrap();
 }
 
-async fn repo() -> impl CompanyRepo {
-    let db = repo::db().await;
+async fn repo() -> anyhow::Result<impl CompanyRepo> {
+    let db = repo::new_db().await?;
     let repo = MongoCompanyRepo::new(db);
-    repo
+    Ok(repo)
 }
