@@ -13,9 +13,8 @@ async fn test_insert_one() {
 
         repo.insert_one(&company).await.unwrap();
 
-        let found = repo.find_one(company.id).await.unwrap();
-        assert!(found.is_some());
-        let found = found.unwrap();
+        let opt = repo.find_one(company.id).await.unwrap();
+        let found = opt.expect("not found");
         assert_eq!(found.id, company.id);
         assert_eq!(found.name, company.name);
     })
