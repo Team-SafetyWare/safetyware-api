@@ -1,5 +1,6 @@
 use crate::repo::company::Company as RepoCompany;
 use crate::repo::company::CompanyRepo;
+use crate::repo::DeleteResult;
 use crate::v1::ResourceApi;
 use crate::warp_ext;
 use crate::warp_ext::{AsJsonReply, IntoInfallible};
@@ -59,7 +60,7 @@ impl ResourceApi for CompanyApi {
                     let reply = company.as_json_reply();
                     Box::new(reply) as Box<dyn Reply>
                 } else {
-                    let reply = warp::reply::with_status(warp::reply(), StatusCode::NOT_FOUND);
+                    let reply = StatusCode::NOT_FOUND;
                     Box::new(reply) as Box<dyn Reply>
                 }
                 .into_infallible()
@@ -115,8 +116,11 @@ impl ResourceApi for CompanyApi {
             .and(warp_ext::with_clone(self.clone()))
             .and_then(move |id: String, s: Self| async move {
                 let oid = id.parse().unwrap();
-                s.repo.delete_one(oid).await.unwrap();
-                let reply = Box::new(warp::reply()) as Box<dyn Reply>;
+                let res = s.repo.delete_one(oid).await.unwrap();
+                let reply = match res {
+                    DeleteResult::Deleted => Box::new(warp::reply()) as Box<dyn Reply>,
+                    DeleteResult::NotFound => Box::new(StatusCode::NOT_FOUND) as Box<dyn Reply>,
+                };
                 reply.into_infallible()
             })
             .boxed()

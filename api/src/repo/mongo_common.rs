@@ -1,4 +1,4 @@
-use crate::repo::ItemStream;
+use crate::repo::{DeleteResult, ItemStream};
 use bson::Bson;
 use futures_util::TryStreamExt;
 use mongodb::Collection;
@@ -52,11 +52,14 @@ where
     Ok(Box::new(stream))
 }
 
-pub async fn delete_one<T, K>(id: K, collection: Collection<T>) -> anyhow::Result<()>
+pub async fn delete_one<T, K>(id: K, collection: Collection<T>) -> anyhow::Result<DeleteResult>
 where
     T: Item,
     Bson: From<K>,
 {
-    collection.delete_one(bson::doc! {"_id": id}, None).await?;
-    Ok(())
+    let res = collection.delete_one(bson::doc! {"_id": id}, None).await?;
+    match res.deleted_count {
+        0 => Ok(DeleteResult::NotFound),
+        _ => Ok(DeleteResult::Deleted),
+    }
 }

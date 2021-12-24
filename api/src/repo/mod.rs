@@ -11,3 +11,8 @@ where
     I: Unpin + Send,
 {
 }
+
+pub enum DeleteResult {
+    Deleted,
+    NotFound,
+}

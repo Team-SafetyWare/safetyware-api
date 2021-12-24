@@ -1,5 +1,5 @@
-use crate::repo::mongo_common as mc;
 use crate::repo::ItemStream;
+use crate::repo::{mongo_common as mc, DeleteResult};
 use bson::oid::ObjectId;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
@@ -17,7 +17,7 @@ pub trait CompanyRepo {
     async fn replace_one(&self, company: &Company) -> anyhow::Result<()>;
     async fn find_one(&self, id: ObjectId) -> anyhow::Result<Option<Company>>;
     async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Company>>>;
-    async fn delete_one(&self, id: ObjectId) -> anyhow::Result<()>;
+    async fn delete_one(&self, id: ObjectId) -> anyhow::Result<DeleteResult>;
 }
 
 #[derive(Debug, Clone)]
@@ -53,7 +53,7 @@ impl CompanyRepo for MongoCompanyRepo {
         mc::find(self.collection()).await
     }
 
-    async fn delete_one(&self, id: ObjectId) -> anyhow::Result<()> {
+    async fn delete_one(&self, id: ObjectId) -> anyhow::Result<DeleteResult> {
         mc::delete_one(id, self.collection()).await
     }
 }
