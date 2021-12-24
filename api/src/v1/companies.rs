@@ -104,11 +104,7 @@ fn create<R: CompanyRepo>(repo: R) -> BoxedFilter<(impl Reply,)> {
 
 fn update<R: CompanyRepo>(_: R) -> BoxedFilter<(impl Reply,)> {
     warp::patch()
-        .and_then(move || async move {
-            todo!();
-            #[allow(unreachable_code)]
-            warp::reply().into_infallible()
-        })
+        .map(|| warp::reply::with_status(warp::reply(), StatusCode::FORBIDDEN))
         .boxed()
 }
 
