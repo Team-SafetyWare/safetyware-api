@@ -1,6 +1,5 @@
 use crate::repo::ItemStream;
 use bson::Bson;
-use futures_util::TryFutureExt;
 use futures_util::TryStreamExt;
 use mongodb::Collection;
 use serde::de::DeserializeOwned;
