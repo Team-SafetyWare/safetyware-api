@@ -1,5 +1,5 @@
 use crate::repo;
-use api::repo::company::{Company, CompanyRepo, MongoCompanyRepo};
+use api::repo::company::{Company, MongoCompanyRepo};
 use api::repo::op::{DeleteOne, Find, FindOne, InsertOne, ReplaceOne};
 use futures_util::TryStreamExt;
 use std::future::Future;

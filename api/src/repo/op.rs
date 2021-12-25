@@ -1,4 +1,3 @@
-use crate::repo::company::Company;
 use crate::repo::{DeleteResult, ItemStream};
 
 pub trait HasId {
