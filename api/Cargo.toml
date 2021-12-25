@@ -3,14 +3,6 @@ name = "api"
 version = "0.1.0"
 edition = "2018"
 
-[lib]
-name = "api"
-path = "src/lib.rs"
-
-[[bin]]
-name = "api"
-path = "src/main.rs"
-
 [dependencies]
 anyhow = "1.0"
 async-trait = "0.1"
@@ -22,7 +14,7 @@ log = "0.4"
 mongodb = "2.1"
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.15", features = ["full"] }
+uuid = { version = "0.8", features = ["serde", "v4"] }
 warp = "0.3"
 
 [dev-dependencies]
-uuid = { version = "0.8", features = ["serde", "v4"] }

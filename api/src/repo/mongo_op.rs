@@ -1,4 +1,5 @@
-use crate::repo::ItemStream;
+use crate::common::{GetId, HasId};
+use crate::repo::{DeleteResult, ItemStream};
 use bson::Bson;
 use futures_util::TryStreamExt;
 use mongodb::Collection;
@@ -17,26 +18,21 @@ where
     Ok(())
 }
 
-pub async fn replace_one<T, K, F>(
-    item: &T,
-    collection: Collection<T>,
-    get_id: F,
-) -> anyhow::Result<()>
+pub async fn replace_one<T>(item: &T, collection: Collection<T>) -> anyhow::Result<()>
 where
-    T: Item,
-    Bson: From<K>,
-    F: Fn(&T) -> K,
+    T: Item + GetId,
+    Bson: From<T::Id>,
 {
-    let id = get_id(item);
+    let id = item.id();
     let query = bson::doc! {"_id": id};
     collection.replace_one(query, item, None).await?;
     Ok(())
 }
 
-pub async fn find_one<T, K>(id: K, collection: Collection<T>) -> anyhow::Result<Option<T>>
+pub async fn find_one<T>(id: T::Id, collection: Collection<T>) -> anyhow::Result<Option<T>>
 where
-    T: Item,
-    Bson: From<K>,
+    T: Item + HasId,
+    Bson: From<T::Id>,
 {
     let filter = bson::doc! {"_id": id};
     let found = collection.find_one(filter, None).await?;
@@ -52,11 +48,14 @@ where
     Ok(Box::new(stream))
 }
 
-pub async fn delete_one<T, K>(id: K, collection: Collection<T>) -> anyhow::Result<()>
+pub async fn delete_one<T>(id: T::Id, collection: Collection<T>) -> anyhow::Result<DeleteResult>
 where
-    T: Item,
-    Bson: From<K>,
+    T: Item + HasId,
+    Bson: From<T::Id>,
 {
-    collection.delete_one(bson::doc! {"_id": id}, None).await?;
-    Ok(())
+    let res = collection.delete_one(bson::doc! {"_id": id}, None).await?;
+    match res.deleted_count {
+        0 => Ok(DeleteResult::NotFound),
+        _ => Ok(DeleteResult::Deleted),
+    }
 }

@@ -1,13 +1,19 @@
 use futures_util::Stream;
 
 pub mod company;
-mod mongo_common;
+mod mongo_op;
+pub mod op;
 
-pub trait ItemStream<T: Unpin>: Stream<Item = anyhow::Result<T>> + Unpin {}
+pub trait ItemStream<T: Unpin + Send>: Stream<Item = anyhow::Result<T>> + Unpin + Send {}
 
 impl<T, I> ItemStream<I> for T
 where
-    T: Stream<Item = anyhow::Result<I>> + Unpin,
-    I: Unpin,
+    T: Stream<Item = anyhow::Result<I>> + Unpin + Send,
+    I: Unpin + Send,
 {
+}
+
+pub enum DeleteResult {
+    Deleted,
+    NotFound,
 }
