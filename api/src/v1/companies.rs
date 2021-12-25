@@ -1,8 +1,7 @@
 use crate::repo::company::Company as RepoCompany;
 use crate::repo::company::CompanyRepo;
 use crate::repo::DeleteResult;
-use crate::v1::ResourceApi;
-use crate::warp_ext;
+use crate::v1::{ResourceApi, ResourceOperation};
 use crate::warp_ext::{AsJsonReply, BoxReplyInfallible};
 use anyhow::Context;
 use bson::oid::ObjectId;
@@ -52,11 +51,9 @@ impl ResourceApi for CompanyApi {
     }
 
     fn get(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        warp::path(self.collection_name())
-            .and(warp::get())
+        self.resource_operation(warp::get())
             .and(warp::path::param())
-            .and(warp_ext::with_clone(self.clone()))
-            .and_then(move |id: String, s: Self| async move {
+            .and_then(move |s: Self, id: String| async move {
                 let oid = id.parse().unwrap();
                 let company = s.repo.find_one(oid).await.unwrap().map(Company::from);
                 match company {
@@ -68,9 +65,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn list(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        warp::path(self.collection_name())
-            .and(warp::get())
-            .and(warp_ext::with_clone(self.clone()))
+        self.resource_operation(warp::get())
             .and_then(move |s: Self| async move {
                 let companies: Vec<Company> = s
                     .repo
@@ -87,11 +82,9 @@ impl ResourceApi for CompanyApi {
     }
 
     fn create(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        warp::path(self.collection_name())
-            .and(warp::post())
+        self.resource_operation(warp::post())
             .and(warp::body::json())
-            .and(warp_ext::with_clone(self.clone()))
-            .and_then(move |mut company: Company, s: Self| async move {
+            .and_then(move |s: Self, mut company: Company| async move {
                 company.id = Some(ObjectId::new().to_string());
                 s.repo
                     .insert_one(&company.clone().try_into().unwrap())
@@ -103,11 +96,9 @@ impl ResourceApi for CompanyApi {
     }
 
     fn delete(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        warp::path(self.collection_name())
-            .and(warp::delete())
+        self.resource_operation(warp::delete())
             .and(warp::path::param())
-            .and(warp_ext::with_clone(self.clone()))
-            .and_then(move |id: String, s: Self| async move {
+            .and_then(move |s: Self, id: String| async move {
                 let oid = id.parse().unwrap();
                 let res = s.repo.delete_one(oid).await.unwrap();
                 match res {
@@ -119,13 +110,11 @@ impl ResourceApi for CompanyApi {
     }
 
     fn replace(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        warp::path(self.collection_name())
-            .and(warp::put())
+        self.resource_operation(warp::put())
             .and(warp::path::param())
             .and(warp::body::json())
-            .and(warp_ext::with_clone(self.clone()))
             .and_then(
-                move |id: String, mut company: Company, s: Self| async move {
+                move |s: Self, id: String, mut company: Company| async move {
                     company.id = Some(id.parse().unwrap());
                     s.repo
                         .replace_one(&company.clone().try_into().unwrap())

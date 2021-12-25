@@ -84,3 +84,24 @@ fn forbidden_filter(
         .and(method.map(|| Box::new(StatusCode::FORBIDDEN) as Box<dyn Reply>))
         .boxed()
 }
+
+pub trait ResourceOperation {
+    fn resource_operation(
+        &self,
+        method: impl Filter<Extract = (), Error = Rejection> + Copy + Send + Sync + 'static,
+    ) -> BoxedFilter<(Self,)>
+    where
+        Self: Sized;
+}
+
+impl<T: ResourceApi + Clone + Send + Sync + 'static> ResourceOperation for T {
+    fn resource_operation(
+        &self,
+        method: impl Filter<Extract = (), Error = Rejection> + Copy + Send + Sync + 'static,
+    ) -> BoxedFilter<(Self,)> {
+        warp::path(self.collection_name())
+            .and(method)
+            .and(warp_ext::with_clone(self.clone()))
+            .boxed()
+    }
+}
