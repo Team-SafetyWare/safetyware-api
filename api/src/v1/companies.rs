@@ -3,7 +3,7 @@ use crate::repo::company::CompanyRepo;
 use crate::repo::DeleteResult;
 use crate::v1::ResourceApi;
 use crate::warp_ext;
-use crate::warp_ext::{AsJsonReply, IntoInfallible};
+use crate::warp_ext::{AsJsonReply, BoxReply, IntoInfallible};
 use anyhow::Context;
 use bson::oid::ObjectId;
 use futures_util::TryStreamExt;
@@ -58,13 +58,10 @@ impl ResourceApi for CompanyApi {
             .and(warp_ext::with_clone(self.clone()))
             .and_then(move |id: String, s: Self| async move {
                 let oid = id.parse().unwrap();
-                let found = s.repo.find_one(oid).await.unwrap().map(Company::from);
-                if let Some(company) = found {
-                    let reply = company.as_json_reply();
-                    Box::new(reply) as Box<dyn Reply>
-                } else {
-                    let reply = StatusCode::NOT_FOUND;
-                    Box::new(reply) as Box<dyn Reply>
+                let company = s.repo.find_one(oid).await.unwrap().map(Company::from);
+                match company {
+                    None => StatusCode::NOT_FOUND.boxed(),
+                    Some(company) => company.as_json_reply().boxed(),
                 }
                 .into_infallible()
             })
@@ -85,8 +82,7 @@ impl ResourceApi for CompanyApi {
                     .try_collect()
                     .await
                     .unwrap();
-                let reply = Box::new(companies.as_json_reply()) as Box<dyn Reply>;
-                reply.into_infallible()
+                companies.as_json_reply().boxed().into_infallible()
             })
             .boxed()
     }
@@ -102,8 +98,7 @@ impl ResourceApi for CompanyApi {
                     .insert_one(&company.clone().try_into().unwrap())
                     .await
                     .unwrap();
-                let reply = Box::new(company.as_json_reply()) as Box<dyn Reply>;
-                reply.into_infallible()
+                company.as_json_reply().boxed().into_infallible()
             })
             .boxed()
     }
@@ -117,8 +112,8 @@ impl ResourceApi for CompanyApi {
                 let oid = id.parse().unwrap();
                 let res = s.repo.delete_one(oid).await.unwrap();
                 let reply = match res {
-                    DeleteResult::Deleted => Box::new(warp::reply()) as Box<dyn Reply>,
-                    DeleteResult::NotFound => Box::new(StatusCode::NOT_FOUND) as Box<dyn Reply>,
+                    DeleteResult::Deleted => warp::reply().boxed(),
+                    DeleteResult::NotFound => StatusCode::NOT_FOUND.boxed(),
                 };
                 reply.into_infallible()
             })
@@ -138,8 +133,7 @@ impl ResourceApi for CompanyApi {
                         .replace_one(&company.clone().try_into().unwrap())
                         .await
                         .unwrap();
-                    let reply = Box::new(company.as_json_reply()) as Box<dyn Reply>;
-                    reply.into_infallible()
+                    company.as_json_reply().boxed().into_infallible()
                 },
             )
             .boxed()

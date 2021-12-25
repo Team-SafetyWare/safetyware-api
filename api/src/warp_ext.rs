@@ -29,3 +29,13 @@ impl<T: Serialize> AsJsonReply for T {
         warp::reply::json(self)
     }
 }
+
+pub trait BoxReply {
+    fn boxed(self) -> Box<dyn Reply>;
+}
+
+impl<T: Reply + 'static> BoxReply for T {
+    fn boxed(self) -> Box<dyn Reply> {
+        Box::new(self) as Box<dyn Reply>
+    }
+}
