@@ -1,5 +1,5 @@
 use crate::common::{HasId, NewId, SetId};
-use crate::repo::op::{DeleteOne, Find, FindOne, InsertOne};
+use crate::repo::op::{DeleteOne, Find, FindOne, InsertOne, ReplaceOne};
 use crate::repo::DeleteResult;
 use crate::warp_ext;
 use crate::warp_ext::{AsJsonReply, BoxReplyInfallible};
@@ -121,5 +121,39 @@ where
                 DeleteResult::NotFound => StatusCode::NOT_FOUND.boxed_infallible(),
             }
         })
+        .boxed()
+}
+
+pub fn replace<Item, RepoItem, Repo>(
+    collection_name: String,
+    repo: Arc<Repo>,
+) -> BoxedFilter<(Box<dyn Reply>,)>
+where
+    Repo: ReplaceOne<RepoItem> + Send + Sync + ?Sized + 'static,
+    Item: HasId<Id = Option<String>>
+        + SetId
+        + Clone
+        + TryInto<RepoItem>
+        + Serialize
+        + DeserializeOwned
+        + Send
+        + 'static,
+    <Item as TryInto<RepoItem>>::Error: Debug + Send,
+    RepoItem: Send,
+{
+    warp::path(collection_name)
+        .and(warp::put())
+        .and(warp_ext::with_clone(repo))
+        .and(warp::path::param())
+        .and(warp::body::json())
+        .and_then(
+            move |repo: Arc<Repo>, id: String, mut item: Item| async move {
+                item.set_id(Some(id.parse().unwrap()));
+                let repo_item = item.clone().try_into().unwrap();
+                let fut = repo.replace_one(&repo_item);
+                fut.await.unwrap();
+                item.as_json_reply().boxed_infallible()
+            },
+        )
         .boxed()
 }

@@ -2,15 +2,14 @@ use crate::common::{GetId, HasId, NewId, SetId};
 use crate::repo::company::Company as RepoCompany;
 use crate::repo::company::CompanyRepo;
 use crate::v1::op;
-use crate::v1::{ResourceApi, ResourceOperation};
-use crate::warp_ext::{AsJsonReply, BoxReplyInfallible};
+use crate::v1::ResourceApi;
 use anyhow::Context;
 use bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
-use warp::{Filter, Reply};
+use warp::Reply;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Company {
@@ -88,19 +87,6 @@ impl ResourceApi for CompanyApi {
     }
 
     fn replace(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        self.operation(warp::put())
-            .and(warp::path::param())
-            .and(warp::body::json())
-            .and_then(
-                move |s: Self, id: String, mut company: Company| async move {
-                    company.id = Some(id.parse().unwrap());
-                    s.repo
-                        .replace_one(&company.clone().try_into().unwrap())
-                        .await
-                        .unwrap();
-                    company.as_json_reply().boxed_infallible()
-                },
-            )
-            .boxed()
+        op::replace::<Company, _, _>(self.collection_name(), self.repo.clone())
     }
 }
