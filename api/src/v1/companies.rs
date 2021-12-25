@@ -51,7 +51,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn get(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        self.resource_operation(warp::get())
+        self.operation(warp::get())
             .and(warp::path::param())
             .and_then(move |s: Self, id: String| async move {
                 let oid = id.parse().unwrap();
@@ -65,7 +65,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn list(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        self.resource_operation(warp::get())
+        self.operation(warp::get())
             .and_then(move |s: Self| async move {
                 let companies: Vec<Company> = s
                     .repo
@@ -82,7 +82,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn create(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        self.resource_operation(warp::post())
+        self.operation(warp::post())
             .and(warp::body::json())
             .and_then(move |s: Self, mut company: Company| async move {
                 company.id = Some(ObjectId::new().to_string());
@@ -96,7 +96,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn delete(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        self.resource_operation(warp::delete())
+        self.operation(warp::delete())
             .and(warp::path::param())
             .and_then(move |s: Self, id: String| async move {
                 let oid = id.parse().unwrap();
@@ -110,7 +110,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn replace(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        self.resource_operation(warp::put())
+        self.operation(warp::put())
             .and(warp::path::param())
             .and(warp::body::json())
             .and_then(

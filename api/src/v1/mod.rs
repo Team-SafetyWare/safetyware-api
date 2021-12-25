@@ -86,7 +86,7 @@ fn forbidden_filter(
 }
 
 pub trait ResourceOperation {
-    fn resource_operation(
+    fn operation(
         &self,
         method: impl Filter<Extract = (), Error = Rejection> + Copy + Send + Sync + 'static,
     ) -> BoxedFilter<(Self,)>
@@ -95,7 +95,7 @@ pub trait ResourceOperation {
 }
 
 impl<T: ResourceApi + Clone + Send + Sync + 'static> ResourceOperation for T {
-    fn resource_operation(
+    fn operation(
         &self,
         method: impl Filter<Extract = (), Error = Rejection> + Copy + Send + Sync + 'static,
     ) -> BoxedFilter<(Self,)> {
