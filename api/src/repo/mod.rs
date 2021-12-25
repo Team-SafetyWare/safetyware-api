@@ -1,7 +1,8 @@
 use futures_util::Stream;
 
 pub mod company;
-mod mongo_common;
+mod mongo_op;
+pub mod op;
 
 pub trait ItemStream<T: Unpin + Send>: Stream<Item = anyhow::Result<T>> + Unpin + Send {}
 

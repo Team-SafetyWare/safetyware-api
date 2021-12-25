@@ -1,6 +1,5 @@
 use crate::db;
 use crate::repo::company::CompanyRepo;
-use crate::v1::companies::CompanyApi;
 use crate::warp_ext;
 use crate::warp_ext::IntoInfallible;
 use mongodb::Database;
@@ -15,12 +14,14 @@ pub fn all(
     db: Database,
     company_repo: impl CompanyRepo + Send + Sync + 'static,
 ) -> BoxedFilter<(impl Reply,)> {
-    let company = CompanyApi {
-        repo: Arc::new(company_repo),
-    }
-    .all();
+    warp::path("v1").and(health(db)).boxed()
 
-    warp::path("v1").and(health(db).or(company)).boxed()
+    // let company = CompanyApi {
+    //     repo: Arc::new(company_repo),
+    // }
+    // .all();
+    //
+    // warp::path("v1").and(health(db).or(company)).boxed()
 }
 
 fn health(db: Database) -> BoxedFilter<(impl Reply,)> {
