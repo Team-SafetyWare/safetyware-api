@@ -9,7 +9,8 @@ use warp::filters::BoxedFilter;
 use warp::http::StatusCode;
 use warp::{Filter, Rejection, Reply};
 
-mod companies;
+pub mod companies;
+pub mod op;
 
 pub fn all(
     db: Database,

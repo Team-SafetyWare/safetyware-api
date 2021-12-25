@@ -1,4 +1,4 @@
-use crate::repo::op::{GetId, HasId};
+use crate::common::{GetId, HasId};
 use crate::repo::{DeleteResult, ItemStream};
 use bson::Bson;
 use futures_util::TryStreamExt;

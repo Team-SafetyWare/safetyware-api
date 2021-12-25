@@ -1,4 +1,5 @@
-use crate::repo::op::{DeleteOne, Find, FindOne, GetId, HasId, InsertOne, ReplaceOne, SetId};
+use crate::common::{GetId, HasId, SetId};
+use crate::repo::op::{DeleteOne, Find, FindOne, InsertOne, ReplaceOne};
 use crate::repo::ItemStream;
 use crate::repo::{mongo_op, DeleteResult};
 use bson::oid::ObjectId;

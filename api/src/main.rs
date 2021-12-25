@@ -1,3 +1,4 @@
+pub mod common;
 pub mod db;
 pub mod repo;
 pub mod settings;
@@ -7,7 +8,6 @@ pub mod warp_ext;
 use crate::repo::company::{CompanyRepo, MongoCompanyRepo};
 use crate::settings::Settings;
 use mongodb::Database;
-use serde::{Deserialize, Serialize};
 use std::env;
 use std::net::Ipv4Addr;
 use warp::cors::Cors;
@@ -15,11 +15,6 @@ use warp::filters::BoxedFilter;
 use warp::{Filter, Reply};
 
 const DEFAULT_PORT: u16 = 3001;
-
-#[derive(Serialize, Deserialize)]
-struct ViewCount {
-    count: i64,
-}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

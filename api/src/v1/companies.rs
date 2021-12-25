@@ -1,6 +1,8 @@
+use crate::common::{GetId, HasId, SetId};
 use crate::repo::company::Company as RepoCompany;
 use crate::repo::company::CompanyRepo;
 use crate::repo::DeleteResult;
+use crate::v1::op;
 use crate::v1::{ResourceApi, ResourceOperation};
 use crate::warp_ext::{AsJsonReply, BoxReplyInfallible};
 use anyhow::Context;
@@ -40,6 +42,22 @@ impl TryFrom<Company> for RepoCompany {
     }
 }
 
+impl HasId for Company {
+    type Id = Option<String>;
+}
+
+impl GetId for Company {
+    fn id(&self) -> Self::Id {
+        self.id.clone()
+    }
+}
+
+impl SetId for Company {
+    fn set_id(&mut self, id: Self::Id) {
+        self.id = id
+    }
+}
+
 #[derive(Clone)]
 pub struct CompanyApi {
     pub repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
@@ -51,17 +69,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn get(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        self.operation(warp::get())
-            .and(warp::path::param())
-            .and_then(move |s: Self, id: String| async move {
-                let oid = id.parse().unwrap();
-                let company = s.repo.find_one(oid).await.unwrap().map(Company::from);
-                match company {
-                    None => StatusCode::NOT_FOUND.boxed_infallible(),
-                    Some(company) => company.as_json_reply().boxed_infallible(),
-                }
-            })
-            .boxed()
+        op::get::<Company, RepoCompany, _>(self.repo.clone(), self.collection_name())
     }
 
     fn list(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
