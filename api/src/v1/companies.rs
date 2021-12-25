@@ -69,7 +69,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn get(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        op::get::<Company, _, _>(self.repo.clone(), self.collection_name())
+        op::get::<Company, _, _>(self.collection_name(), self.repo.clone())
     }
 
     fn list(&self) -> BoxedFilter<(Box<dyn Reply>,)> {

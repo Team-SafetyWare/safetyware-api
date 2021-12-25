@@ -11,8 +11,8 @@ use warp::http::StatusCode;
 use warp::{Filter, Reply};
 
 pub fn get<Item, RepoItem, Repo>(
-    repo: Arc<Repo>,
     collection_name: String,
+    repo: Arc<Repo>,
 ) -> BoxedFilter<(Box<dyn Reply>,)>
 where
     Repo: FindOne<RepoItem> + Send + Sync + ?Sized + 'static,
