@@ -1,7 +1,6 @@
 use crate::common::{GetId, HasId, NewId, SetId};
 use crate::repo::company::Company as RepoCompany;
 use crate::repo::company::CompanyRepo;
-use crate::repo::DeleteResult;
 use crate::v1::op;
 use crate::v1::{ResourceApi, ResourceOperation};
 use crate::warp_ext::{AsJsonReply, BoxReplyInfallible};
@@ -11,7 +10,6 @@ use serde::{Deserialize, Serialize};
 use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
-use warp::http::StatusCode;
 use warp::{Filter, Reply};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -86,17 +84,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn delete(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        self.operation(warp::delete())
-            .and(warp::path::param())
-            .and_then(move |s: Self, id: String| async move {
-                let oid = id.parse().unwrap();
-                let res = s.repo.delete_one(oid).await.unwrap();
-                match res {
-                    DeleteResult::Deleted => warp::reply().boxed_infallible(),
-                    DeleteResult::NotFound => StatusCode::NOT_FOUND.boxed_infallible(),
-                }
-            })
-            .boxed()
+        op::delete(self.collection_name(), self.repo.clone())
     }
 
     fn replace(&self) -> BoxedFilter<(Box<dyn Reply>,)> {

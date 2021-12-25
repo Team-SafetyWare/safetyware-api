@@ -1,5 +1,6 @@
 use crate::common::{HasId, NewId, SetId};
-use crate::repo::op::{Find, FindOne, InsertOne};
+use crate::repo::op::{DeleteOne, Find, FindOne, InsertOne};
+use crate::repo::DeleteResult;
 use crate::warp_ext;
 use crate::warp_ext::{AsJsonReply, BoxReplyInfallible};
 use futures_util::TryStreamExt;
@@ -28,9 +29,9 @@ where
         .and(warp::get())
         .and(warp_ext::with_clone(repo))
         .and(warp::path::param())
-        .and_then(move |repo: Arc<Repo>, id_string: String| async move {
-            let id = RepoItem::Id::from_str(&id_string).unwrap();
-            let item = repo.find_one(id).await.unwrap().map(Item::from);
+        .and_then(move |repo: Arc<Repo>, id: String| async move {
+            let rid: RepoItem::Id = id.parse().unwrap();
+            let item = repo.find_one(rid).await.unwrap().map(Item::from);
             match item {
                 None => StatusCode::NOT_FOUND.boxed_infallible(),
                 Some(item) => item.as_json_reply().boxed_infallible(),
@@ -93,6 +94,32 @@ where
             let fut = repo.insert_one(&repo_item);
             fut.await.unwrap();
             item.as_json_reply().boxed_infallible()
+        })
+        .boxed()
+}
+
+pub fn delete<RepoItem, Repo>(
+    collection_name: String,
+    repo: Arc<Repo>,
+) -> BoxedFilter<(Box<dyn Reply>,)>
+where
+    Repo: DeleteOne<RepoItem> + Send + Sync + ?Sized + 'static,
+    RepoItem: HasId,
+    RepoItem::Id: FromStr + Send,
+    <RepoItem::Id as FromStr>::Err: Debug + Send,
+{
+    warp::path(collection_name)
+        .and(warp::delete())
+        .and(warp_ext::with_clone(repo))
+        .and(warp::path::param())
+        .and_then(move |repo: Arc<Repo>, id: String| async move {
+            let rid: RepoItem::Id = id.parse().unwrap();
+            let fut = repo.delete_one(rid);
+            let res = fut.await.unwrap();
+            match res {
+                DeleteResult::Deleted => warp::reply().boxed_infallible(),
+                DeleteResult::NotFound => StatusCode::NOT_FOUND.boxed_infallible(),
+            }
         })
         .boxed()
 }
