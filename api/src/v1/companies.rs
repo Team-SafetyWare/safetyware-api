@@ -4,6 +4,7 @@ use crate::repo::DeleteResult;
 use crate::v1::ResourceApi;
 use crate::warp_ext;
 use crate::warp_ext::{AsJsonReply, IntoInfallible};
+use anyhow::Context;
 use bson::oid::ObjectId;
 use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
@@ -34,7 +35,7 @@ impl TryFrom<Company> for RepoCompany {
 
     fn try_from(value: Company) -> Result<Self, Self::Error> {
         Ok(Self {
-            id: value.name.parse()?,
+            id: value.id.context("id missing")?.parse()?,
             name: value.name,
         })
     }
