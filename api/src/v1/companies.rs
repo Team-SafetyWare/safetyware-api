@@ -4,24 +4,26 @@ use crate::repo::DeleteResult;
 use crate::v1::ResourceApi;
 use crate::warp_ext;
 use crate::warp_ext::{AsJsonReply, IntoInfallible};
+use bson::oid::ObjectId;
 use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
-use std::convert::TryFrom;
+use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
 use warp::http::StatusCode;
 use warp::{Filter, Reply};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Company {
-    pub id: String,
+    #[serde(skip_deserializing)]
+    pub id: Option<String>,
     pub name: String,
 }
 
 impl From<RepoCompany> for Company {
     fn from(value: RepoCompany) -> Self {
         Self {
-            id: value.id.to_string(),
+            id: Some(value.id.to_string()),
             name: value.name,
         }
     }
@@ -89,21 +91,17 @@ impl ResourceApi for CompanyApi {
     }
 
     fn create(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        #[derive(Debug, Deserialize, Serialize)]
-        struct Req {
-            name: String,
-        }
         warp::path(self.collection_name())
             .and(warp::post())
             .and(warp::body::json())
             .and(warp_ext::with_clone(self.clone()))
-            .and_then(move |req: Req, s: Self| async move {
-                let company = RepoCompany {
-                    id: Default::default(),
-                    name: req.name,
-                };
-                s.repo.insert_one(&company).await.unwrap();
-                let reply = Box::new(Company::from(company).as_json_reply()) as Box<dyn Reply>;
+            .and_then(move |mut company: Company, s: Self| async move {
+                company.id = Some(ObjectId::new().to_string());
+                s.repo
+                    .insert_one(&company.clone().try_into().unwrap())
+                    .await
+                    .unwrap();
+                let reply = Box::new(company.as_json_reply()) as Box<dyn Reply>;
                 reply.into_infallible()
             })
             .boxed()
@@ -127,24 +125,22 @@ impl ResourceApi for CompanyApi {
     }
 
     fn replace(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        #[derive(Debug, Deserialize, Serialize)]
-        struct Req {
-            name: String,
-        }
         warp::path(self.collection_name())
             .and(warp::put())
             .and(warp::path::param())
             .and(warp::body::json())
             .and(warp_ext::with_clone(self.clone()))
-            .and_then(move |id: String, req: Req, s: Self| async move {
-                let company = RepoCompany {
-                    id: id.parse().unwrap(),
-                    name: req.name,
-                };
-                s.repo.replace_one(&company).await.unwrap();
-                let reply = Box::new(Company::from(company).as_json_reply()) as Box<dyn Reply>;
-                reply.into_infallible()
-            })
+            .and_then(
+                move |id: String, mut company: Company, s: Self| async move {
+                    company.id = Some(id.parse().unwrap());
+                    s.repo
+                        .replace_one(&company.clone().try_into().unwrap())
+                        .await
+                        .unwrap();
+                    let reply = Box::new(company.as_json_reply()) as Box<dyn Reply>;
+                    reply.into_infallible()
+                },
+            )
             .boxed()
     }
 }
