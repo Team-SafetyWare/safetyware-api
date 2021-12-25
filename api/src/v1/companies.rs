@@ -1,4 +1,4 @@
-use crate::common::{GetId, HasId, SetId};
+use crate::common::{GetId, HasId, NewId, SetId};
 use crate::repo::company::Company as RepoCompany;
 use crate::repo::company::CompanyRepo;
 use crate::repo::DeleteResult;
@@ -57,6 +57,12 @@ impl SetId for Company {
     }
 }
 
+impl NewId for Company {
+    fn new_id() -> Self::Id {
+        Some(ObjectId::new().to_string())
+    }
+}
+
 #[derive(Clone)]
 pub struct CompanyApi {
     pub repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
@@ -76,17 +82,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn create(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        self.operation(warp::post())
-            .and(warp::body::json())
-            .and_then(move |s: Self, mut company: Company| async move {
-                company.id = Some(ObjectId::new().to_string());
-                s.repo
-                    .insert_one(&company.clone().try_into().unwrap())
-                    .await
-                    .unwrap();
-                company.as_json_reply().boxed_infallible()
-            })
-            .boxed()
+        op::create::<Company, _, _>(self.collection_name(), self.repo.clone())
     }
 
     fn delete(&self) -> BoxedFilter<(Box<dyn Reply>,)> {

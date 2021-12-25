@@ -1,9 +1,11 @@
-use crate::common::HasId;
-use crate::repo::op::{Find, FindOne};
+use crate::common::{HasId, NewId, SetId};
+use crate::repo::op::{Find, FindOne, InsertOne};
 use crate::warp_ext;
 use crate::warp_ext::{AsJsonReply, BoxReplyInfallible};
 use futures_util::TryStreamExt;
+use serde::de::DeserializeOwned;
 use serde::Serialize;
+use std::convert::TryInto;
 use std::fmt::Debug;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -59,6 +61,38 @@ where
                 .unwrap()
                 .as_json_reply()
                 .boxed_infallible()
+        })
+        .boxed()
+}
+
+pub fn create<Item, RepoItem, Repo>(
+    collection_name: String,
+    repo: Arc<Repo>,
+) -> BoxedFilter<(Box<dyn Reply>,)>
+where
+    Repo: InsertOne<RepoItem> + Send + Sync + ?Sized + 'static,
+    Item: HasId<Id = Option<String>>
+        + NewId
+        + SetId
+        + TryInto<RepoItem>
+        + Clone
+        + DeserializeOwned
+        + Serialize
+        + Send
+        + 'static,
+    <Item as TryInto<RepoItem>>::Error: Debug + Send,
+    RepoItem: Send,
+{
+    warp::path(collection_name)
+        .and(warp::post())
+        .and(warp_ext::with_clone(repo))
+        .and(warp::body::json())
+        .and_then(move |repo: Arc<Repo>, mut item: Item| async move {
+            item.set_id(Item::new_id());
+            let repo_item = item.clone().try_into().unwrap();
+            let fut = repo.insert_one(&repo_item);
+            fut.await.unwrap();
+            item.as_json_reply().boxed_infallible()
         })
         .boxed()
 }

@@ -9,3 +9,7 @@ pub trait GetId: HasId {
 pub trait SetId: HasId {
     fn set_id(&mut self, id: Self::Id);
 }
+
+pub trait NewId: HasId {
+    fn new_id() -> Self::Id;
+}
