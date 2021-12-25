@@ -1,7 +1,8 @@
 use crate::common::HasId;
-use crate::repo::op::FindOne;
+use crate::repo::op::{Find, FindOne};
 use crate::warp_ext;
 use crate::warp_ext::{AsJsonReply, BoxReplyInfallible};
+use futures_util::TryStreamExt;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::str::FromStr;
@@ -32,6 +33,32 @@ where
                 None => StatusCode::NOT_FOUND.boxed_infallible(),
                 Some(item) => item.as_json_reply().boxed_infallible(),
             }
+        })
+        .boxed()
+}
+
+pub fn list<Item, RepoItem, Repo>(
+    collection_name: String,
+    repo: Arc<Repo>,
+) -> BoxedFilter<(Box<dyn Reply>,)>
+where
+    Repo: Find<RepoItem> + Send + Sync + ?Sized + 'static,
+    Item: Serialize + Send,
+    RepoItem: Into<Item>,
+{
+    warp::path(collection_name)
+        .and(warp::get())
+        .and(warp_ext::with_clone(repo))
+        .and_then(move |repo: Arc<Repo>| async move {
+            repo.find()
+                .await
+                .unwrap()
+                .map_ok(Into::into)
+                .try_collect::<Vec<Item>>()
+                .await
+                .unwrap()
+                .as_json_reply()
+                .boxed_infallible()
         })
         .boxed()
 }

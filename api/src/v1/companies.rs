@@ -7,7 +7,6 @@ use crate::v1::{ResourceApi, ResourceOperation};
 use crate::warp_ext::{AsJsonReply, BoxReplyInfallible};
 use anyhow::Context;
 use bson::oid::ObjectId;
-use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use std::convert::{TryFrom, TryInto};
 use std::sync::Arc;
@@ -73,20 +72,7 @@ impl ResourceApi for CompanyApi {
     }
 
     fn list(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        self.operation(warp::get())
-            .and_then(move |s: Self| async move {
-                let companies: Vec<Company> = s
-                    .repo
-                    .find()
-                    .await
-                    .unwrap()
-                    .map_ok(Into::into)
-                    .try_collect()
-                    .await
-                    .unwrap();
-                companies.as_json_reply().boxed_infallible()
-            })
-            .boxed()
+        op::list::<Company, _, _>(self.collection_name(), self.repo.clone())
     }
 
     fn create(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
