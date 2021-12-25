@@ -39,3 +39,13 @@ impl<T: Reply + 'static> BoxReply for T {
         Box::new(self) as Box<dyn Reply>
     }
 }
+
+pub trait BoxReplyInfallible {
+    fn boxed_infallible(self) -> Result<Box<dyn Reply>, Infallible>;
+}
+
+impl<T: BoxReply> BoxReplyInfallible for T {
+    fn boxed_infallible(self) -> Result<Box<dyn Reply>, Infallible> {
+        self.boxed().into_infallible()
+    }
+}
