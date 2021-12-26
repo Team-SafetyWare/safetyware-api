@@ -2,7 +2,6 @@ use crate::db;
 use crate::repo::company::CompanyRepo;
 use crate::v1::companies::CompanyApi;
 use crate::warp_ext;
-use crate::warp_ext::IntoInfallible;
 use mongodb::Database;
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
@@ -27,9 +26,9 @@ pub fn all(
 fn health(db: Database) -> BoxedFilter<(impl Reply,)> {
     warp::path("health")
         .and(warp_ext::with_clone(db))
-        .and_then(move |db: Database| async move {
+        .then(move |db: Database| async move {
             db::test_connection(&db).await.unwrap();
-            warp::reply().into_infallible()
+            warp::reply()
         })
         .boxed()
 }
