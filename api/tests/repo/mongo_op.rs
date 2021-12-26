@@ -113,7 +113,7 @@ async fn test_replace_one_missing() {
 }
 
 #[tokio::test]
-async fn test_find_one() {
+async fn test_find_one_exists() {
     test_op(|collection| async move {
         // Arrange.
         let item = Item {
@@ -128,6 +128,21 @@ async fn test_find_one() {
         // Assert.
         let found = opt.expect("not found");
         assert_eq!(found, item);
+    })
+    .await
+}
+
+#[tokio::test]
+async fn test_find_one_missing() {
+    test_op(|collection| async move {
+        // Arrange.
+        let id = Item::new_id();
+
+        // Act.
+        let opt = mongo_op::find_one(id, &collection).await.unwrap();
+
+        // Assert.
+        assert!(opt.is_none());
     })
     .await
 }
