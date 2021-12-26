@@ -175,18 +175,36 @@ async fn test_find() {
 }
 
 #[tokio::test]
-async fn test_delete_one() {
+async fn test_delete_one_existing() {
     test_op(|collection| async move {
+        // Arrange.
         let item = Item {
             id: Default::default(),
             name: Uuid::new_v4().to_string(),
         };
         mongo_op::insert_one(&item, &collection).await.unwrap();
 
+        // Act.
         mongo_op::delete_one(item.id, &collection).await.unwrap();
 
+        // Assert.
         let opt = mongo_op::find_one(item.id, &collection).await.unwrap();
         assert!(opt.is_none());
+    })
+    .await
+}
+
+#[tokio::test]
+async fn test_delete_one_missing() {
+    test_op(|collection| async move {
+        // Arrange.
+        let id = Item::new_id();
+
+        // Act.
+        let res = mongo_op::delete_one(id, &collection).await;
+
+        // Assert.
+        assert!(res.is_err());
     })
     .await
 }
