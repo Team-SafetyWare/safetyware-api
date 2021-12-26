@@ -41,6 +41,7 @@ dependencies = [
  "log",
  "mongodb",
  "serde 1.0.132",
+ "thiserror",
  "tokio",
  "uuid",
  "warp",

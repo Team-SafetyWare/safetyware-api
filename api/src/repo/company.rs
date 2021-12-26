@@ -1,7 +1,7 @@
 use crate::common::{GetId, HasId, SetId};
 use crate::repo::op::{DeleteOne, Find, FindOne, InsertOne, ReplaceOne};
-use crate::repo::ItemStream;
 use crate::repo::{mongo_op, DeleteResult};
+use crate::repo::{ItemStream, ReplaceResult};
 use bson::oid::ObjectId;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
@@ -61,7 +61,7 @@ impl InsertOne<Company> for MongoCompanyRepo {
 
 #[async_trait::async_trait]
 impl ReplaceOne<Company> for MongoCompanyRepo {
-    async fn replace_one(&self, item: &Company) -> anyhow::Result<()> {
+    async fn replace_one(&self, item: &Company) -> ReplaceResult {
         mongo_op::replace_one(item, self.collection()).await
     }
 }
@@ -82,7 +82,7 @@ impl Find<Company> for MongoCompanyRepo {
 
 #[async_trait::async_trait]
 impl DeleteOne<Company> for MongoCompanyRepo {
-    async fn delete_one(&self, id: <Company as HasId>::Id) -> anyhow::Result<DeleteResult> {
+    async fn delete_one(&self, id: <Company as HasId>::Id) -> DeleteResult {
         mongo_op::delete_one(id, self.collection()).await
     }
 }
