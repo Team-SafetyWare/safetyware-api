@@ -1,0 +1,220 @@
+{
+	"info": {
+		"_postman_id": "9fac5d37-ca08-4b84-ad1d-4396e9f1ab5a",
+		"name": "API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "v1",
+			"item": [
+				{
+					"name": "companies",
+					"item": [
+						{
+							"name": "get",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base}}/v1/companies/:id",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"companies",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "61c30d6184db74c60f52493d"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base}}/v1/companies",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"companies"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Mountain Ascent\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base}}/v1/companies",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"companies"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Mountain Ascent\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base}}/v1/companies/:id",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"companies",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "61c30d6184db74c60f52493d"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base}}/v1/companies/:id",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"companies",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "61c7a5bb5132ee2c17c83b84"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "replace",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Initech\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base}}/v1/companies/:id",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"companies",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "61c30d6184db74c60f52493d"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base}}/v1/health",
+							"host": [
+								"{{base}}"
+							],
+							"path": [
+								"v1",
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
