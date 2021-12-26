@@ -10,7 +10,7 @@ pub trait Item: Serialize + DeserializeOwned + Unpin + Send + Sync + 'static {}
 
 impl<T> Item for T where T: Serialize + DeserializeOwned + Unpin + Send + Sync + 'static {}
 
-pub async fn insert_one<T>(item: &T, collection: Collection<T>) -> anyhow::Result<()>
+pub async fn insert_one<T>(item: &T, collection: &Collection<T>) -> anyhow::Result<()>
 where
     T: Item,
 {
@@ -18,7 +18,7 @@ where
     Ok(())
 }
 
-pub async fn replace_one<T>(item: &T, collection: Collection<T>) -> ReplaceResult
+pub async fn replace_one<T>(item: &T, collection: &Collection<T>) -> ReplaceResult
 where
     T: Item + GetId,
     Bson: From<T::Id>,
@@ -35,7 +35,7 @@ where
     }
 }
 
-pub async fn find_one<T>(id: T::Id, collection: Collection<T>) -> anyhow::Result<Option<T>>
+pub async fn find_one<T>(id: T::Id, collection: &Collection<T>) -> anyhow::Result<Option<T>>
 where
     T: Item + HasId,
     Bson: From<T::Id>,
@@ -45,7 +45,7 @@ where
     Ok(found)
 }
 
-pub async fn find<T>(collection: Collection<T>) -> anyhow::Result<Box<dyn ItemStream<T>>>
+pub async fn find<T>(collection: &Collection<T>) -> anyhow::Result<Box<dyn ItemStream<T>>>
 where
     T: Item,
 {
@@ -54,7 +54,7 @@ where
     Ok(Box::new(stream))
 }
 
-pub async fn delete_one<T>(id: T::Id, collection: Collection<T>) -> DeleteResult
+pub async fn delete_one<T>(id: T::Id, collection: &Collection<T>) -> DeleteResult
 where
     T: Item + HasId,
     Bson: From<T::Id>,
