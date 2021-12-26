@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9fac5d37-ca08-4b84-ad1d-4396e9f1ab5a",
+		"_postman_id": "6b8867f9-6958-4aa5-b66a-aed33f70d0c8",
 		"name": "API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -29,7 +29,7 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "61c30d6184db74c60f52493d"
+											"value": ""
 										}
 									]
 								}
@@ -61,7 +61,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"Mountain Ascent\"\r\n}",
+									"raw": "{\r\n    \"name\": \"Tall Hats Shop\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -88,7 +88,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"Mountain Ascent\"\r\n}",
+									"raw": "{\r\n    \"name\": \"Tall Hats Shop\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -108,7 +108,7 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "61c30d6184db74c60f52493d"
+											"value": ""
 										}
 									]
 								}
@@ -133,7 +133,7 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "61c7a5bb5132ee2c17c83b84"
+											"value": ""
 										}
 									]
 								}
@@ -147,7 +147,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"Initech\"\r\n}",
+									"raw": "{\r\n    \"name\": \"Tall Hats Shop\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -167,7 +167,7 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "61c30d6184db74c60f52493d"
+											"value": ""
 										}
 									]
 								}
