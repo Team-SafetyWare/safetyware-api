@@ -22,10 +22,8 @@ async fn test_insert_one_new() {
 
         // Assert.
         let opt = mongo_op::find_one(item.id, &collection).await.unwrap();
-        assert!(opt.is_some());
-        let found = opt.unwrap();
-        assert_eq!(found.id, item.id);
-        assert_eq!(found.name, item.name);
+        let found = opt.expect("not found");
+        assert_eq!(found, item);
     })
     .await
 }
@@ -50,7 +48,7 @@ async fn test_insert_one_existing() {
 }
 
 #[tokio::test]
-async fn test_replace_one() {
+async fn test_replace_one_modified() {
     test_op(|collection| async move {
         // Arrange.
         let id = Default::default();
@@ -70,7 +68,28 @@ async fn test_replace_one() {
         // Assert.
         let opt = mongo_op::find_one(id, &collection).await.unwrap();
         let found = opt.expect("not found");
-        assert_eq!(found.name, second.name);
+        assert_eq!(found, second);
+    })
+    .await
+}
+
+#[tokio::test]
+async fn test_replace_one_unmodified() {
+    test_op(|collection| async move {
+        // Arrange.
+        let item = Item {
+            id: Default::default(),
+            name: Uuid::new_v4().to_string(),
+        };
+        mongo_op::insert_one(&item, &collection).await.unwrap();
+
+        // Act.
+        mongo_op::replace_one(&item, &collection).await.unwrap();
+
+        // Assert.
+        let opt = mongo_op::find_one(item.id, &collection).await.unwrap();
+        let found = opt.expect("not found");
+        assert_eq!(found, item);
     })
     .await
 }
@@ -90,8 +109,7 @@ async fn test_find_one() {
 
         // Assert.
         let found = opt.expect("not found");
-        assert_eq!(found.id, item.id);
-        assert_eq!(found.name, item.name);
+        assert_eq!(found, item);
     })
     .await
 }
@@ -117,7 +135,7 @@ async fn test_find() {
         let found: Vec<_> = stream.try_collect().await.unwrap();
         assert_eq!(found.len(), items.len());
         for item in items {
-            assert!(found.iter().any(|c| c.id == item.id))
+            assert!(found.iter().any(|c| *c == item))
         }
     })
     .await
@@ -140,7 +158,7 @@ async fn test_delete_one() {
     .await
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 struct Item {
     #[serde(rename = "_id")]
     pub id: ObjectId,

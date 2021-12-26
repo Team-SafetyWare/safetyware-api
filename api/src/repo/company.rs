@@ -6,7 +6,7 @@ use bson::oid::ObjectId;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Company {
     #[serde(rename = "_id")]
     pub id: ObjectId,
