@@ -42,7 +42,7 @@ async fn test_insert_one_existing() {
         let res = mongo_op::insert_one(&item, &collection).await;
 
         // Assert.
-        assert!(res.is_err())
+        assert!(res.is_err());
     })
     .await
 }
@@ -95,6 +95,24 @@ async fn test_replace_one_unmodified() {
 }
 
 #[tokio::test]
+async fn test_replace_one_missing() {
+    test_op(|collection| async move {
+        // Arrange.
+        let item = Item {
+            id: Default::default(),
+            name: Uuid::new_v4().to_string(),
+        };
+
+        // Act.
+        let res = mongo_op::replace_one(&item, &collection).await;
+
+        // Assert.
+        assert!(res.is_err());
+    })
+    .await
+}
+
+#[tokio::test]
 async fn test_find_one() {
     test_op(|collection| async move {
         // Arrange.
@@ -135,7 +153,7 @@ async fn test_find() {
         let found: Vec<_> = stream.try_collect().await.unwrap();
         assert_eq!(found.len(), items.len());
         for item in items {
-            assert!(found.iter().any(|c| *c == item))
+            assert!(found.iter().any(|c| *c == item));
         }
     })
     .await
