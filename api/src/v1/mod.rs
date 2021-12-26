@@ -27,9 +27,10 @@ fn health(db: Database) -> BoxedFilter<(impl Reply,)> {
     warp::path("health")
         .and(warp_ext::with_clone(db))
         .then(move |db: Database| async move {
-            db::test_connection(&db).await.unwrap();
-            warp::reply()
+            db::test_connection(&db).await?;
+            Ok(warp::reply())
         })
+        .map(warp_ext::convert_err)
         .boxed()
 }
 
