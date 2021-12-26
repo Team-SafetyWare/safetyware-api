@@ -9,7 +9,7 @@ use std::future::Future;
 use uuid::Uuid;
 
 #[tokio::test]
-async fn test_insert_one() {
+async fn test_insert_one_new() {
     test_op(|collection| async move {
         // Arrange.
         let item = Item {
@@ -22,9 +22,29 @@ async fn test_insert_one() {
 
         // Assert.
         let opt = mongo_op::find_one(item.id, &collection).await.unwrap();
-        let found = opt.expect("not found");
+        assert!(opt.is_some());
+        let found = opt.unwrap();
         assert_eq!(found.id, item.id);
         assert_eq!(found.name, item.name);
+    })
+    .await
+}
+
+#[tokio::test]
+async fn test_insert_one_existing() {
+    test_op(|collection| async move {
+        // Arrange.
+        let item = Item {
+            id: Default::default(),
+            name: Uuid::new_v4().to_string(),
+        };
+        mongo_op::insert_one(&item, &collection).await.unwrap();
+
+        // Act.
+        let res = mongo_op::insert_one(&item, &collection).await;
+
+        // Assert.
+        assert!(res.is_err())
     })
     .await
 }
