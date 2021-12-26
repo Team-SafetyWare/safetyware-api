@@ -1,7 +1,7 @@
 use mongodb::{Client, Database};
 use uuid::Uuid;
 
-mod company;
+mod mongo_op;
 
 pub async fn new_db() -> anyhow::Result<Database> {
     let client = db_client().await?;

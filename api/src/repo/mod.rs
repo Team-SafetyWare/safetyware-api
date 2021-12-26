@@ -1,7 +1,7 @@
 use futures_util::Stream;
 
 pub mod company;
-mod mongo_op;
+pub mod mongo_op;
 pub mod op;
 
 pub trait ItemStream<T: Unpin + Send>: Stream<Item = anyhow::Result<T>> + Unpin + Send {}
@@ -13,7 +13,22 @@ where
 {
 }
 
-pub enum DeleteResult {
-    Deleted,
+#[derive(thiserror::Error, Debug)]
+pub enum ReplaceError {
+    #[error("not found")]
     NotFound,
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
 }
+
+pub type ReplaceResult = Result<(), ReplaceError>;
+
+#[derive(thiserror::Error, Debug)]
+pub enum DeleteError {
+    #[error("not found")]
+    NotFound,
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
+pub type DeleteResult = Result<(), DeleteError>;

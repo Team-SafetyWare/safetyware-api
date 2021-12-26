@@ -1,6 +1,6 @@
 use crate::common::{HasId, NewId, SetId};
 use crate::repo::op::{DeleteOne, Find, FindOne, InsertOne, ReplaceOne};
-use crate::repo::DeleteResult;
+use crate::repo::{DeleteError, ReplaceError};
 use crate::warp_ext;
 use crate::warp_ext::{AsJsonReply, BoxReplyInfallible};
 use futures_util::TryStreamExt;
@@ -115,10 +115,11 @@ where
         .and_then(move |repo: Arc<Repo>, id: String| async move {
             let rid: RepoItem::Id = id.parse().unwrap();
             let fut = repo.delete_one(rid);
-            let res = fut.await.unwrap();
+            let res = fut.await;
             match res {
-                DeleteResult::Deleted => warp::reply().boxed_infallible(),
-                DeleteResult::NotFound => StatusCode::NOT_FOUND.boxed_infallible(),
+                Ok(()) => warp::reply().boxed_infallible(),
+                Err(DeleteError::NotFound) => StatusCode::NOT_FOUND.boxed_infallible(),
+                Err(DeleteError::Other(e)) => panic!("{}", e),
             }
         })
         .boxed()
@@ -151,8 +152,12 @@ where
                 item.set_id(Some(id.parse().unwrap()));
                 let repo_item = item.clone().try_into().unwrap();
                 let fut = repo.replace_one(&repo_item);
-                fut.await.unwrap();
-                item.as_json_reply().boxed_infallible()
+                let res = fut.await;
+                match res {
+                    Ok(()) => item.as_json_reply().boxed_infallible(),
+                    Err(ReplaceError::NotFound) => StatusCode::NOT_FOUND.boxed_infallible(),
+                    Err(ReplaceError::Other(e)) => panic!("{}", e),
+                }
             },
         )
         .boxed()

@@ -1,5 +1,5 @@
 use crate::common::HasId;
-use crate::repo::{DeleteResult, ItemStream};
+use crate::repo::{DeleteResult, ItemStream, ReplaceResult};
 
 #[async_trait::async_trait]
 pub trait InsertOne<T> {
@@ -8,7 +8,7 @@ pub trait InsertOne<T> {
 
 #[async_trait::async_trait]
 pub trait ReplaceOne<T> {
-    async fn replace_one(&self, item: &T) -> anyhow::Result<()>;
+    async fn replace_one(&self, item: &T) -> ReplaceResult;
 }
 
 #[async_trait::async_trait]
@@ -23,5 +23,5 @@ pub trait Find<T> {
 
 #[async_trait::async_trait]
 pub trait DeleteOne<T: HasId> {
-    async fn delete_one(&self, id: T::Id) -> anyhow::Result<DeleteResult>;
+    async fn delete_one(&self, id: T::Id) -> DeleteResult;
 }
