@@ -15,7 +15,7 @@ Follow these steps if you need to run the API without making code changes.
 
 ## Develop
 
-Follow this section if you need to make code changes.
+This section describes how to make code changes.
 
 ### Install tools
 
@@ -63,7 +63,7 @@ Follow this section if you need to make code changes.
 
 ## Sample data
 
-Follow these steps to load or save sample data.
+This section describes how to load and save sample data.
 
 ### Load sample data
 
@@ -81,7 +81,7 @@ Follow these steps to load or save sample data.
 
 ## Deploy
 
-Follow this section to deploy the API in the cloud.
+This section describes how to deploy the API to the cloud.
 
 ### Install tools
 
