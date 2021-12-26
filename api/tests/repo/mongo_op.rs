@@ -1,6 +1,6 @@
 use crate::repo;
 use api::common::{GetId, HasId, NewId, SetId};
-use api::repo::mongo_op;
+use api::repo::{mongo_op, DeleteError, ReplaceError};
 use bson::oid::ObjectId;
 use futures_util::TryStreamExt;
 use mongodb::Collection;
@@ -107,7 +107,7 @@ async fn test_replace_one_missing() {
         let res = mongo_op::replace_one(&item, &collection).await;
 
         // Assert.
-        assert!(res.is_err());
+        assert!(matches!(res, Err(ReplaceError::NotFound)));
     })
     .await
 }
@@ -204,7 +204,7 @@ async fn test_delete_one_missing() {
         let res = mongo_op::delete_one(id, &collection).await;
 
         // Assert.
-        assert!(res.is_err());
+        assert!(matches!(res, Err(DeleteError::NotFound)));
     })
     .await
 }
