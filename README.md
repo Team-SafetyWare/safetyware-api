@@ -63,6 +63,17 @@ This section describes how to make code changes.
    docker compose down
    ```
 
+## Test
+
+1. Start the Docker containers.
+   ```
+   docker compose up -d --build mongo
+   ```
+2. Run automated tests.
+   ```
+   cargo test
+   ```
+
 ## Postman
 
 Postman can be used to interact with the API manually. Follow these steps to access the API from Postman.
