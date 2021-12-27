@@ -16,7 +16,7 @@ where
     match res {
         Ok(reply) => reply.boxed(),
         Err(err) => {
-            log::error!("{}", err.to_string());
+            log::error!("{:?}", err);
             StatusCode::INTERNAL_SERVER_ERROR.boxed()
         }
     }
