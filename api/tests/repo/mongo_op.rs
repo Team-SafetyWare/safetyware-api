@@ -1,12 +1,12 @@
 use crate::repo;
 use api::common::{GetId, HasId, NewId, SetId};
+use api::crockford;
 use api::repo::{mongo_op, DeleteError, ReplaceError};
 use bson::oid::ObjectId;
 use futures_util::TryStreamExt;
 use mongodb::Collection;
 use serde::{Deserialize, Serialize};
 use std::future::Future;
-use uuid::Uuid;
 
 #[tokio::test]
 async fn test_insert_one_new() {
@@ -14,7 +14,7 @@ async fn test_insert_one_new() {
         // Arrange.
         let item = Item {
             id: Default::default(),
-            name: Uuid::new_v4().to_string(),
+            name: crockford::random_id(),
         };
 
         // Act.
@@ -34,7 +34,7 @@ async fn test_insert_one_existing() {
         // Arrange.
         let item = Item {
             id: Default::default(),
-            name: Uuid::new_v4().to_string(),
+            name: crockford::random_id(),
         };
         mongo_op::insert_one(&item, &collection).await.unwrap();
 
@@ -54,12 +54,12 @@ async fn test_replace_one_modified() {
         let id = Default::default();
         let first = Item {
             id,
-            name: Uuid::new_v4().to_string(),
+            name: crockford::random_id(),
         };
         mongo_op::insert_one(&first, &collection).await.unwrap();
         let second = Item {
             id,
-            name: Uuid::new_v4().to_string(),
+            name: crockford::random_id(),
         };
 
         // Act.
@@ -79,7 +79,7 @@ async fn test_replace_one_unmodified() {
         // Arrange.
         let item = Item {
             id: Default::default(),
-            name: Uuid::new_v4().to_string(),
+            name: crockford::random_id(),
         };
         mongo_op::insert_one(&item, &collection).await.unwrap();
 
@@ -100,7 +100,7 @@ async fn test_replace_one_missing() {
         // Arrange.
         let item = Item {
             id: Default::default(),
-            name: Uuid::new_v4().to_string(),
+            name: crockford::random_id(),
         };
 
         // Act.
@@ -118,7 +118,7 @@ async fn test_find_one_exists() {
         // Arrange.
         let item = Item {
             id: Default::default(),
-            name: Uuid::new_v4().to_string(),
+            name: crockford::random_id(),
         };
         mongo_op::insert_one(&item, &collection).await.unwrap();
 
@@ -154,7 +154,7 @@ async fn test_find() {
         let items: Vec<_> = (0..3)
             .map(|_| Item {
                 id: Default::default(),
-                name: Uuid::new_v4().to_string(),
+                name: crockford::random_id(),
             })
             .collect();
         for item in &items {
@@ -180,7 +180,7 @@ async fn test_delete_one_existing() {
         // Arrange.
         let item = Item {
             id: Default::default(),
-            name: Uuid::new_v4().to_string(),
+            name: crockford::random_id(),
         };
         mongo_op::insert_one(&item, &collection).await.unwrap();
 
