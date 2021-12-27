@@ -174,8 +174,11 @@ where
 mod tests {
     use super::*;
     use crate::common::GetId;
+    use crate::crockford;
     use crate::repo::{mem_op, DeleteResult, ItemStream, ReplaceResult};
+    use anyhow::Context;
     use serde::Deserialize;
+    use std::convert::TryFrom;
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
     pub struct RepoItem {
@@ -256,6 +259,55 @@ mod tests {
     impl DeleteOne<RepoItem> for MemoryItemRepo {
         async fn delete_one(&self, id: &<RepoItem as HasId>::Id) -> DeleteResult {
             mem_op::delete_one(id, &self.collection)
+        }
+    }
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct ApiItem {
+        #[serde(skip_deserializing)]
+        pub id: Option<String>,
+        pub name: String,
+    }
+
+    impl From<RepoItem> for ApiItem {
+        fn from(value: RepoItem) -> Self {
+            Self {
+                id: Some(value.id.to_string()),
+                name: value.name,
+            }
+        }
+    }
+
+    impl TryFrom<ApiItem> for RepoItem {
+        type Error = anyhow::Error;
+
+        fn try_from(value: ApiItem) -> Result<Self, Self::Error> {
+            Ok(Self {
+                id: value.id.context("id missing")?.parse()?,
+                name: value.name,
+            })
+        }
+    }
+
+    impl HasId for ApiItem {
+        type Id = Option<String>;
+    }
+
+    impl GetId for ApiItem {
+        fn id(&self) -> &Self::Id {
+            &self.id
+        }
+    }
+
+    impl SetId for ApiItem {
+        fn set_id(&mut self, id: Self::Id) {
+            self.id = id
+        }
+    }
+
+    impl NewId for ApiItem {
+        fn new_id() -> Self::Id {
+            Some(crockford::random_id())
         }
     }
 }
