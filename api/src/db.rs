@@ -10,7 +10,7 @@ pub async fn connect(db_uri: &str) -> anyhow::Result<Database> {
 }
 
 pub async fn test_connection(db: &Database) -> anyhow::Result<()> {
-    let nonexistent = crockford::random_id().to_string();
+    let nonexistent = crockford::random_id();
     db.collection::<Document>(&nonexistent)
         .find_one(None, None)
         .await?;
