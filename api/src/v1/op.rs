@@ -182,6 +182,32 @@ mod tests {
     use std::convert::TryFrom;
     use std::future::Future;
 
+    #[tokio::test]
+    async fn test_create() {
+        test_filter(|filter| async move {
+            // Arrange.
+            let item = ApiItem {
+                id: None,
+                name: crockford::random_id(),
+            };
+
+            // Act.
+            let res = warp::test::request()
+                .method("POST")
+                .path("/items")
+                .body(serde_json::to_string(&item).unwrap())
+                .reply(&filter)
+                .await;
+
+            // Assert.
+            assert_eq!(res.status(), StatusCode::OK);
+            let created: ApiItem = serde_json::from_slice(res.body()).unwrap();
+            assert!(!created.id.unwrap().is_empty());
+            assert_eq!(created.name, item.name);
+        })
+        .await
+    }
+
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
     pub struct RepoItem {
         pub id: String,
@@ -266,7 +292,6 @@ mod tests {
 
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct ApiItem {
-        #[serde(skip_deserializing)]
         pub id: Option<String>,
         pub name: String,
     }
@@ -350,5 +375,16 @@ mod tests {
         fn replace(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
             replace::<ApiItem, _, _>(self.collection_name(), self.repo.clone())
         }
+    }
+
+    async fn test_filter<T, F>(test: T)
+    where
+        T: Fn(BoxedFilter<(Box<dyn Reply>,)>) -> F,
+        F: Future,
+    {
+        let repo = MemItemRepo::default();
+        let api = ItemApi::new(repo);
+        let filter = api.all();
+        test(filter).await;
     }
 }

@@ -13,7 +13,6 @@ use warp::Reply;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Company {
-    #[serde(skip_deserializing)]
     pub id: Option<String>,
     pub name: String,
 }

@@ -3,7 +3,6 @@ use crate::repo::company::CompanyRepo;
 use crate::v1::companies::CompanyApi;
 use crate::warp_ext;
 use mongodb::Database;
-use std::sync::Arc;
 use warp::filters::BoxedFilter;
 use warp::http::StatusCode;
 use warp::{Filter, Rejection, Reply};

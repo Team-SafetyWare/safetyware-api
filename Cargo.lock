@@ -61,6 +61,7 @@ dependencies = [
  "mongodb",
  "rand",
  "serde 1.0.132",
+ "serde_json",
  "thiserror",
  "tokio",
  "warp",
