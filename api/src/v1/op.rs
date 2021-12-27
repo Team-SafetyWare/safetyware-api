@@ -176,6 +176,7 @@ mod tests {
     use crate::common::GetId;
     use crate::crockford;
     use crate::repo::{mem_op, DeleteResult, ItemStream, ReplaceResult};
+    use crate::v1::ResourceApi;
     use anyhow::Context;
     use serde::Deserialize;
     use std::convert::TryFrom;
@@ -308,6 +309,37 @@ mod tests {
     impl NewId for ApiItem {
         fn new_id() -> Self::Id {
             Some(crockford::random_id())
+        }
+    }
+
+    #[derive(Clone)]
+    pub struct ItemApi {
+        pub repo: Arc<dyn ItemRepo + Send + Sync + 'static>,
+    }
+
+    impl ResourceApi for ItemApi {
+        fn collection_name(&self) -> String {
+            "items".to_string()
+        }
+
+        fn get(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
+            get::<ApiItem, _, _>(self.collection_name(), self.repo.clone())
+        }
+
+        fn list(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
+            list::<ApiItem, _, _>(self.collection_name(), self.repo.clone())
+        }
+
+        fn create(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
+            create::<ApiItem, _, _>(self.collection_name(), self.repo.clone())
+        }
+
+        fn delete(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
+            delete(self.collection_name(), self.repo.clone())
+        }
+
+        fn replace(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
+            replace::<ApiItem, _, _>(self.collection_name(), self.repo.clone())
         }
     }
 }
