@@ -259,8 +259,10 @@ mod tests {
     #[tokio::test]
     async fn test_get_nonexisting() {
         test_filter(|filter| async move {
-            // Act.
+            // Arrange.
             let id = ApiItem::new_id().unwrap();
+
+            // Act.
             let res = warp::test::request()
                 .method("GET")
                 .path(&format!("/items/{}", id))
@@ -276,8 +278,10 @@ mod tests {
     #[tokio::test]
     async fn test_get_bad_id() {
         test_filter(|filter| async move {
-            // Act.
+            // Arrange.
             let id = "abc";
+
+            // Act.
             let res = warp::test::request()
                 .method("GET")
                 .path(&format!("/items/{}", id))
@@ -431,6 +435,25 @@ mod tests {
                 .reply(&filter)
                 .await;
             assert_eq!(found_res.status(), StatusCode::NOT_FOUND);
+        })
+        .await
+    }
+
+    #[tokio::test]
+    async fn test_delete_nonexistent() {
+        test_filter(|filter| async move {
+            // Arrange.
+            let id = ApiItem::new_id().unwrap();
+
+            // Act.
+            let res = warp::test::request()
+                .method("DELETE")
+                .path(&format!("/items/{}", id))
+                .reply(&filter)
+                .await;
+
+            // Assert.
+            assert_eq!(res.status(), StatusCode::NOT_FOUND);
         })
         .await
     }
