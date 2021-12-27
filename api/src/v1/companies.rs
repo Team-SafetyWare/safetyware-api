@@ -13,7 +13,6 @@ use warp::Reply;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Company {
-    #[serde(skip_deserializing)]
     pub id: Option<String>,
     pub name: String,
 }
@@ -63,6 +62,14 @@ impl NewId for Company {
 #[derive(Clone)]
 pub struct CompanyApi {
     pub repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
+}
+
+impl CompanyApi {
+    pub fn new(repo: impl CompanyRepo + Send + Sync + 'static) -> Self {
+        Self {
+            repo: Arc::new(repo),
+        }
+    }
 }
 
 impl ResourceApi for CompanyApi {

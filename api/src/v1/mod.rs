@@ -3,7 +3,6 @@ use crate::repo::company::CompanyRepo;
 use crate::v1::companies::CompanyApi;
 use crate::warp_ext;
 use mongodb::Database;
-use std::sync::Arc;
 use warp::filters::BoxedFilter;
 use warp::http::StatusCode;
 use warp::{Filter, Rejection, Reply};
@@ -15,10 +14,7 @@ pub fn all(
     db: Database,
     company_repo: impl CompanyRepo + Send + Sync + 'static,
 ) -> BoxedFilter<(impl Reply,)> {
-    let company = CompanyApi {
-        repo: Arc::new(company_repo),
-    }
-    .all();
+    let company = CompanyApi::new(company_repo).all();
 
     warp::path("v1").and(health(db).or(company)).boxed()
 }
