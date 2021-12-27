@@ -73,9 +73,11 @@ This section describes how to make code changes.
    ```
    cargo test
    ```
-3. Run Postman tests.
+3. Start the API locally, outside Docker.
+4. Run Postman tests.
    ```
-   docker run --rm -v $pwd/postman:/etc/newman -t postman/newman:5.3-alpine run API.postman_collection.json --environment dev.postman_environment.json
+   docker run --rm --network host --volume $pwd/postman:/etc/newman -t postman/newman:5.3-alpine `
+       run API.postman_collection.json --global-var "base=http://host.docker.internal:3001"
    ```
 
 ## Postman
