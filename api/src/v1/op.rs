@@ -490,17 +490,9 @@ mod tests {
     {
     }
 
-    #[derive(Debug, Clone)]
+    #[derive(Default, Debug, Clone)]
     pub struct MemItemRepo {
         pub collection: mem_op::Collection<RepoItem>,
-    }
-
-    impl Default for MemItemRepo {
-        fn default() -> Self {
-            Self {
-                collection: Default::default(),
-            }
-        }
     }
 
     impl ItemRepo for MemItemRepo {}
