@@ -2,7 +2,6 @@ use crate::repo;
 use api::common::{GetId, HasId, NewId, SetId};
 use api::crockford;
 use api::repo::{mongo_op, DeleteError, ReplaceError};
-use bson::oid::ObjectId;
 use futures_util::TryStreamExt;
 use mongodb::Collection;
 use serde::{Deserialize, Serialize};
@@ -13,7 +12,7 @@ async fn test_insert_one_new() {
     test_op(|collection| async move {
         // Arrange.
         let item = Item {
-            id: Default::default(),
+            id: Item::new_id(),
             name: crockford::random_id(),
         };
 
@@ -21,7 +20,7 @@ async fn test_insert_one_new() {
         mongo_op::insert_one(&item, &collection).await.unwrap();
 
         // Assert.
-        let opt = mongo_op::find_one(item.id, &collection).await.unwrap();
+        let opt = mongo_op::find_one(&item.id, &collection).await.unwrap();
         let found = opt.expect("not found");
         assert_eq!(found, item);
     })
@@ -33,7 +32,7 @@ async fn test_insert_one_existing() {
     test_op(|collection| async move {
         // Arrange.
         let item = Item {
-            id: Default::default(),
+            id: Item::new_id(),
             name: crockford::random_id(),
         };
         mongo_op::insert_one(&item, &collection).await.unwrap();
@@ -51,14 +50,14 @@ async fn test_insert_one_existing() {
 async fn test_replace_one_modified() {
     test_op(|collection| async move {
         // Arrange.
-        let id = Default::default();
+        let id = Item::new_id();
         let first = Item {
-            id,
+            id: id.clone(),
             name: crockford::random_id(),
         };
         mongo_op::insert_one(&first, &collection).await.unwrap();
         let second = Item {
-            id,
+            id: id.clone(),
             name: crockford::random_id(),
         };
 
@@ -66,7 +65,7 @@ async fn test_replace_one_modified() {
         mongo_op::replace_one(&second, &collection).await.unwrap();
 
         // Assert.
-        let opt = mongo_op::find_one(id, &collection).await.unwrap();
+        let opt = mongo_op::find_one(&id, &collection).await.unwrap();
         let found = opt.expect("not found");
         assert_eq!(found, second);
     })
@@ -78,7 +77,7 @@ async fn test_replace_one_unmodified() {
     test_op(|collection| async move {
         // Arrange.
         let item = Item {
-            id: Default::default(),
+            id: Item::new_id(),
             name: crockford::random_id(),
         };
         mongo_op::insert_one(&item, &collection).await.unwrap();
@@ -87,7 +86,7 @@ async fn test_replace_one_unmodified() {
         mongo_op::replace_one(&item, &collection).await.unwrap();
 
         // Assert.
-        let opt = mongo_op::find_one(item.id, &collection).await.unwrap();
+        let opt = mongo_op::find_one(&item.id, &collection).await.unwrap();
         let found = opt.expect("not found");
         assert_eq!(found, item);
     })
@@ -99,7 +98,7 @@ async fn test_replace_one_missing() {
     test_op(|collection| async move {
         // Arrange.
         let item = Item {
-            id: Default::default(),
+            id: Item::new_id(),
             name: crockford::random_id(),
         };
 
@@ -117,13 +116,13 @@ async fn test_find_one_exists() {
     test_op(|collection| async move {
         // Arrange.
         let item = Item {
-            id: Default::default(),
+            id: Item::new_id(),
             name: crockford::random_id(),
         };
         mongo_op::insert_one(&item, &collection).await.unwrap();
 
         // Act.
-        let opt = mongo_op::find_one(item.id, &collection).await.unwrap();
+        let opt = mongo_op::find_one(&item.id, &collection).await.unwrap();
 
         // Assert.
         let found = opt.expect("not found");
@@ -139,7 +138,7 @@ async fn test_find_one_missing() {
         let id = Item::new_id();
 
         // Act.
-        let opt = mongo_op::find_one(id, &collection).await.unwrap();
+        let opt = mongo_op::find_one(&id, &collection).await.unwrap();
 
         // Assert.
         assert!(opt.is_none());
@@ -153,7 +152,7 @@ async fn test_find() {
         // Arrange.
         let items: Vec<_> = (0..3)
             .map(|_| Item {
-                id: Default::default(),
+                id: Item::new_id(),
                 name: crockford::random_id(),
             })
             .collect();
@@ -179,16 +178,16 @@ async fn test_delete_one_existing() {
     test_op(|collection| async move {
         // Arrange.
         let item = Item {
-            id: Default::default(),
+            id: Item::new_id(),
             name: crockford::random_id(),
         };
         mongo_op::insert_one(&item, &collection).await.unwrap();
 
         // Act.
-        mongo_op::delete_one(item.id, &collection).await.unwrap();
+        mongo_op::delete_one(&item.id, &collection).await.unwrap();
 
         // Assert.
-        let opt = mongo_op::find_one(item.id, &collection).await.unwrap();
+        let opt = mongo_op::find_one(&item.id, &collection).await.unwrap();
         assert!(opt.is_none());
     })
     .await
@@ -201,7 +200,7 @@ async fn test_delete_one_missing() {
         let id = Item::new_id();
 
         // Act.
-        let res = mongo_op::delete_one(id, &collection).await;
+        let res = mongo_op::delete_one(&id, &collection).await;
 
         // Assert.
         assert!(matches!(res, Err(DeleteError::NotFound)));
@@ -212,17 +211,17 @@ async fn test_delete_one_missing() {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 struct Item {
     #[serde(rename = "_id")]
-    pub id: ObjectId,
+    pub id: String,
     pub name: String,
 }
 
 impl HasId for Item {
-    type Id = ObjectId;
+    type Id = String;
 }
 
 impl GetId for Item {
-    fn id(&self) -> Self::Id {
-        self.id
+    fn id(&self) -> &Self::Id {
+        &self.id
     }
 }
 
@@ -234,7 +233,7 @@ impl SetId for Item {
 
 impl NewId for Item {
     fn new_id() -> Self::Id {
-        Default::default()
+        crockford::random_id()
     }
 }
 

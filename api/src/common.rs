@@ -3,7 +3,7 @@ pub trait HasId {
 }
 
 pub trait GetId: HasId {
-    fn id(&self) -> Self::Id;
+    fn id(&self) -> &Self::Id;
 }
 
 pub trait SetId: HasId {

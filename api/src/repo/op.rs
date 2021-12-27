@@ -13,7 +13,7 @@ pub trait ReplaceOne<T> {
 
 #[async_trait::async_trait]
 pub trait FindOne<T: HasId> {
-    async fn find_one(&self, id: T::Id) -> anyhow::Result<Option<T>>;
+    async fn find_one(&self, id: &T::Id) -> anyhow::Result<Option<T>>;
 }
 
 #[async_trait::async_trait]
@@ -23,5 +23,5 @@ pub trait Find<T> {
 
 #[async_trait::async_trait]
 pub trait DeleteOne<T: HasId> {
-    async fn delete_one(&self, id: T::Id) -> DeleteResult;
+    async fn delete_one(&self, id: &T::Id) -> DeleteResult;
 }
