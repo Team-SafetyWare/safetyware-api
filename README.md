@@ -69,7 +69,7 @@ This section describes how to make code changes.
    ```
    docker compose up -d --build mongo
    ```
-2. Run automated tests.
+2. Run the tests.
    ```
    cargo test
    ```
