@@ -1,7 +1,7 @@
 use futures_util::Stream;
 
 pub mod company;
-pub mod memory_op;
+pub mod mem_op;
 pub mod mongo_op;
 pub mod op;
 

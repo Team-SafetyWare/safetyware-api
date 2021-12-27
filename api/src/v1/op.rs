@@ -168,3 +168,94 @@ where
         .map(warp_ext::convert_err)
         .boxed()
 }
+
+//noinspection DuplicatedCode
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::common::GetId;
+    use crate::repo::{mem_op, DeleteResult, ItemStream, ReplaceResult};
+    use serde::Deserialize;
+
+    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+    pub struct RepoItem {
+        pub id: String,
+        pub name: String,
+    }
+
+    impl HasId for RepoItem {
+        type Id = String;
+    }
+
+    impl GetId for RepoItem {
+        fn id(&self) -> &Self::Id {
+            &self.id
+        }
+    }
+
+    impl SetId for RepoItem {
+        fn set_id(&mut self, id: Self::Id) {
+            self.id = id
+        }
+    }
+
+    #[async_trait::async_trait]
+    pub trait ItemRepo:
+        InsertOne<RepoItem>
+        + ReplaceOne<RepoItem>
+        + FindOne<RepoItem>
+        + Find<RepoItem>
+        + DeleteOne<RepoItem>
+    {
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct MemoryItemRepo {
+        pub collection: mem_op::Collection<RepoItem>,
+    }
+
+    impl Default for MemoryItemRepo {
+        fn default() -> Self {
+            Self {
+                collection: Default::default(),
+            }
+        }
+    }
+
+    impl ItemRepo for MemoryItemRepo {}
+
+    #[async_trait::async_trait]
+    impl InsertOne<RepoItem> for MemoryItemRepo {
+        async fn insert_one(&self, item: &RepoItem) -> anyhow::Result<()> {
+            mem_op::insert_one(item, &self.collection)
+        }
+    }
+
+    #[async_trait::async_trait]
+    impl ReplaceOne<RepoItem> for MemoryItemRepo {
+        async fn replace_one(&self, item: &RepoItem) -> ReplaceResult {
+            mem_op::replace_one(item, &self.collection)
+        }
+    }
+
+    #[async_trait::async_trait]
+    impl FindOne<RepoItem> for MemoryItemRepo {
+        async fn find_one(&self, id: &<RepoItem as HasId>::Id) -> anyhow::Result<Option<RepoItem>> {
+            mem_op::find_one(id, &self.collection)
+        }
+    }
+
+    #[async_trait::async_trait]
+    impl Find<RepoItem> for MemoryItemRepo {
+        async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<RepoItem>>> {
+            mem_op::find(&self.collection)
+        }
+    }
+
+    #[async_trait::async_trait]
+    impl DeleteOne<RepoItem> for MemoryItemRepo {
+        async fn delete_one(&self, id: &<RepoItem as HasId>::Id) -> DeleteResult {
+            mem_op::delete_one(id, &self.collection)
+        }
+    }
+}
