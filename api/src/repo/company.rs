@@ -2,24 +2,23 @@ use crate::common::{GetId, HasId, SetId};
 use crate::repo::op::{DeleteOne, Find, FindOne, InsertOne, ReplaceOne};
 use crate::repo::{mongo_op, DeleteResult};
 use crate::repo::{ItemStream, ReplaceResult};
-use bson::oid::ObjectId;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Company {
     #[serde(rename = "_id")]
-    pub id: ObjectId,
+    pub id: String,
     pub name: String,
 }
 
 impl HasId for Company {
-    type Id = ObjectId;
+    type Id = String;
 }
 
 impl GetId for Company {
-    fn id(&self) -> Self::Id {
-        self.id
+    fn id(&self) -> &Self::Id {
+        &self.id
     }
 }
 
@@ -68,7 +67,7 @@ impl ReplaceOne<Company> for MongoCompanyRepo {
 
 #[async_trait::async_trait]
 impl FindOne<Company> for MongoCompanyRepo {
-    async fn find_one(&self, id: <Company as HasId>::Id) -> anyhow::Result<Option<Company>> {
+    async fn find_one(&self, id: &<Company as HasId>::Id) -> anyhow::Result<Option<Company>> {
         mongo_op::find_one(id, &self.collection()).await
     }
 }
@@ -82,7 +81,7 @@ impl Find<Company> for MongoCompanyRepo {
 
 #[async_trait::async_trait]
 impl DeleteOne<Company> for MongoCompanyRepo {
-    async fn delete_one(&self, id: <Company as HasId>::Id) -> DeleteResult {
+    async fn delete_one(&self, id: &<Company as HasId>::Id) -> DeleteResult {
         mongo_op::delete_one(id, &self.collection()).await
     }
 }

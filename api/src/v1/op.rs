@@ -22,7 +22,7 @@ where
     Repo: FindOne<RepoItem> + Send + Sync + ?Sized + 'static,
     Item: HasId<Id = Option<String>> + From<RepoItem> + Serialize,
     RepoItem: HasId,
-    RepoItem::Id: FromStr + Send,
+    RepoItem::Id: FromStr + Send + Sync,
     <RepoItem::Id as FromStr>::Err: Into<anyhow::Error>,
 {
     warp::path(collection_name)
@@ -31,7 +31,7 @@ where
         .and(warp::path::param())
         .then(move |repo: Arc<Repo>, id: String| async move {
             let rid: RepoItem::Id = id.parse().map_err(Into::into)?;
-            let item = repo.find_one(rid).await?.map(Item::from);
+            let item = repo.find_one(&rid).await?.map(Item::from);
             let reply = match item {
                 None => StatusCode::NOT_FOUND.boxed(),
                 Some(item) => item.as_json_reply().boxed(),
@@ -118,7 +118,7 @@ where
         .and(warp::path::param())
         .then(move |repo: Arc<Repo>, id: String| async move {
             let rid: RepoItem::Id = id.parse().map_err(Into::into)?;
-            let fut = repo.delete_one(rid);
+            let fut = repo.delete_one(&rid);
             let res = fut.await;
             match res {
                 Ok(()) => Ok(warp::reply().boxed()),

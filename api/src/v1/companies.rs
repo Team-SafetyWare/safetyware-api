@@ -1,10 +1,10 @@
 use crate::common::{GetId, HasId, NewId, SetId};
+use crate::crockford;
 use crate::repo::company::Company as RepoCompany;
 use crate::repo::company::CompanyRepo;
 use crate::v1::op;
 use crate::v1::ResourceApi;
 use anyhow::Context;
-use bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::sync::Arc;
@@ -43,8 +43,8 @@ impl HasId for Company {
 }
 
 impl GetId for Company {
-    fn id(&self) -> Self::Id {
-        self.id.clone()
+    fn id(&self) -> &Self::Id {
+        &self.id
     }
 }
 
@@ -56,7 +56,7 @@ impl SetId for Company {
 
 impl NewId for Company {
     fn new_id() -> Self::Id {
-        Some(ObjectId::new().to_string())
+        Some(crockford::random_id())
     }
 }
 
