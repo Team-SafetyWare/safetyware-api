@@ -1,5 +1,6 @@
 use serde::Serialize;
 use std::convert::Infallible;
+use warp::http::StatusCode;
 use warp::{Filter, Reply};
 
 pub fn with_clone<T: Clone + Send>(
@@ -8,15 +9,16 @@ pub fn with_clone<T: Clone + Send>(
     warp::any().map(move || item.clone())
 }
 
-pub trait IntoInfallible {
-    fn into_infallible(self) -> Result<Self, Infallible>
-    where
-        Self: Sized;
-}
-
-impl<T: Reply> IntoInfallible for T {
-    fn into_infallible(self) -> Result<Self, Infallible> {
-        Result::<_, Infallible>::Ok(self)
+pub fn convert_err<T>(res: anyhow::Result<T>) -> Box<dyn Reply>
+where
+    T: Reply + 'static,
+{
+    match res {
+        Ok(reply) => reply.boxed(),
+        Err(err) => {
+            log::error!("{:?}", err);
+            StatusCode::INTERNAL_SERVER_ERROR.boxed()
+        }
     }
 }
 
@@ -37,15 +39,5 @@ pub trait BoxReply {
 impl<T: Reply + 'static> BoxReply for T {
     fn boxed(self) -> Box<dyn Reply> {
         Box::new(self) as Box<dyn Reply>
-    }
-}
-
-pub trait BoxReplyInfallible {
-    fn boxed_infallible(self) -> Result<Box<dyn Reply>, Infallible>;
-}
-
-impl<T: BoxReply> BoxReplyInfallible for T {
-    fn boxed_infallible(self) -> Result<Box<dyn Reply>, Infallible> {
-        self.boxed().into_infallible()
     }
 }

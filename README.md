@@ -51,6 +51,7 @@ This section describes how to make code changes.
    ```
    $env:SW_DB_URI="mongodb://localhost:42781"
    $env:RUST_LOG="info"
+   $env:RUST_BACKTRACE="1"
    ```
 3. Build and run.
    ```
