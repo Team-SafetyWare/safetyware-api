@@ -13,7 +13,6 @@
     <option name="redirectInputPath" value="" />
     <method v="2">
       <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Start containers" run_configuration_type="docker-deploy" />
     </method>
   </configuration>
 </component>

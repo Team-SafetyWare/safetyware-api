@@ -1,11 +1,11 @@
-use api::crockford;
 use mongodb::{Client, Database};
+use uuid::Uuid;
 
 mod mongo_op;
 
 pub async fn new_db() -> anyhow::Result<Database> {
     let client = db_client().await?;
-    let name = format!("test-{}", crockford::random_id());
+    let name = format!("test-{}", Uuid::new_v4());
     let db = client.database(&name);
     Ok(db)
 }
