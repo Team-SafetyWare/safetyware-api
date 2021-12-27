@@ -333,7 +333,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_update() {
+    async fn test_update_forbidden() {
         test_filter(|filter| async move {
             // Arrange.
             let item = ApiItem {
@@ -351,6 +351,51 @@ mod tests {
 
             // Assert.
             assert_eq!(res.status(), StatusCode::FORBIDDEN);
+        })
+        .await
+    }
+
+    #[tokio::test]
+    async fn test_replace() {
+        test_filter(|filter| async move {
+            // Arrange.
+            let item = ApiItem {
+                id: None,
+                name: crockford::random_id(),
+            };
+            let create_res = warp::test::request()
+                .method("POST")
+                .path("/items")
+                .body(serde_json::to_string(&item).unwrap())
+                .reply(&filter)
+                .await;
+            let created: ApiItem = serde_json::from_slice(create_res.body()).unwrap();
+            let replacement = ApiItem {
+                id: None,
+                name: crockford::random_id(),
+            };
+
+            // Act.
+            let res = warp::test::request()
+                .method("PUT")
+                .path(&format!("/items/{}", created.id.as_ref().unwrap()))
+                .body(serde_json::to_string(&replacement).unwrap())
+                .reply(&filter)
+                .await;
+
+            // Assert.
+            assert_eq!(res.status(), StatusCode::OK);
+            let res_item: ApiItem = serde_json::from_slice(res.body()).unwrap();
+            assert_eq!(res_item.id, created.id);
+            assert_eq!(res_item.name, replacement.name);
+            let found_res = warp::test::request()
+                .method("GET")
+                .path(&format!("/items/{}", created.id.as_ref().unwrap()))
+                .reply(&filter)
+                .await;
+            let found_item: ApiItem = serde_json::from_slice(found_res.body()).unwrap();
+            assert_eq!(found_item.id, created.id);
+            assert_eq!(found_item.name, replacement.name);
         })
         .await
     }
