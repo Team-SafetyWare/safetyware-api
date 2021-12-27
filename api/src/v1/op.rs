@@ -180,6 +180,7 @@ mod tests {
     use anyhow::Context;
     use serde::Deserialize;
     use std::convert::TryFrom;
+    use std::future::Future;
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
     pub struct RepoItem {
@@ -214,11 +215,11 @@ mod tests {
     }
 
     #[derive(Debug, Clone)]
-    pub struct MemoryItemRepo {
+    pub struct MemItemRepo {
         pub collection: mem_op::Collection<RepoItem>,
     }
 
-    impl Default for MemoryItemRepo {
+    impl Default for MemItemRepo {
         fn default() -> Self {
             Self {
                 collection: Default::default(),
@@ -226,38 +227,38 @@ mod tests {
         }
     }
 
-    impl ItemRepo for MemoryItemRepo {}
+    impl ItemRepo for MemItemRepo {}
 
     #[async_trait::async_trait]
-    impl InsertOne<RepoItem> for MemoryItemRepo {
+    impl InsertOne<RepoItem> for MemItemRepo {
         async fn insert_one(&self, item: &RepoItem) -> anyhow::Result<()> {
             mem_op::insert_one(item, &self.collection)
         }
     }
 
     #[async_trait::async_trait]
-    impl ReplaceOne<RepoItem> for MemoryItemRepo {
+    impl ReplaceOne<RepoItem> for MemItemRepo {
         async fn replace_one(&self, item: &RepoItem) -> ReplaceResult {
             mem_op::replace_one(item, &self.collection)
         }
     }
 
     #[async_trait::async_trait]
-    impl FindOne<RepoItem> for MemoryItemRepo {
+    impl FindOne<RepoItem> for MemItemRepo {
         async fn find_one(&self, id: &<RepoItem as HasId>::Id) -> anyhow::Result<Option<RepoItem>> {
             mem_op::find_one(id, &self.collection)
         }
     }
 
     #[async_trait::async_trait]
-    impl Find<RepoItem> for MemoryItemRepo {
+    impl Find<RepoItem> for MemItemRepo {
         async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<RepoItem>>> {
             mem_op::find(&self.collection)
         }
     }
 
     #[async_trait::async_trait]
-    impl DeleteOne<RepoItem> for MemoryItemRepo {
+    impl DeleteOne<RepoItem> for MemItemRepo {
         async fn delete_one(&self, id: &<RepoItem as HasId>::Id) -> DeleteResult {
             mem_op::delete_one(id, &self.collection)
         }
@@ -315,6 +316,14 @@ mod tests {
     #[derive(Clone)]
     pub struct ItemApi {
         pub repo: Arc<dyn ItemRepo + Send + Sync + 'static>,
+    }
+
+    impl ItemApi {
+        pub fn new(repo: impl ItemRepo + Send + Sync + 'static) -> Self {
+            Self {
+                repo: Arc::new(repo),
+            }
+        }
     }
 
     impl ResourceApi for ItemApi {

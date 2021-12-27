@@ -65,6 +65,14 @@ pub struct CompanyApi {
     pub repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
 }
 
+impl CompanyApi {
+    pub fn new(repo: impl CompanyRepo + Send + Sync + 'static) -> Self {
+        Self {
+            repo: Arc::new(repo),
+        }
+    }
+}
+
 impl ResourceApi for CompanyApi {
     fn collection_name(&self) -> String {
         "companies".to_string()

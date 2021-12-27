@@ -15,10 +15,7 @@ pub fn all(
     db: Database,
     company_repo: impl CompanyRepo + Send + Sync + 'static,
 ) -> BoxedFilter<(impl Reply,)> {
-    let company = CompanyApi {
-        repo: Arc::new(company_repo),
-    }
-    .all();
+    let company = CompanyApi::new(company_repo).all();
 
     warp::path("v1").and(health(db).or(company)).boxed()
 }
