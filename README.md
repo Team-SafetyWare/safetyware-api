@@ -69,9 +69,13 @@ This section describes how to make code changes.
    ```
    docker compose up -d --build mongo
    ```
-2. Run the tests.
+2. Run Rust tests.
    ```
    cargo test
+   ```
+3. Run Postman tests.
+   ```
+   docker run --rm -v $pwd/postman:/etc/newman -t postman/newman:5.3-alpine run API.postman_collection.json --environment dev.postman_environment.json
    ```
 
 ## Postman
