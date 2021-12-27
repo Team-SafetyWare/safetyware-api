@@ -208,6 +208,88 @@ mod tests {
         .await
     }
 
+    #[tokio::test]
+    async fn test_create_invalid() {
+        test_filter(|filter| async move {
+            // Act.
+            let res = warp::test::request()
+                .method("POST")
+                .path("/items")
+                .body(r#"{"nonexistent":"nonexistent"}"#)
+                .reply(&filter)
+                .await;
+
+            // Assert.
+            assert_eq!(res.status(), StatusCode::BAD_REQUEST);
+        })
+        .await
+    }
+
+    #[tokio::test]
+    async fn test_get_existing() {
+        test_filter(|filter| async move {
+            // Arrange.
+            let item = ApiItem {
+                id: None,
+                name: crockford::random_id(),
+            };
+            let create_res = warp::test::request()
+                .method("POST")
+                .path("/items")
+                .body(serde_json::to_string(&item).unwrap())
+                .reply(&filter)
+                .await;
+            let created: ApiItem = serde_json::from_slice(create_res.body()).unwrap();
+
+            // Act.
+            let res = warp::test::request()
+                .method("GET")
+                .path(&format!("/items/{}", created.id.as_ref().unwrap()))
+                .reply(&filter)
+                .await;
+
+            // Assert.
+            assert_eq!(res.status(), StatusCode::OK);
+            let found: ApiItem = serde_json::from_slice(res.body()).unwrap();
+            assert_eq!(created, found);
+        })
+        .await
+    }
+
+    #[tokio::test]
+    async fn test_get_nonexisting() {
+        test_filter(|filter| async move {
+            // Act.
+            let id = crockford::random_id();
+            let res = warp::test::request()
+                .method("GET")
+                .path(&format!("/items/{}", id))
+                .reply(&filter)
+                .await;
+
+            // Assert.
+            assert_eq!(res.status(), StatusCode::NOT_FOUND);
+        })
+        .await
+    }
+
+    #[tokio::test]
+    async fn test_get_bad_id() {
+        test_filter(|filter| async move {
+            // Act.
+            let id = "abc";
+            let res = warp::test::request()
+                .method("GET")
+                .path(&format!("/items/{}", id))
+                .reply(&filter)
+                .await;
+
+            // Assert.
+            assert_eq!(res.status(), StatusCode::NOT_FOUND);
+        })
+        .await
+    }
+
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
     pub struct RepoItem {
         pub id: String,
@@ -290,7 +372,7 @@ mod tests {
         }
     }
 
-    #[derive(Debug, Clone, Serialize, Deserialize)]
+    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
     pub struct ApiItem {
         pub id: Option<String>,
         pub name: String,
