@@ -8,7 +8,6 @@ use futures_util::TryStreamExt;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::convert::TryInto;
-use std::fmt::Debug;
 use std::str::FromStr;
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
@@ -24,20 +23,22 @@ where
     Item: HasId<Id = Option<String>> + From<RepoItem> + Serialize,
     RepoItem: HasId,
     RepoItem::Id: FromStr + Send,
-    <RepoItem::Id as FromStr>::Err: Debug,
+    <RepoItem::Id as FromStr>::Err: Into<anyhow::Error>,
 {
     warp::path(collection_name)
         .and(warp::get())
         .and(warp_ext::with_clone(repo))
         .and(warp::path::param())
         .then(move |repo: Arc<Repo>, id: String| async move {
-            let rid: RepoItem::Id = id.parse().unwrap();
-            let item = repo.find_one(rid).await.unwrap().map(Item::from);
-            match item {
+            let rid: RepoItem::Id = id.parse().map_err(Into::into)?;
+            let item = repo.find_one(rid).await?.map(Item::from);
+            let reply = match item {
                 None => StatusCode::NOT_FOUND.boxed(),
                 Some(item) => item.as_json_reply().boxed(),
-            }
+            };
+            Ok(reply)
         })
+        .map(warp_ext::convert_err)
         .boxed()
 }
 
@@ -54,16 +55,16 @@ where
         .and(warp::get())
         .and(warp_ext::with_clone(repo))
         .then(move |repo: Arc<Repo>| async move {
-            repo.find()
-                .await
-                .unwrap()
+            Ok(repo
+                .find()
+                .await?
                 .map_ok(Into::into)
                 .try_collect::<Vec<Item>>()
-                .await
-                .unwrap()
+                .await?
                 .as_json_reply()
-                .boxed()
+                .boxed())
         })
+        .map(warp_ext::convert_err)
         .boxed()
 }
 
@@ -82,7 +83,7 @@ where
         + Serialize
         + Send
         + 'static,
-    <Item as TryInto<RepoItem>>::Error: Debug + Send,
+    <Item as TryInto<RepoItem>>::Error: Into<anyhow::Error>,
     RepoItem: Send,
 {
     warp::path(collection_name)
@@ -91,11 +92,13 @@ where
         .and(warp::body::json())
         .then(move |repo: Arc<Repo>, mut item: Item| async move {
             item.set_id(Item::new_id());
-            let repo_item = item.clone().try_into().unwrap();
+            let repo_item = item.clone().try_into().map_err(Into::into)?;
             let fut = repo.insert_one(&repo_item);
-            fut.await.unwrap();
-            item.as_json_reply().boxed()
+            fut.await?;
+            let reply = item.as_json_reply().boxed();
+            Ok(reply)
         })
+        .map(warp_ext::convert_err)
         .boxed()
 }
 
@@ -107,22 +110,23 @@ where
     Repo: DeleteOne<RepoItem> + Send + Sync + ?Sized + 'static,
     RepoItem: HasId,
     RepoItem::Id: FromStr + Send,
-    <RepoItem::Id as FromStr>::Err: Debug + Send,
+    <RepoItem::Id as FromStr>::Err: Into<anyhow::Error>,
 {
     warp::path(collection_name)
         .and(warp::delete())
         .and(warp_ext::with_clone(repo))
         .and(warp::path::param())
         .then(move |repo: Arc<Repo>, id: String| async move {
-            let rid: RepoItem::Id = id.parse().unwrap();
+            let rid: RepoItem::Id = id.parse().map_err(Into::into)?;
             let fut = repo.delete_one(rid);
             let res = fut.await;
             match res {
-                Ok(()) => warp::reply().boxed(),
-                Err(DeleteError::NotFound) => StatusCode::NOT_FOUND.boxed(),
-                Err(DeleteError::Other(e)) => panic!("{}", e),
+                Ok(()) => Ok(warp::reply().boxed()),
+                Err(DeleteError::NotFound) => Ok(StatusCode::NOT_FOUND.boxed()),
+                Err(e) => Err(e.into()),
             }
         })
+        .map(warp_ext::convert_err)
         .boxed()
 }
 
@@ -140,7 +144,7 @@ where
         + DeserializeOwned
         + Send
         + 'static,
-    <Item as TryInto<RepoItem>>::Error: Debug + Send,
+    <Item as TryInto<RepoItem>>::Error: Into<anyhow::Error>,
     RepoItem: Send,
 {
     warp::path(collection_name)
@@ -150,16 +154,17 @@ where
         .and(warp::body::json())
         .then(
             move |repo: Arc<Repo>, id: String, mut item: Item| async move {
-                item.set_id(Some(id.parse().unwrap()));
-                let repo_item = item.clone().try_into().unwrap();
+                item.set_id(Some(id.parse()?));
+                let repo_item = item.clone().try_into().map_err(Into::into)?;
                 let fut = repo.replace_one(&repo_item);
                 let res = fut.await;
                 match res {
-                    Ok(()) => item.as_json_reply().boxed(),
-                    Err(ReplaceError::NotFound) => StatusCode::NOT_FOUND.boxed(),
-                    Err(ReplaceError::Other(e)) => panic!("{}", e),
+                    Ok(()) => Ok(item.as_json_reply().boxed()),
+                    Err(ReplaceError::NotFound) => Ok(StatusCode::NOT_FOUND.boxed()),
+                    Err(e) => Err(e.into()),
                 }
             },
         )
+        .map(warp_ext::convert_err)
         .boxed()
 }
