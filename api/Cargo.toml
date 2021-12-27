@@ -3,6 +3,10 @@ name = "api"
 version = "0.1.0"
 edition = "2018"
 
+[[bin]]
+name = "api"
+test = false
+
 [dependencies]
 anyhow = { version = "1.0", features = ["backtrace"] }
 async-trait = "0.1"
