@@ -400,6 +400,41 @@ mod tests {
         .await
     }
 
+    #[tokio::test]
+    async fn test_delete_existing() {
+        test_filter(|filter| async move {
+            // Arrange.
+            let item = ApiItem {
+                id: None,
+                name: crockford::random_id(),
+            };
+            let create_res = warp::test::request()
+                .method("POST")
+                .path("/items")
+                .body(serde_json::to_string(&item).unwrap())
+                .reply(&filter)
+                .await;
+            let created: ApiItem = serde_json::from_slice(create_res.body()).unwrap();
+
+            // Act.
+            let res = warp::test::request()
+                .method("DELETE")
+                .path(&format!("/items/{}", created.id.as_ref().unwrap()))
+                .reply(&filter)
+                .await;
+
+            // Assert.
+            assert_eq!(res.status(), StatusCode::OK);
+            let found_res = warp::test::request()
+                .method("GET")
+                .path(&format!("/items/{}", created.id.as_ref().unwrap()))
+                .reply(&filter)
+                .await;
+            assert_eq!(found_res.status(), StatusCode::NOT_FOUND);
+        })
+        .await
+    }
+
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
     pub struct RepoItem {
         pub id: String,
