@@ -260,7 +260,7 @@ mod tests {
     async fn test_get_nonexisting() {
         test_filter(|filter| async move {
             // Act.
-            let id = crockford::random_id();
+            let id = ApiItem::new_id().unwrap();
             let res = warp::test::request()
                 .method("GET")
                 .path(&format!("/items/{}", id))
@@ -286,6 +286,71 @@ mod tests {
 
             // Assert.
             assert_eq!(res.status(), StatusCode::NOT_FOUND);
+        })
+        .await
+    }
+
+    #[tokio::test]
+    async fn test_list() {
+        test_filter(|filter| async move {
+            // Arrange.
+            let items = vec![
+                ApiItem {
+                    id: None,
+                    name: crockford::random_id(),
+                },
+                ApiItem {
+                    id: None,
+                    name: crockford::random_id(),
+                },
+            ];
+            for item in &items {
+                warp::test::request()
+                    .method("POST")
+                    .path("/items")
+                    .body(serde_json::to_string(&item).unwrap())
+                    .reply(&filter)
+                    .await;
+            }
+
+            // Act.
+            let res = warp::test::request()
+                .method("GET")
+                .path("/items")
+                .reply(&filter)
+                .await;
+
+            // Assert.
+            assert_eq!(res.status(), StatusCode::OK);
+            let list: Vec<ApiItem> = serde_json::from_slice(res.body()).unwrap();
+            assert_eq!(list.len(), items.len());
+            for found in &list {
+                assert!(items.iter().any(|item| found.name == item.name));
+                assert!(!found.id.as_ref().unwrap().is_empty());
+            }
+        })
+        .await
+    }
+
+    #[tokio::test]
+    async fn test_update() {
+        test_filter(|filter| async move {
+            // Arrange.
+            let item = ApiItem {
+                id: ApiItem::new_id(),
+                name: crockford::random_id(),
+            };
+
+            // Act.
+            let res = warp::test::request()
+                .method("PATCH")
+                .path(&format!("/items/{}", item.id.as_ref().unwrap()))
+                .body(serde_json::to_string(&item).unwrap())
+                .reply(&filter)
+                .await;
+
+            // Assert.
+            assert_eq!(res.status(), StatusCode::FORBIDDEN);
         })
         .await
     }
