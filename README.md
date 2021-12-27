@@ -65,19 +65,9 @@ This section describes how to make code changes.
 
 ## Test
 
-1. Start the Docker containers.
+1. Run the tests.
    ```
-   docker compose up -d --build mongo
-   ```
-2. Run Rust tests.
-   ```
-   cargo test
-   ```
-3. Start the API locally, outside Docker.
-4. Run Postman tests.
-   ```
-   docker run --rm --network host --volume $pwd/postman:/etc/newman -t postman/newman:5.3-alpine `
-       run API.postman_collection.json --global-var "base=http://host.docker.internal:3001"
+   .\script\Test.ps1
    ```
 
 ## Postman
