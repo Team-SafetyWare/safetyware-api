@@ -41,7 +41,7 @@ where
     T::Id: Eq + Hash + Clone,
 {
     let collection = collection.read().unwrap();
-    let found = collection.get(id).map(|item| item.clone());
+    let found = collection.get(id).cloned();
     Ok(found)
 }
 
@@ -51,7 +51,7 @@ where
     T::Id: Eq + Hash + Clone + Unpin + Send,
 {
     let collection = collection.read().unwrap();
-    let values = collection.values().map(|i| i.clone());
+    let values = collection.values().cloned();
     let results: Vec<anyhow::Result<T>> = values.map(|i| Ok(i)).collect();
     let stream = stream::iter(results);
     Ok(Box::new(stream))
