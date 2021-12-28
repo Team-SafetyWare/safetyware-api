@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6b8867f9-6958-4aa5-b66a-aed33f70d0c8",
+		"_postman_id": "4210dc0e-2227-4bdc-8611-aecb0b4abf0d",
 		"name": "API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -86,15 +86,6 @@
 							"request": {
 								"method": "PATCH",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"Tall Hats Shop\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "{{base}}/v1/companies/:id",
 									"host": [
@@ -162,6 +153,165 @@
 									"path": [
 										"v1",
 										"companies",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "people",
+					"item": [
+						{
+							"name": "get",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base}}/v1/people/:id",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"people",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base}}/v1/people",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"people"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Yosemite Sam\",\r\n    \"company_id\": \"ddac1mkee80w52vbpsqbp2df\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base}}/v1/people",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"people"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{base}}/v1/people/:id",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"people",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base}}/v1/people/:id",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"people",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "replace",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Yosemite Sam\",\r\n    \"company_id\": \"ddac1mkee80w52vbpsqbp2df\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base}}/v1/people/:id",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"people",
 										":id"
 									],
 									"variable": [

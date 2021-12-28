@@ -4,6 +4,7 @@ pub mod company;
 pub mod mem_op;
 pub mod mongo_op;
 pub mod op;
+pub mod person;
 
 pub trait ItemStream<T: Unpin + Send>: Stream<Item = anyhow::Result<T>> + Unpin + Send {}
 

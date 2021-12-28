@@ -1,6 +1,8 @@
 use crate::db;
 use crate::repo::company::CompanyRepo;
+use crate::repo::person::PersonRepo;
 use crate::v1::companies::CompanyApi;
+use crate::v1::people::PersonApi;
 use crate::warp_ext;
 use mongodb::Database;
 use warp::filters::BoxedFilter;
@@ -9,14 +11,19 @@ use warp::{Filter, Rejection, Reply};
 
 pub mod companies;
 pub mod op;
+pub mod people;
 
 pub fn all(
     db: Database,
     company_repo: impl CompanyRepo + Send + Sync + 'static,
+    person_repo: impl PersonRepo + Send + Sync + 'static,
 ) -> BoxedFilter<(impl Reply,)> {
     let company = CompanyApi::new(company_repo).all();
+    let person = PersonApi::new(person_repo).all();
 
-    warp::path("v1").and(health(db).or(company)).boxed()
+    warp::path("v1")
+        .and(health(db).or(company).or(person))
+        .boxed()
 }
 
 fn health(db: Database) -> BoxedFilter<(impl Reply,)> {
