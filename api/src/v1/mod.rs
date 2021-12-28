@@ -9,6 +9,7 @@ use warp::{Filter, Rejection, Reply};
 
 pub mod companies;
 pub mod op;
+pub mod people;
 
 pub fn all(
     db: Database,
