@@ -65,13 +65,9 @@ This section describes how to make code changes.
 
 ## Test
 
-1. Start the Docker containers.
+1. Run the tests.
    ```
-   docker compose up -d --build mongo
-   ```
-2. Run the tests.
-   ```
-   cargo test
+   .\script\Test.ps1
    ```
 
 ## Postman
