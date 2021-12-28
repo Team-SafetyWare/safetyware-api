@@ -56,37 +56,47 @@ pub trait ResourceApi {
     }
 
     fn get(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        forbidden_filter(self.collection_name(), warp::get())
+        warp::path(self.collection_name())
+            .and(warp::get())
+            .and(warp::path::param())
+            .map(|_: String| Box::new(StatusCode::FORBIDDEN) as Box<dyn Reply>)
+            .boxed()
     }
 
     fn list(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        forbidden_filter(self.collection_name(), warp::get())
+        warp::path(self.collection_name())
+            .and(warp::get())
+            .map(|| Box::new(StatusCode::FORBIDDEN) as Box<dyn Reply>)
+            .boxed()
     }
 
     fn create(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        forbidden_filter(self.collection_name(), warp::post())
+        warp::path(self.collection_name())
+            .and(warp::post())
+            .map(|| Box::new(StatusCode::FORBIDDEN) as Box<dyn Reply>)
+            .boxed()
     }
 
     fn update(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        forbidden_filter(self.collection_name(), warp::patch())
+        warp::path(self.collection_name())
+            .and(warp::patch())
+            .map(|| Box::new(StatusCode::FORBIDDEN) as Box<dyn Reply>)
+            .boxed()
     }
 
     fn delete(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        forbidden_filter(self.collection_name(), warp::delete())
+        warp::path(self.collection_name())
+            .and(warp::delete())
+            .map(|| Box::new(StatusCode::FORBIDDEN) as Box<dyn Reply>)
+            .boxed()
     }
 
     fn replace(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        forbidden_filter(self.collection_name(), warp::put())
+        warp::path(self.collection_name())
+            .and(warp::put())
+            .map(|| Box::new(StatusCode::FORBIDDEN) as Box<dyn Reply>)
+            .boxed()
     }
-}
-
-fn forbidden_filter(
-    collection_name: String,
-    method: impl Filter<Extract = (), Error = Rejection> + Copy + Send + Sync + 'static,
-) -> BoxedFilter<(Box<dyn Reply>,)> {
-    warp::path(collection_name)
-        .and(method.map(|| Box::new(StatusCode::FORBIDDEN) as Box<dyn Reply>))
-        .boxed()
 }
 
 pub trait ResourceOperation {
