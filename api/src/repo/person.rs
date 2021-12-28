@@ -46,7 +46,7 @@ impl MongoPersonRepo {
     }
 
     pub fn collection(&self) -> Collection<Person> {
-        self.db.collection("company")
+        self.db.collection("person")
     }
 }
 
