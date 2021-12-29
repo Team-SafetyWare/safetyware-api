@@ -7,7 +7,6 @@ pub mod v1;
 pub mod warp_ext;
 
 use crate::repo::company::{CompanyRepo, MongoCompanyRepo};
-use crate::repo::location_reading::{LocationReadingRepo, MongoLocationReadingRepo};
 use crate::repo::person::{MongoPersonRepo, PersonRepo};
 use crate::settings::Settings;
 use mongodb::Database;
@@ -26,8 +25,7 @@ async fn main() -> anyhow::Result<()> {
     let db = db::connect(&settings.db_uri).await?;
     let company_repo = MongoCompanyRepo::new(db.clone());
     let person_repo = MongoPersonRepo::new(db.clone());
-    let location_reading_repo = MongoLocationReadingRepo::new(db.clone());
-    let route = filter(db, company_repo, person_repo, location_reading_repo)
+    let route = filter(db.clone(), company_repo.clone(), person_repo.clone())
         .with(log())
         .with(cors());
     let port = get_port();
@@ -39,9 +37,8 @@ fn filter(
     db: Database,
     company_repo: impl CompanyRepo + Send + Sync + 'static,
     person_repo: impl PersonRepo + Send + Sync + 'static,
-    location_reading_repo: impl LocationReadingRepo + Send + Sync + 'static,
 ) -> BoxedFilter<(impl Reply,)> {
-    let v1 = v1::all(db, company_repo, person_repo, location_reading_repo);
+    let v1 = v1::all(db, company_repo, person_repo);
     let robots = robots();
     v1.or(robots).boxed()
 }

@@ -1,7 +1,6 @@
 use futures_util::Stream;
 
 pub mod company;
-pub mod location_reading;
 pub mod mem_op;
 pub mod mongo_op;
 pub mod op;
