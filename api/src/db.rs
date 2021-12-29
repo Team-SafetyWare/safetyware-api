@@ -1,6 +1,6 @@
 use crate::crockford;
 use bson::Document;
-use mongodb::{Client, Database};
+use mongodb::{Client, Database, IndexModel};
 
 pub const DB_NAME: &str = "sw";
 
@@ -19,10 +19,33 @@ pub async fn connect(db_uri: &str) -> anyhow::Result<Database> {
     Ok(db)
 }
 
+pub async fn connect_and_prepare(db_uri: &str) -> anyhow::Result<Database> {
+    let db = connect(db_uri).await?;
+    prepare(&db).await?;
+    Ok(db)
+}
+
 pub async fn test_connection(db: &Database) -> anyhow::Result<()> {
     let nonexistent = crockford::random_id();
     db.collection::<Document>(&nonexistent)
         .find_one(None, None)
+        .await?;
+    Ok(())
+}
+
+pub async fn prepare(db: &Database) -> anyhow::Result<()> {
+    prepare_coll_person(db).await?;
+    Ok(())
+}
+
+pub async fn prepare_coll_person(db: &Database) -> anyhow::Result<()> {
+    db.collection::<Document>(coll::PERSON)
+        .create_index(
+            IndexModel::builder()
+                .keys(bson::doc! { "company_id": 1 })
+                .build(),
+            None,
+        )
         .await?;
     Ok(())
 }

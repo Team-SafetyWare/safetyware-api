@@ -23,7 +23,7 @@ const DEFAULT_PORT: u16 = 3001;
 async fn main() -> anyhow::Result<()> {
     env_logger::init();
     let settings = Settings::read();
-    let db = db::connect(&settings.db_uri).await?;
+    let db = db::connect_and_prepare(&settings.db_uri).await?;
     let company_repo = MongoCompanyRepo::new(db.clone());
     let person_repo = MongoPersonRepo::new(db.clone());
     let location_reading_repo = MongoLocationReadingRepo::new(db.clone());
