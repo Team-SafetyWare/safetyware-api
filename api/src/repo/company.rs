@@ -1,4 +1,5 @@
 use crate::common::{GetId, HasId, SetId};
+use crate::db::coll;
 use crate::repo::op::{DeleteOne, Find, FindOne, InsertOne, ReplaceOne};
 use crate::repo::{mongo_op, DeleteResult};
 use crate::repo::{ItemStream, ReplaceResult};
@@ -45,7 +46,7 @@ impl MongoCompanyRepo {
     }
 
     pub fn collection(&self) -> Collection<Company> {
-        self.db.collection("company")
+        self.db.collection(coll::COMPANY)
     }
 }
 

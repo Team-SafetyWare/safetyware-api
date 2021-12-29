@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4210dc0e-2227-4bdc-8611-aecb0b4abf0d",
+		"_postman_id": "953875bf-cab5-4b9f-84a8-eeeecdb9dca5",
 		"name": "API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -76,31 +76,6 @@
 									"path": [
 										"v1",
 										"companies"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "update",
-							"request": {
-								"method": "PATCH",
-								"header": [],
-								"url": {
-									"raw": "{{base}}/v1/companies/:id",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"v1",
-										"companies",
-										":id"
-									],
-									"variable": [
-										{
-											"key": "id",
-											"value": ""
-										}
 									]
 								}
 							},
@@ -241,31 +216,6 @@
 							"response": []
 						},
 						{
-							"name": "update",
-							"request": {
-								"method": "PATCH",
-								"header": [],
-								"url": {
-									"raw": "{{base}}/v1/people/:id",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"v1",
-										"people",
-										":id"
-									],
-									"variable": [
-										{
-											"key": "id",
-											"value": ""
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "delete",
 							"request": {
 								"method": "DELETE",
@@ -319,6 +269,29 @@
 											"key": "id",
 											"value": ""
 										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "locationReadings",
+					"item": [
+						{
+							"name": "list",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base}}/v1/locationReadings",
+									"host": [
+										"{{base}}"
+									],
+									"path": [
+										"v1",
+										"locationReadings"
 									]
 								}
 							},
