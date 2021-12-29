@@ -24,6 +24,7 @@ async fn main() -> anyhow::Result<()> {
     env_logger::init();
     let settings = Settings::read();
     let db = db::connect(&settings.db_uri).await?;
+    db::prepare(&db).await?;
     let company_repo = MongoCompanyRepo::new(db.clone());
     let person_repo = MongoPersonRepo::new(db.clone());
     let location_reading_repo = MongoLocationReadingRepo::new(db.clone());

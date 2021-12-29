@@ -1,3 +1,4 @@
+use crate::db::coll;
 use crate::repo::op::Find;
 use crate::repo::{mongo_op, ItemStream};
 use chrono::{DateTime, Utc};
@@ -54,7 +55,7 @@ impl MongoLocationReadingRepo {
     }
 
     pub fn collection(&self) -> Collection<MongoLocationReading> {
-        self.db.collection("location_reading")
+        self.db.collection(coll::LOCATION_READING)
     }
 }
 
