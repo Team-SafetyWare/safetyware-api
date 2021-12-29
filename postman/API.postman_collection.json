@@ -285,13 +285,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base}}/v1/people",
+									"raw": "{{base}}/v1/locationReadings",
 									"host": [
 										"{{base}}"
 									],
 									"path": [
 										"v1",
-										"people"
+										"locationReadings"
 									]
 								}
 							},
