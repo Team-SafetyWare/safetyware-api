@@ -1,6 +1,7 @@
 use crate::repo::location_reading::LocationReading as RepoLocationReading;
 use crate::v1::{op, ResourceApi};
 
+use chrono::SecondsFormat;
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
@@ -19,7 +20,7 @@ pub struct LocationReading {
 impl From<RepoLocationReading> for LocationReading {
     fn from(value: RepoLocationReading) -> Self {
         Self {
-            timestamp: value.timestamp,
+            timestamp: value.timestamp.to_rfc3339_opts(SecondsFormat::Millis, true),
             person_id: value.person_id,
             coordinates: value.coordinates,
         }

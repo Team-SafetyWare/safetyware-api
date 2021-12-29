@@ -21,7 +21,7 @@ pub struct DbLocation {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LocationReading {
-    pub timestamp: String,
+    pub timestamp: DateTime<Utc>,
     pub person_id: String,
     pub coordinates: Vec<f64>,
 }
@@ -30,7 +30,7 @@ impl From<DbLocationReading> for LocationReading {
     fn from(value: DbLocationReading) -> Self {
         Self {
             person_id: value.person_id,
-            timestamp: value.timestamp.to_string(),
+            timestamp: value.timestamp,
             coordinates: value.location.coordinates,
         }
     }
