@@ -1,7 +1,6 @@
 use api::crockford;
 use mongodb::{Client, Database};
 
-mod location_reading;
 mod mongo_op;
 
 pub async fn new_db() -> anyhow::Result<Database> {
