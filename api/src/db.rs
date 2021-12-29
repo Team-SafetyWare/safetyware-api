@@ -35,14 +35,37 @@ pub async fn test_connection(db: &Database) -> anyhow::Result<()> {
 
 pub async fn prepare(db: &Database) -> anyhow::Result<()> {
     prepare_coll_person(db).await?;
+    prepare_coll_location_reading(db).await?;
     Ok(())
 }
 
 pub async fn prepare_coll_person(db: &Database) -> anyhow::Result<()> {
-    db.collection::<Document>(coll::PERSON)
+    let collection = db.collection::<Document>(coll::PERSON);
+    collection
         .create_index(
             IndexModel::builder()
                 .keys(bson::doc! { "company_id": 1 })
+                .build(),
+            None,
+        )
+        .await?;
+    Ok(())
+}
+
+pub async fn prepare_coll_location_reading(db: &Database) -> anyhow::Result<()> {
+    let collection = db.collection::<Document>(coll::LOCATION_READING);
+    collection
+        .create_index(
+            IndexModel::builder()
+                .keys(bson::doc! { "person_id": 1 })
+                .build(),
+            None,
+        )
+        .await?;
+    collection
+        .create_index(
+            IndexModel::builder()
+                .keys(bson::doc! { "location": "2dsphere" })
                 .build(),
             None,
         )
