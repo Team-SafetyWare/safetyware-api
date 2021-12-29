@@ -7,35 +7,30 @@ use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LocationReading {
-    pub timestamp: String,
-    pub person_id: String,
-    pub coordinates: Vec<f64>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MongoLocationReading {
+pub struct DbLocationReading {
     #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
     pub timestamp: DateTime<Utc>,
-    pub metadata: Metadata,
-    pub location: Location,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Metadata {
     pub person_id: String,
+    pub location: DbLocation,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Location {
+pub struct DbLocation {
     pub coordinates: Vec<f64>,
 }
 
-impl From<MongoLocationReading> for LocationReading {
-    fn from(value: MongoLocationReading) -> Self {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LocationReading {
+    pub timestamp: DateTime<Utc>,
+    pub person_id: String,
+    pub coordinates: Vec<f64>,
+}
+
+impl From<DbLocationReading> for LocationReading {
+    fn from(value: DbLocationReading) -> Self {
         Self {
-            person_id: value.metadata.person_id,
-            timestamp: value.timestamp.to_string(),
+            person_id: value.person_id,
+            timestamp: value.timestamp,
             coordinates: value.location.coordinates,
         }
     }
@@ -54,7 +49,7 @@ impl MongoLocationReadingRepo {
         Self { db }
     }
 
-    pub fn collection(&self) -> Collection<MongoLocationReading> {
+    pub fn collection(&self) -> Collection<DbLocationReading> {
         self.db.collection(coll::LOCATION_READING)
     }
 }

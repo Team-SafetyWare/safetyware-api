@@ -1,6 +1,7 @@
 use crate::repo::location_reading::LocationReading as RepoLocationReading;
 use crate::v1::{op, ResourceApi};
 
+use chrono::{DateTime, Utc};
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
@@ -11,7 +12,7 @@ use warp::Reply;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LocationReading {
-    pub timestamp: String,
+    pub timestamp: DateTime<Utc>,
     pub person_id: String,
     pub coordinates: Vec<f64>,
 }
