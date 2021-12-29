@@ -2,7 +2,6 @@ use crate::db;
 use crate::repo::company::CompanyRepo;
 use crate::repo::person::PersonRepo;
 use crate::v1::companies::CompanyApi;
-use crate::v1::location_reading::LocationReadingApi;
 use crate::v1::people::PersonApi;
 use crate::warp_ext;
 use mongodb::Database;
@@ -11,7 +10,6 @@ use warp::http::StatusCode;
 use warp::{Filter, Rejection, Reply};
 
 pub mod companies;
-pub mod location_reading;
 pub mod op;
 pub mod people;
 
@@ -22,10 +20,9 @@ pub fn all(
 ) -> BoxedFilter<(impl Reply,)> {
     let company = CompanyApi::new(company_repo).all();
     let person = PersonApi::new(person_repo).all();
-    let location_reading = LocationReadingApi::new(db.clone()).all();
 
     warp::path("v1")
-        .and(health(db).or(company).or(person).or(location_reading))
+        .and(health(db).or(company).or(person))
         .boxed()
 }
 
