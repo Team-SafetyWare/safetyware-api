@@ -1,6 +1,5 @@
 use crate::db;
 use crate::repo::company::CompanyRepo;
-use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
 use crate::v1::companies::CompanyApi;
 use crate::v1::location_reading::LocationReadingApi;
@@ -20,11 +19,10 @@ pub fn all(
     db: Database,
     company_repo: impl CompanyRepo + Send + Sync + 'static,
     person_repo: impl PersonRepo + Send + Sync + 'static,
-    location_reading_repo: impl LocationReadingRepo + Send + Sync + 'static,
 ) -> BoxedFilter<(impl Reply,)> {
     let company = CompanyApi::new(company_repo).all();
     let person = PersonApi::new(person_repo).all();
-    let location_reading = LocationReadingApi::new(location_reading_repo).all();
+    let location_reading = LocationReadingApi::new(db.clone()).all();
 
     warp::path("v1")
         .and(health(db).or(company).or(person).or(location_reading))
