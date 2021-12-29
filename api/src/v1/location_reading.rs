@@ -1,62 +1,45 @@
-use crate::v1::ResourceApi;
-use crate::warp_ext;
-use crate::warp_ext::AsJsonReply;
-use chrono::{DateTime, Utc};
+use crate::repo::location_reading::LocationReading as RepoLocationReading;
+use crate::v1::{op, ResourceApi};
 
-use futures_util::TryStreamExt;
-use mongodb::{Collection, Database};
+
+
+use std::sync::Arc;
+
+
+
 use serde::{Deserialize, Serialize};
 
+use crate::repo::location_reading::LocationReadingRepo;
 use warp::filters::BoxedFilter;
-use warp::{Filter, Reply};
+use warp::{Reply};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ApiLocationReading {
+pub struct LocationReading {
     pub timestamp: String,
     pub person_id: String,
     pub coordinates: Vec<f64>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DbLocationReading {
-    #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
-    pub timestamp: DateTime<Utc>,
-    pub metadata: Metadata,
-    pub location: Location,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Metadata {
-    pub person_id: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Location {
-    pub coordinates: Vec<f64>,
-}
-
-impl From<DbLocationReading> for ApiLocationReading {
-    fn from(value: DbLocationReading) -> Self {
+impl From<RepoLocationReading> for LocationReading {
+    fn from(value: RepoLocationReading) -> Self {
         Self {
-            person_id: value.metadata.person_id,
-            timestamp: value.timestamp.to_string(),
-            coordinates: value.location.coordinates,
+            timestamp: value.timestamp,
+            person_id: value.person_id,
+            coordinates: value.coordinates,
         }
     }
 }
 
 #[derive(Clone)]
 pub struct LocationReadingApi {
-    pub db: Database,
+    pub repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
 }
 
 impl LocationReadingApi {
-    pub fn new(db: Database) -> Self {
-        Self { db }
-    }
-
-    fn collection(&self) -> Collection<DbLocationReading> {
-        self.db.collection("location_reading")
+    pub fn new(repo: impl LocationReadingRepo + Send + Sync + 'static) -> Self {
+        Self {
+            repo: Arc::new(repo),
+        }
     }
 }
 
@@ -66,21 +49,6 @@ impl ResourceApi for LocationReadingApi {
     }
 
     fn list(&self) -> BoxedFilter<(Box<dyn Reply>,)> {
-        warp::path(self.collection_name())
-            .and(warp::get())
-            .and(warp_ext::with_clone(self.collection()))
-            .then(
-                move |collection: Collection<DbLocationReading>| async move {
-                    let all: Vec<ApiLocationReading> = collection
-                        .find(None, None)
-                        .await?
-                        .map_ok(Into::into)
-                        .try_collect()
-                        .await?;
-                    Ok(all.as_json_reply())
-                },
-            )
-            .map(warp_ext::convert_err)
-            .boxed()
+        op::list::<LocationReading, _, _>(self.collection_name(), self.repo.clone())
     }
 }
