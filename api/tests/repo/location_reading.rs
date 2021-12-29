@@ -1,10 +1,10 @@
 use crate::repo;
+use api::crockford;
 use api::db::coll;
 use api::repo::location_reading::{
     Location, Metadata, MongoLocationReading, MongoLocationReadingRepo,
 };
 use api::repo::op::Find;
-use api::{crockford, db};
 use chrono::{DateTime, NaiveDate, Utc};
 use futures_util::TryStreamExt;
 use mongodb::Database;
@@ -54,7 +54,6 @@ where
     F: Future,
 {
     let db = repo::new_db().await.unwrap();
-    db::prepare(&db).await.unwrap();
     test(db.clone()).await;
     db.drop(None).await.unwrap();
 }
