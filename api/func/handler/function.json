@@ -7,7 +7,13 @@
       "name": "req",
       "methods": [
         "get",
-        "post"
+        "post",
+        "delete",
+        "head",
+        "patch",
+        "put",
+        "options",
+        "trace"
       ],
       "route": "{*path}"
     },
