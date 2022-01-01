@@ -52,6 +52,7 @@ fn filter(
     );
     let graphql = graphql::filter(Store {
         company_repo: Arc::new(company_repo),
+        person_repo: Arc::new(person_repo),
     });
     let robots = robots();
     v1.or(graphql).or(robots).boxed()

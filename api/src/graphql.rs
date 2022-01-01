@@ -1,11 +1,12 @@
-use crate::repo::company;
 use crate::repo::company::CompanyRepo;
+use crate::repo::{company, person};
 
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
 use derive_more::From;
 use juniper::{graphql_object, Context, EmptyMutation, EmptySubscription, RootNode};
 
+use crate::repo::person::PersonRepo;
 use futures_util::TryStreamExt;
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
@@ -41,6 +42,7 @@ fn schema() -> Schema {
 #[derive(Clone)]
 pub struct Store {
     pub company_repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
+    pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
 }
 
 impl Context for Store {}
@@ -76,6 +78,36 @@ pub struct Company(company::Company);
 
 #[graphql_object(context = Store)]
 impl Company {
+    fn id(&self) -> &str {
+        &self.0.id
+    }
+
+    fn name(&self) -> &str {
+        &self.0.name
+    }
+
+    async fn people(&self, store: &Store) -> Vec<Person> {
+        store
+            .person_repo
+            .find()
+            .await
+            .unwrap()
+            .try_filter_map(|p| async move {
+                Ok(Some(p)
+                    .filter(|p| p.company_id == self.0.id)
+                    .map(Into::into))
+            })
+            .try_collect()
+            .await
+            .unwrap()
+    }
+}
+
+#[derive(Clone, From)]
+pub struct Person(person::Person);
+
+#[graphql_object(context = Store)]
+impl Person {
     fn id(&self) -> &str {
         &self.0.id
     }
