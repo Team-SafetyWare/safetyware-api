@@ -1,6 +1,7 @@
 pub mod common;
 pub mod crockford;
 pub mod db;
+pub mod graphql;
 pub mod repo;
 pub mod settings;
 pub mod v1;
@@ -42,8 +43,9 @@ fn filter(
     location_reading_repo: impl LocationReadingRepo + Send + Sync + 'static,
 ) -> BoxedFilter<(impl Reply,)> {
     let v1 = v1::all(db, company_repo, person_repo, location_reading_repo);
+    let graphql = graphql::filter();
     let robots = robots();
-    v1.or(robots).boxed()
+    v1.or(graphql).or(robots).boxed()
 }
 
 fn robots() -> BoxedFilter<(impl Reply,)> {
