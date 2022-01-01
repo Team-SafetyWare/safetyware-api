@@ -4,11 +4,7 @@ use crate::repo::company::CompanyRepo;
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
 use derive_more::From;
-use juniper::{
-    graphql_object, Context, EmptyMutation,
-    EmptySubscription, RootNode,
-};
-
+use juniper::{graphql_object, Context, EmptyMutation, EmptySubscription, RootNode};
 
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
