@@ -1,12 +1,14 @@
 use crate::repo::company::CompanyRepo;
-use crate::repo::{company, person};
+use crate::repo::{company, location_reading, person};
 
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
 use derive_more::From;
 use juniper::{graphql_object, Context, EmptyMutation, EmptySubscription, RootNode};
 
+use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
+use chrono::{DateTime, Utc};
 use futures_util::TryStreamExt;
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
@@ -21,12 +23,11 @@ pub fn filter(store: Store) -> BoxedFilter<(impl Reply,)> {
     let graphiql_filter = warp::get()
         .and(warp::path("graphiql"))
         .and(juniper_warp::graphiql_filter("/graphql", None));
-    let filter = graphql_filter
+    graphql_filter
         .or(graphiql_filter)
         .unify()
         .map(|r: Response<Vec<u8>>| r.boxed())
-        .boxed();
-    filter
+        .boxed()
 }
 
 type Schema = RootNode<'static, Query, EmptyMutation<Store>, EmptySubscription<Store>>;
@@ -43,6 +44,7 @@ fn schema() -> Schema {
 pub struct Store {
     pub company_repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
     pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
+    pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
 }
 
 impl Context for Store {}
@@ -114,5 +116,35 @@ impl Person {
 
     fn name(&self) -> &str {
         &self.0.name
+    }
+
+    async fn location_readings(&self, store: &Store) -> Vec<LocationReading> {
+        store
+            .location_reading_repo
+            .find()
+            .await
+            .unwrap()
+            .try_filter_map(|lr| async move {
+                Ok(Some(lr)
+                    .filter(|lr| lr.person_id == self.0.id)
+                    .map(Into::into))
+            })
+            .try_collect()
+            .await
+            .unwrap()
+    }
+}
+
+#[derive(Clone, From)]
+pub struct LocationReading(location_reading::LocationReading);
+
+#[graphql_object(context = Store)]
+impl LocationReading {
+    fn timestamp(&self) -> &DateTime<Utc> {
+        &self.0.timestamp
+    }
+
+    fn coordinates(&self) -> &Vec<f64> {
+        &self.0.coordinates
     }
 }
