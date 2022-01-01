@@ -6,6 +6,7 @@ use crate::warp_ext::BoxReply;
 use derive_more::From;
 use juniper::{graphql_object, Context, EmptyMutation, EmptySubscription, RootNode};
 
+use futures_util::TryStreamExt;
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
 use warp::http::Response;
@@ -49,13 +50,24 @@ pub struct Query;
 #[graphql_object(context = Store)]
 impl Query {
     async fn company(#[graphql(context)] store: &Store, id: String) -> Option<Company> {
-        // Todo: Do not unwrap.
         store
             .company_repo
             .find_one(&id)
             .await
             .unwrap()
             .map(Into::into)
+    }
+
+    async fn companies(#[graphql(context)] store: &Store) -> Vec<Company> {
+        store
+            .company_repo
+            .find()
+            .await
+            .unwrap()
+            .map_ok(Into::into)
+            .try_collect()
+            .await
+            .unwrap()
     }
 }
 
