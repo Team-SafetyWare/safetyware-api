@@ -132,6 +132,15 @@ impl Mutation {
         context.company_repo.replace_one(&item).await.unwrap();
         item.into()
     }
+
+    async fn delete_company(#[graphql(context)] context: &Context, id: ID) -> ID {
+        context
+            .company_repo
+            .delete_one(&id.clone().to_string())
+            .await
+            .unwrap();
+        id
+    }
 }
 
 #[derive(Clone, From)]
