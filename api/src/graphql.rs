@@ -56,7 +56,7 @@ pub struct Query;
 
 #[graphql_object(context = Context)]
 impl Query {
-    async fn get_company(#[graphql(context)] context: &Context, id: String) -> Option<Company> {
+    async fn company(#[graphql(context)] context: &Context, id: String) -> Option<Company> {
         context
             .company_repo
             .find_one(&id)
@@ -65,7 +65,7 @@ impl Query {
             .map(Into::into)
     }
 
-    async fn get_companies(#[graphql(context)] context: &Context) -> Vec<Company> {
+    async fn companies(#[graphql(context)] context: &Context) -> Vec<Company> {
         context
             .company_repo
             .find()
@@ -77,7 +77,7 @@ impl Query {
             .unwrap()
     }
 
-    async fn get_person(#[graphql(context)] context: &Context, id: String) -> Option<Person> {
+    async fn person(#[graphql(context)] context: &Context, id: String) -> Option<Person> {
         context
             .person_repo
             .find_one(&id)
@@ -86,7 +86,7 @@ impl Query {
             .map(Into::into)
     }
 
-    async fn get_people(#[graphql(context)] context: &Context) -> Vec<Person> {
+    async fn people(#[graphql(context)] context: &Context) -> Vec<Person> {
         context
             .person_repo
             .find()
@@ -98,7 +98,7 @@ impl Query {
             .unwrap()
     }
 
-    async fn get_location_readings(#[graphql(context)] context: &Context) -> Vec<LocationReading> {
+    async fn location_readings(#[graphql(context)] context: &Context) -> Vec<LocationReading> {
         context
             .location_reading_repo
             .find()
