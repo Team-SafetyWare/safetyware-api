@@ -1,11 +1,13 @@
 pub mod common;
 pub mod crockford;
 pub mod db;
+pub mod graphql;
 pub mod repo;
 pub mod settings;
 pub mod v1;
 pub mod warp_ext;
 
+use crate::graphql::Context;
 use crate::repo::company::{CompanyRepo, MongoCompanyRepo};
 use crate::repo::location_reading::{LocationReadingRepo, MongoLocationReadingRepo};
 use crate::repo::person::{MongoPersonRepo, PersonRepo};
@@ -13,6 +15,7 @@ use crate::settings::Settings;
 use mongodb::Database;
 use std::env;
 use std::net::Ipv4Addr;
+use std::sync::Arc;
 use warp::cors::Cors;
 use warp::filters::BoxedFilter;
 use warp::{Filter, Reply};
@@ -37,13 +40,24 @@ async fn main() -> anyhow::Result<()> {
 
 fn filter(
     db: Database,
-    company_repo: impl CompanyRepo + Send + Sync + 'static,
-    person_repo: impl PersonRepo + Send + Sync + 'static,
-    location_reading_repo: impl LocationReadingRepo + Send + Sync + 'static,
+    company_repo: impl CompanyRepo + Clone + Send + Sync + 'static,
+    person_repo: impl PersonRepo + Clone + Send + Sync + 'static,
+    location_reading_repo: impl LocationReadingRepo + Clone + Send + Sync + 'static,
 ) -> BoxedFilter<(impl Reply,)> {
-    let v1 = v1::all(db, company_repo, person_repo, location_reading_repo);
+    let v1 = v1::all(
+        db,
+        company_repo.clone(),
+        person_repo.clone(),
+        location_reading_repo.clone(),
+    );
+    let graphql = graphql::graphql_filter(Context {
+        company_repo: Arc::new(company_repo),
+        person_repo: Arc::new(person_repo),
+        location_reading_repo: Arc::new(location_reading_repo),
+    });
+    let graphiql = graphql::graphiql_filter();
     let robots = robots();
-    v1.or(robots).boxed()
+    v1.or(graphql).or(graphiql).or(robots).boxed()
 }
 
 fn robots() -> BoxedFilter<(impl Reply,)> {
