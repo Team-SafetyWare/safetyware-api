@@ -56,7 +56,7 @@ pub struct Query;
 
 #[graphql_object(context = Context)]
 impl Query {
-    async fn company(#[graphql(context)] context: &Context, id: String) -> Option<Company> {
+    async fn get_company(#[graphql(context)] context: &Context, id: String) -> Option<Company> {
         context
             .company_repo
             .find_one(&id)
@@ -65,9 +65,42 @@ impl Query {
             .map(Into::into)
     }
 
-    async fn companies(#[graphql(context)] context: &Context) -> Vec<Company> {
+    async fn get_companies(#[graphql(context)] context: &Context) -> Vec<Company> {
         context
             .company_repo
+            .find()
+            .await
+            .unwrap()
+            .map_ok(Into::into)
+            .try_collect()
+            .await
+            .unwrap()
+    }
+
+    async fn get_person(#[graphql(context)] context: &Context, id: String) -> Option<Person> {
+        context
+            .person_repo
+            .find_one(&id)
+            .await
+            .unwrap()
+            .map(Into::into)
+    }
+
+    async fn get_people(#[graphql(context)] context: &Context) -> Vec<Person> {
+        context
+            .person_repo
+            .find()
+            .await
+            .unwrap()
+            .map_ok(Into::into)
+            .try_collect()
+            .await
+            .unwrap()
+    }
+
+    async fn get_location_readings(#[graphql(context)] context: &Context) -> Vec<LocationReading> {
+        context
+            .location_reading_repo
             .find()
             .await
             .unwrap()
@@ -121,6 +154,15 @@ impl Person {
         &self.0.name
     }
 
+    async fn company(&self, context: &Context) -> Option<Company> {
+        context
+            .company_repo
+            .find_one(&self.0.company_id)
+            .await
+            .unwrap()
+            .map(Into::into)
+    }
+
     async fn location_readings(&self, context: &Context) -> Vec<LocationReading> {
         context
             .location_reading_repo
@@ -145,6 +187,15 @@ pub struct LocationReading(location_reading::LocationReading);
 impl LocationReading {
     fn timestamp(&self) -> &DateTime<Utc> {
         &self.0.timestamp
+    }
+
+    async fn person(&self, context: &Context) -> Option<Person> {
+        context
+            .person_repo
+            .find_one(&self.0.person_id)
+            .await
+            .unwrap()
+            .map(Into::into)
     }
 
     fn coordinates(&self) -> &Vec<f64> {
