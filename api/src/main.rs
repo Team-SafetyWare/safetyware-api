@@ -50,13 +50,14 @@ fn filter(
         person_repo.clone(),
         location_reading_repo.clone(),
     );
-    let graphql = graphql::filter(Store {
+    let graphql = graphql::graphql_filter(Store {
         company_repo: Arc::new(company_repo),
         person_repo: Arc::new(person_repo),
         location_reading_repo: Arc::new(location_reading_repo),
     });
+    let graphiql = graphql::graphiql_filter();
     let robots = robots();
-    v1.or(graphql).or(robots).boxed()
+    v1.or(graphql).or(graphiql).or(robots).boxed()
 }
 
 fn robots() -> BoxedFilter<(impl Reply,)> {

@@ -15,17 +15,20 @@ use warp::filters::BoxedFilter;
 use warp::http::Response;
 use warp::{Filter, Reply};
 
-pub fn filter(store: Store) -> BoxedFilter<(impl Reply,)> {
-    let state = warp::any().and(warp_ext::with_clone(store));
-    let graphql_filter = (warp::get().or(warp::post()).unify())
+pub fn graphql_filter(store: Store) -> BoxedFilter<(impl Reply,)> {
+    let state = warp_ext::with_clone(store).boxed();
+    let schema = schema();
+    (warp::get().or(warp::post()).unify())
         .and(warp::path("graphql"))
-        .and(juniper_warp::make_graphql_filter(schema(), state.boxed()));
-    let graphiql_filter = warp::get()
+        .and(juniper_warp::make_graphql_filter(schema, state))
+        .map(|r: Response<Vec<u8>>| r.boxed())
+        .boxed()
+}
+
+pub fn graphiql_filter() -> BoxedFilter<(impl Reply,)> {
+    warp::get()
         .and(warp::path("graphiql"))
-        .and(juniper_warp::graphiql_filter("/graphql", None));
-    graphql_filter
-        .or(graphiql_filter)
-        .unify()
+        .and(juniper_warp::graphiql_filter("/graphql", None))
         .map(|r: Response<Vec<u8>>| r.boxed())
         .boxed()
 }
