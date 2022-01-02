@@ -119,6 +119,19 @@ impl Mutation {
         context.company_repo.insert_one(&item).await.unwrap();
         item.into()
     }
+
+    async fn replace_company(
+        #[graphql(context)] context: &Context,
+        id: ID,
+        input: CompanyInput,
+    ) -> Company {
+        let item = company::Company {
+            id: id.to_string(),
+            name: input.name,
+        };
+        context.company_repo.replace_one(&item).await.unwrap();
+        item.into()
+    }
 }
 
 #[derive(Clone, From)]
