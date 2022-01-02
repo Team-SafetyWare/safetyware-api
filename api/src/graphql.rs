@@ -1,10 +1,10 @@
 use crate::repo::company::CompanyRepo;
 use crate::repo::{company, location_reading, person};
 
-use crate::warp_ext;
 use crate::warp_ext::BoxReply;
+use crate::{crockford, warp_ext};
 use derive_more::From;
-use juniper::{graphql_object, EmptyMutation, EmptySubscription, RootNode, ID};
+use juniper::{graphql_object, EmptySubscription, GraphQLInputObject, RootNode, ID};
 
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
@@ -33,14 +33,10 @@ pub fn graphiql_filter() -> BoxedFilter<(impl Reply,)> {
         .boxed()
 }
 
-type Schema = RootNode<'static, Query, EmptyMutation<Context>, EmptySubscription<Context>>;
+type Schema = RootNode<'static, Query, Mutation, EmptySubscription<Context>>;
 
 fn schema() -> Schema {
-    Schema::new(
-        Query,
-        EmptyMutation::<Context>::new(),
-        EmptySubscription::<Context>::new(),
-    )
+    Schema::new(Query, Mutation, EmptySubscription::<Context>::new())
 }
 
 #[derive(Clone)]
@@ -111,8 +107,27 @@ impl Query {
     }
 }
 
+pub struct Mutation;
+
+#[graphql_object(context = Context)]
+impl Mutation {
+    async fn create_company(#[graphql(context)] context: &Context, input: CompanyInput) -> Company {
+        let item = company::Company {
+            id: crockford::random_id(),
+            name: input.name,
+        };
+        context.company_repo.insert_one(&item).await.unwrap();
+        item.into()
+    }
+}
+
 #[derive(Clone, From)]
 pub struct Company(company::Company);
+
+#[derive(GraphQLInputObject)]
+struct CompanyInput {
+    name: String,
+}
 
 #[graphql_object(context = Context)]
 impl Company {
