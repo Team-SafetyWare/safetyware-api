@@ -141,6 +141,39 @@ impl Mutation {
             .unwrap();
         id
     }
+
+    async fn create_person(#[graphql(context)] context: &Context, input: PersonInput) -> Person {
+        let item = person::Person {
+            id: crockford::random_id(),
+            name: input.name,
+            company_id: input.company_id,
+        };
+        context.person_repo.insert_one(&item).await.unwrap();
+        item.into()
+    }
+
+    async fn replace_person(
+        #[graphql(context)] context: &Context,
+        id: ID,
+        input: PersonInput,
+    ) -> Person {
+        let item = person::Person {
+            id: id.to_string(),
+            name: input.name,
+            company_id: input.company_id,
+        };
+        context.person_repo.replace_one(&item).await.unwrap();
+        item.into()
+    }
+
+    async fn delete_person(#[graphql(context)] context: &Context, id: ID) -> ID {
+        context
+            .person_repo
+            .delete_one(&id.clone().to_string())
+            .await
+            .unwrap();
+        id
+    }
 }
 
 #[derive(Clone, From)]
@@ -180,6 +213,12 @@ impl Company {
 
 #[derive(Clone, From)]
 pub struct Person(person::Person);
+
+#[derive(GraphQLInputObject)]
+struct PersonInput {
+    name: String,
+    company_id: String,
+}
 
 #[graphql_object(context = Context)]
 impl Person {
