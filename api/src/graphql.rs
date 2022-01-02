@@ -4,7 +4,7 @@ use crate::repo::{company, location_reading, person};
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
 use derive_more::From;
-use juniper::{graphql_object, EmptyMutation, EmptySubscription, RootNode};
+use juniper::{graphql_object, EmptyMutation, EmptySubscription, RootNode, ID};
 
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
@@ -56,10 +56,10 @@ pub struct Query;
 
 #[graphql_object(context = Context)]
 impl Query {
-    async fn company(#[graphql(context)] context: &Context, id: String) -> Option<Company> {
+    async fn company(#[graphql(context)] context: &Context, id: ID) -> Option<Company> {
         context
             .company_repo
-            .find_one(&id)
+            .find_one(&id.to_string())
             .await
             .unwrap()
             .map(Into::into)
@@ -77,10 +77,10 @@ impl Query {
             .unwrap()
     }
 
-    async fn person(#[graphql(context)] context: &Context, id: String) -> Option<Person> {
+    async fn person(#[graphql(context)] context: &Context, id: ID) -> Option<Person> {
         context
             .person_repo
-            .find_one(&id)
+            .find_one(&id.to_string())
             .await
             .unwrap()
             .map(Into::into)
@@ -116,8 +116,8 @@ pub struct Company(company::Company);
 
 #[graphql_object(context = Context)]
 impl Company {
-    fn id(&self) -> &str {
-        &self.0.id
+    fn id(&self) -> ID {
+        self.0.id.clone().into()
     }
 
     fn name(&self) -> &str {
@@ -146,8 +146,8 @@ pub struct Person(person::Person);
 
 #[graphql_object(context = Context)]
 impl Person {
-    fn id(&self) -> &str {
-        &self.0.id
+    fn id(&self) -> ID {
+        self.0.id.clone().into()
     }
 
     fn name(&self) -> &str {
