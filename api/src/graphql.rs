@@ -1,10 +1,10 @@
 use crate::repo::company::CompanyRepo;
 use crate::repo::{company, location_reading, person};
 
-use crate::warp_ext;
 use crate::warp_ext::BoxReply;
+use crate::{crockford, warp_ext};
 use derive_more::From;
-use juniper::{graphql_object, EmptyMutation, EmptySubscription, RootNode};
+use juniper::{graphql_object, EmptySubscription, GraphQLInputObject, RootNode, ID};
 
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
@@ -33,14 +33,10 @@ pub fn graphiql_filter() -> BoxedFilter<(impl Reply,)> {
         .boxed()
 }
 
-type Schema = RootNode<'static, Query, EmptyMutation<Context>, EmptySubscription<Context>>;
+type Schema = RootNode<'static, Query, Mutation, EmptySubscription<Context>>;
 
 fn schema() -> Schema {
-    Schema::new(
-        Query,
-        EmptyMutation::<Context>::new(),
-        EmptySubscription::<Context>::new(),
-    )
+    Schema::new(Query, Mutation, EmptySubscription::<Context>::new())
 }
 
 #[derive(Clone)]
@@ -56,16 +52,16 @@ pub struct Query;
 
 #[graphql_object(context = Context)]
 impl Query {
-    async fn get_company(#[graphql(context)] context: &Context, id: String) -> Option<Company> {
+    async fn company(#[graphql(context)] context: &Context, id: ID) -> Option<Company> {
         context
             .company_repo
-            .find_one(&id)
+            .find_one(&id.to_string())
             .await
             .unwrap()
             .map(Into::into)
     }
 
-    async fn get_companies(#[graphql(context)] context: &Context) -> Vec<Company> {
+    async fn companies(#[graphql(context)] context: &Context) -> Vec<Company> {
         context
             .company_repo
             .find()
@@ -77,16 +73,16 @@ impl Query {
             .unwrap()
     }
 
-    async fn get_person(#[graphql(context)] context: &Context, id: String) -> Option<Person> {
+    async fn person(#[graphql(context)] context: &Context, id: ID) -> Option<Person> {
         context
             .person_repo
-            .find_one(&id)
+            .find_one(&id.to_string())
             .await
             .unwrap()
             .map(Into::into)
     }
 
-    async fn get_people(#[graphql(context)] context: &Context) -> Vec<Person> {
+    async fn people(#[graphql(context)] context: &Context) -> Vec<Person> {
         context
             .person_repo
             .find()
@@ -98,7 +94,7 @@ impl Query {
             .unwrap()
     }
 
-    async fn get_location_readings(#[graphql(context)] context: &Context) -> Vec<LocationReading> {
+    async fn location_readings(#[graphql(context)] context: &Context) -> Vec<LocationReading> {
         context
             .location_reading_repo
             .find()
@@ -111,13 +107,87 @@ impl Query {
     }
 }
 
+pub struct Mutation;
+
+#[graphql_object(context = Context)]
+impl Mutation {
+    async fn create_company(#[graphql(context)] context: &Context, input: CompanyInput) -> Company {
+        let item = company::Company {
+            id: crockford::random_id(),
+            name: input.name,
+        };
+        context.company_repo.insert_one(&item).await.unwrap();
+        item.into()
+    }
+
+    async fn replace_company(
+        #[graphql(context)] context: &Context,
+        id: ID,
+        input: CompanyInput,
+    ) -> Company {
+        let item = company::Company {
+            id: id.to_string(),
+            name: input.name,
+        };
+        context.company_repo.replace_one(&item).await.unwrap();
+        item.into()
+    }
+
+    async fn delete_company(#[graphql(context)] context: &Context, id: ID) -> ID {
+        context
+            .company_repo
+            .delete_one(&id.clone().to_string())
+            .await
+            .unwrap();
+        id
+    }
+
+    async fn create_person(#[graphql(context)] context: &Context, input: PersonInput) -> Person {
+        let item = person::Person {
+            id: crockford::random_id(),
+            name: input.name,
+            company_id: input.company_id,
+        };
+        context.person_repo.insert_one(&item).await.unwrap();
+        item.into()
+    }
+
+    async fn replace_person(
+        #[graphql(context)] context: &Context,
+        id: ID,
+        input: PersonInput,
+    ) -> Person {
+        let item = person::Person {
+            id: id.to_string(),
+            name: input.name,
+            company_id: input.company_id,
+        };
+        context.person_repo.replace_one(&item).await.unwrap();
+        item.into()
+    }
+
+    async fn delete_person(#[graphql(context)] context: &Context, id: ID) -> ID {
+        context
+            .person_repo
+            .delete_one(&id.clone().to_string())
+            .await
+            .unwrap();
+        id
+    }
+}
+
 #[derive(Clone, From)]
 pub struct Company(company::Company);
 
+#[derive(GraphQLInputObject)]
+struct CompanyInput {
+    name: String,
+}
+
 #[graphql_object(context = Context)]
 impl Company {
-    fn id(&self) -> &str {
-        &self.0.id
+    fn id(&self) -> ID {
+        self.0.id.clone().into()
     }
 
     fn name(&self) -> &str {
@@ -144,10 +214,16 @@ impl Company {
 #[derive(Clone, From)]
 pub struct Person(person::Person);
 
+#[derive(GraphQLInputObject)]
+struct PersonInput {
+    name: String,
+    company_id: String,
+}
+
 #[graphql_object(context = Context)]
 impl Person {
-    fn id(&self) -> &str {
-        &self.0.id
+    fn id(&self) -> ID {
+        self.0.id.clone().into()
     }
 
     fn name(&self) -> &str {
