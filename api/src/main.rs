@@ -7,7 +7,7 @@ pub mod settings;
 pub mod v1;
 pub mod warp_ext;
 
-use crate::graphql::Store;
+use crate::graphql::Context;
 use crate::repo::company::{CompanyRepo, MongoCompanyRepo};
 use crate::repo::location_reading::{LocationReadingRepo, MongoLocationReadingRepo};
 use crate::repo::person::{MongoPersonRepo, PersonRepo};
@@ -50,7 +50,7 @@ fn filter(
         person_repo.clone(),
         location_reading_repo.clone(),
     );
-    let graphql = graphql::graphql_filter(Store {
+    let graphql = graphql::graphql_filter(Context {
         company_repo: Arc::new(company_repo),
         person_repo: Arc::new(person_repo),
         location_reading_repo: Arc::new(location_reading_repo),

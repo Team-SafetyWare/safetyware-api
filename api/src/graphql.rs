@@ -4,7 +4,7 @@ use crate::repo::{company, location_reading, person};
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
 use derive_more::From;
-use juniper::{graphql_object, Context, EmptyMutation, EmptySubscription, RootNode};
+use juniper::{graphql_object, EmptyMutation, EmptySubscription, RootNode};
 
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
@@ -15,7 +15,7 @@ use warp::filters::BoxedFilter;
 use warp::http::Response;
 use warp::{Filter, Reply};
 
-pub fn graphql_filter(store: Store) -> BoxedFilter<(impl Reply,)> {
+pub fn graphql_filter(store: Context) -> BoxedFilter<(impl Reply,)> {
     let state = warp_ext::with_clone(store).boxed();
     let schema = schema();
     (warp::get().or(warp::post()).unify())
@@ -33,30 +33,30 @@ pub fn graphiql_filter() -> BoxedFilter<(impl Reply,)> {
         .boxed()
 }
 
-type Schema = RootNode<'static, Query, EmptyMutation<Store>, EmptySubscription<Store>>;
+type Schema = RootNode<'static, Query, EmptyMutation<Context>, EmptySubscription<Context>>;
 
 fn schema() -> Schema {
     Schema::new(
         Query,
-        EmptyMutation::<Store>::new(),
-        EmptySubscription::<Store>::new(),
+        EmptyMutation::<Context>::new(),
+        EmptySubscription::<Context>::new(),
     )
 }
 
 #[derive(Clone)]
-pub struct Store {
+pub struct Context {
     pub company_repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
     pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
     pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
 }
 
-impl Context for Store {}
+impl juniper::Context for Context {}
 
 pub struct Query;
 
-#[graphql_object(context = Store)]
+#[graphql_object(context = Context)]
 impl Query {
-    async fn company(#[graphql(context)] store: &Store, id: String) -> Option<Company> {
+    async fn company(#[graphql(context)] store: &Context, id: String) -> Option<Company> {
         store
             .company_repo
             .find_one(&id)
@@ -65,7 +65,7 @@ impl Query {
             .map(Into::into)
     }
 
-    async fn companies(#[graphql(context)] store: &Store) -> Vec<Company> {
+    async fn companies(#[graphql(context)] store: &Context) -> Vec<Company> {
         store
             .company_repo
             .find()
@@ -81,7 +81,7 @@ impl Query {
 #[derive(Clone, From)]
 pub struct Company(company::Company);
 
-#[graphql_object(context = Store)]
+#[graphql_object(context = Context)]
 impl Company {
     fn id(&self) -> &str {
         &self.0.id
@@ -91,7 +91,7 @@ impl Company {
         &self.0.name
     }
 
-    async fn people(&self, store: &Store) -> Vec<Person> {
+    async fn people(&self, store: &Context) -> Vec<Person> {
         store
             .person_repo
             .find()
@@ -111,7 +111,7 @@ impl Company {
 #[derive(Clone, From)]
 pub struct Person(person::Person);
 
-#[graphql_object(context = Store)]
+#[graphql_object(context = Context)]
 impl Person {
     fn id(&self) -> &str {
         &self.0.id
@@ -121,7 +121,7 @@ impl Person {
         &self.0.name
     }
 
-    async fn location_readings(&self, store: &Store) -> Vec<LocationReading> {
+    async fn location_readings(&self, store: &Context) -> Vec<LocationReading> {
         store
             .location_reading_repo
             .find()
@@ -141,7 +141,7 @@ impl Person {
 #[derive(Clone, From)]
 pub struct LocationReading(location_reading::LocationReading);
 
-#[graphql_object(context = Store)]
+#[graphql_object(context = Context)]
 impl LocationReading {
     fn timestamp(&self) -> &DateTime<Utc> {
         &self.0.timestamp
