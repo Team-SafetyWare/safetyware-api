@@ -15,8 +15,8 @@ use warp::filters::BoxedFilter;
 use warp::http::Response;
 use warp::{Filter, Reply};
 
-pub fn graphql_filter(store: Context) -> BoxedFilter<(impl Reply,)> {
-    let state = warp_ext::with_clone(store).boxed();
+pub fn graphql_filter(context: Context) -> BoxedFilter<(impl Reply,)> {
+    let state = warp_ext::with_clone(context).boxed();
     let schema = schema();
     (warp::get().or(warp::post()).unify())
         .and(warp::path("graphql"))
@@ -56,8 +56,8 @@ pub struct Query;
 
 #[graphql_object(context = Context)]
 impl Query {
-    async fn company(#[graphql(context)] store: &Context, id: String) -> Option<Company> {
-        store
+    async fn company(#[graphql(context)] context: &Context, id: String) -> Option<Company> {
+        context
             .company_repo
             .find_one(&id)
             .await
@@ -65,8 +65,8 @@ impl Query {
             .map(Into::into)
     }
 
-    async fn companies(#[graphql(context)] store: &Context) -> Vec<Company> {
-        store
+    async fn companies(#[graphql(context)] context: &Context) -> Vec<Company> {
+        context
             .company_repo
             .find()
             .await
@@ -91,8 +91,8 @@ impl Company {
         &self.0.name
     }
 
-    async fn people(&self, store: &Context) -> Vec<Person> {
-        store
+    async fn people(&self, context: &Context) -> Vec<Person> {
+        context
             .person_repo
             .find()
             .await
@@ -121,8 +121,8 @@ impl Person {
         &self.0.name
     }
 
-    async fn location_readings(&self, store: &Context) -> Vec<LocationReading> {
-        store
+    async fn location_readings(&self, context: &Context) -> Vec<LocationReading> {
+        context
             .location_reading_repo
             .find()
             .await
