@@ -54,23 +54,23 @@ pub struct Query;
 #[graphql_object(context = Context)]
 impl Query {
     async fn company(#[graphql(context)] context: &Context, id: ID) -> Option<Company> {
-        company::company(context, id).await
+        company::get(context, id).await
     }
 
     async fn companies(#[graphql(context)] context: &Context) -> Vec<Company> {
-        company::companies(context).await
+        company::list(context).await
     }
 
     async fn person(#[graphql(context)] context: &Context, id: ID) -> Option<Person> {
-        person::person(context, id).await
+        person::get(context, id).await
     }
 
     async fn people(#[graphql(context)] context: &Context) -> Vec<Person> {
-        person::people(context).await
+        person::list(context).await
     }
 
     async fn location_readings(#[graphql(context)] context: &Context) -> Vec<LocationReading> {
-        location_reading::location_readings(context).await
+        location_reading::list(context).await
     }
 }
 
@@ -79,7 +79,7 @@ pub struct Mutation;
 #[graphql_object(context = Context)]
 impl Mutation {
     async fn create_company(#[graphql(context)] context: &Context, input: CompanyInput) -> Company {
-        company::create_company(context, input).await
+        company::create(context, input).await
     }
 
     async fn replace_company(
@@ -87,15 +87,15 @@ impl Mutation {
         id: ID,
         input: CompanyInput,
     ) -> Company {
-        company::replace_company(context, id, input).await
+        company::replace(context, id, input).await
     }
 
     async fn delete_company(#[graphql(context)] context: &Context, id: ID) -> ID {
-        company::delete_company(context, id).await
+        company::delete(context, id).await
     }
 
     async fn create_person(#[graphql(context)] context: &Context, input: PersonInput) -> Person {
-        person::create_person(context, input).await
+        person::create(context, input).await
     }
 
     async fn replace_person(
@@ -103,10 +103,10 @@ impl Mutation {
         id: ID,
         input: PersonInput,
     ) -> Person {
-        person::replace_person(context, id, input).await
+        person::replace(context, id, input).await
     }
 
     async fn delete_person(#[graphql(context)] context: &Context, id: ID) -> ID {
-        person::delete_person(context, id).await
+        person::delete(context, id).await
     }
 }

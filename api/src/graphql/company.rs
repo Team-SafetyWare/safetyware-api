@@ -41,7 +41,7 @@ impl Company {
     }
 }
 
-pub async fn company(context: &Context, id: ID) -> Option<Company> {
+pub async fn get(context: &Context, id: ID) -> Option<Company> {
     context
         .company_repo
         .find_one(&id.to_string())
@@ -50,7 +50,7 @@ pub async fn company(context: &Context, id: ID) -> Option<Company> {
         .map(Into::into)
 }
 
-pub async fn companies(context: &Context) -> Vec<Company> {
+pub async fn list(context: &Context) -> Vec<Company> {
     context
         .company_repo
         .find()
@@ -62,7 +62,7 @@ pub async fn companies(context: &Context) -> Vec<Company> {
         .unwrap()
 }
 
-pub async fn create_company(context: &Context, input: CompanyInput) -> Company {
+pub async fn create(context: &Context, input: CompanyInput) -> Company {
     let item = company::Company {
         id: crockford::random_id(),
         name: input.name,
@@ -71,7 +71,7 @@ pub async fn create_company(context: &Context, input: CompanyInput) -> Company {
     item.into()
 }
 
-pub async fn replace_company(context: &Context, id: ID, input: CompanyInput) -> Company {
+pub async fn replace(context: &Context, id: ID, input: CompanyInput) -> Company {
     let item = company::Company {
         id: id.to_string(),
         name: input.name,
@@ -80,7 +80,7 @@ pub async fn replace_company(context: &Context, id: ID, input: CompanyInput) -> 
     item.into()
 }
 
-pub async fn delete_company(context: &Context, id: ID) -> ID {
+pub async fn delete(context: &Context, id: ID) -> ID {
     context
         .company_repo
         .delete_one(&id.clone().to_string())

@@ -28,7 +28,7 @@ impl LocationReading {
     }
 }
 
-pub async fn location_readings(context: &Context) -> Vec<LocationReading> {
+pub async fn list(context: &Context) -> Vec<LocationReading> {
     context
         .location_reading_repo
         .find()

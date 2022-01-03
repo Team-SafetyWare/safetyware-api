@@ -52,7 +52,7 @@ impl Person {
     }
 }
 
-pub async fn person(context: &Context, id: ID) -> Option<Person> {
+pub async fn get(context: &Context, id: ID) -> Option<Person> {
     context
         .person_repo
         .find_one(&id.to_string())
@@ -61,7 +61,7 @@ pub async fn person(context: &Context, id: ID) -> Option<Person> {
         .map(Into::into)
 }
 
-pub async fn people(context: &Context) -> Vec<Person> {
+pub async fn list(context: &Context) -> Vec<Person> {
     context
         .person_repo
         .find()
@@ -73,7 +73,7 @@ pub async fn people(context: &Context) -> Vec<Person> {
         .unwrap()
 }
 
-pub async fn create_person(context: &Context, input: PersonInput) -> Person {
+pub async fn create(context: &Context, input: PersonInput) -> Person {
     let item = person::Person {
         id: crockford::random_id(),
         name: input.name,
@@ -83,7 +83,7 @@ pub async fn create_person(context: &Context, input: PersonInput) -> Person {
     item.into()
 }
 
-pub async fn replace_person(context: &Context, id: ID, input: PersonInput) -> Person {
+pub async fn replace(context: &Context, id: ID, input: PersonInput) -> Person {
     let item = person::Person {
         id: id.to_string(),
         name: input.name,
@@ -93,7 +93,7 @@ pub async fn replace_person(context: &Context, id: ID, input: PersonInput) -> Pe
     item.into()
 }
 
-pub async fn delete_person(context: &Context, id: ID) -> ID {
+pub async fn delete(context: &Context, id: ID) -> ID {
     context
         .person_repo
         .delete_one(&id.clone().to_string())
