@@ -6,6 +6,7 @@ use api::graphql::Context;
 use api::repo::company::MongoCompanyRepo;
 use api::repo::location_reading::MongoLocationReadingRepo;
 use api::repo::person::MongoPersonRepo;
+use serde::{Deserialize, Serialize};
 use std::future::Future;
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
@@ -21,7 +22,7 @@ pub struct MongoContext {
 async fn test_graphql<T, F>(test: T)
 where
     T: Fn(BoxedFilter<(Box<dyn Reply>,)>, MongoContext) -> F,
-    F: Future,
+    F: Future<Output = anyhow::Result<()>>,
 {
     let db = repo::new_db().await.unwrap();
     let mc = MongoContext {
@@ -35,5 +36,14 @@ where
         location_reading_repo: Arc::new(mc.location_reading_repo.clone()),
     };
     let filter = graphql::graphql_filter(context);
-    test(filter, mc).await;
+    test(filter, mc).await.unwrap();
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct QueryJson {
+    query: String,
+}
+
+fn encode_query(query: String) -> anyhow::Result<String> {
+    Ok(serde_json::to_string(&QueryJson { query })?)
 }
