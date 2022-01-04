@@ -11,7 +11,7 @@ Follow these steps if you need to run the API without making code changes.
    ```
    docker compose up --build
    ```
-3. Navigate to http://localhost:3001.
+3. Navigate to http://localhost:3001/graphiql.
 4. Load sample data as described later in this document (optional).
 
 ## Develop
@@ -69,26 +69,6 @@ This section describes how to make code changes.
    ```
    .\script\Test.ps1
    ```
-
-## Postman
-
-Postman can be used to interact with the API manually. Follow these steps to access the API from Postman.
-
-### Load API definitions
-
-1. Install and open [Postman](https://www.postman.com/downloads/).
-2. Navigate to **File | Import | Folder**.
-3. Import the "postman" folder in this repository.
-
-### Send requests
-
-1. Start the API locally.
-2. In Postman, activate the "local" environment.
-3. Send requests using definitions in the "API" collection.
-
-### Save API definitions
-
-1. Export collections and environments individually. Overwrite files in **/postman**.
 
 ## Sample data
 
