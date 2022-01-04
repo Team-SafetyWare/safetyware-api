@@ -29,3 +29,4 @@ tokio = { version = "1.15", features = ["full"] }
 warp = "0.3"
 
 [dev-dependencies]
+json_dotpath = "1.1"

@@ -16,7 +16,7 @@ use warp::filters::BoxedFilter;
 use warp::http::Response;
 use warp::{Filter, Reply};
 
-pub fn graphql_filter(context: Context) -> BoxedFilter<(impl Reply,)> {
+pub fn graphql_filter(context: Context) -> BoxedFilter<(Box<dyn Reply>,)> {
     let state = warp_ext::with_clone(context).boxed();
     let schema = schema();
     (warp::get().or(warp::post()).unify())
@@ -26,7 +26,7 @@ pub fn graphql_filter(context: Context) -> BoxedFilter<(impl Reply,)> {
         .boxed()
 }
 
-pub fn graphiql_filter() -> BoxedFilter<(impl Reply,)> {
+pub fn graphiql_filter() -> BoxedFilter<(Box<dyn Reply>,)> {
     warp::get()
         .and(warp::path("graphiql"))
         .and(juniper_warp::graphiql_filter("/graphql", None))
