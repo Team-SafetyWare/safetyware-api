@@ -4,7 +4,6 @@ pub mod db;
 pub mod graphql;
 pub mod repo;
 pub mod settings;
-pub mod v1;
 pub mod warp_ext;
 
 use crate::graphql::Context;
@@ -44,12 +43,6 @@ fn filter(
     person_repo: impl PersonRepo + Clone + Send + Sync + 'static,
     location_reading_repo: impl LocationReadingRepo + Clone + Send + Sync + 'static,
 ) -> BoxedFilter<(impl Reply,)> {
-    let v1 = v1::all(
-        db,
-        company_repo.clone(),
-        person_repo.clone(),
-        location_reading_repo.clone(),
-    );
     let graphql = graphql::graphql_filter(Context {
         company_repo: Arc::new(company_repo),
         person_repo: Arc::new(person_repo),
@@ -57,12 +50,24 @@ fn filter(
     });
     let graphiql = graphql::graphiql_filter();
     let robots = robots();
-    v1.or(graphql).or(graphiql).or(robots).boxed()
+    let health = health(db);
+    graphql.or(graphiql).or(robots).or(health).boxed()
 }
 
 fn robots() -> BoxedFilter<(impl Reply,)> {
     warp::path("robots.txt")
         .map(|| "User-agent: *\nDisallow: /")
+        .boxed()
+}
+
+fn health(db: Database) -> BoxedFilter<(impl Reply,)> {
+    warp::path("health")
+        .and(warp_ext::with_clone(db))
+        .then(move |db: Database| async move {
+            db::test_connection(&db).await?;
+            Ok(warp::reply())
+        })
+        .map(warp_ext::convert_err)
         .boxed()
 }
 
