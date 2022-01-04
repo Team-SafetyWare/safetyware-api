@@ -10,7 +10,7 @@ use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
-use juniper::{graphql_object, EmptySubscription, RootNode, ID};
+use juniper::{graphql_object, EmptySubscription, FieldResult, RootNode, ID};
 use std::sync::Arc;
 use warp::filters::BoxedFilter;
 use warp::http::Response;
@@ -53,23 +53,28 @@ pub struct Query;
 
 #[graphql_object(context = Context)]
 impl Query {
-    async fn company(#[graphql(context)] context: &Context, id: ID) -> Option<Company> {
+    async fn company(
+        #[graphql(context)] context: &Context,
+        id: ID,
+    ) -> FieldResult<Option<Company>> {
         company::get(context, id).await
     }
 
-    async fn companies(#[graphql(context)] context: &Context) -> Vec<Company> {
+    async fn companies(#[graphql(context)] context: &Context) -> FieldResult<Vec<Company>> {
         company::list(context).await
     }
 
-    async fn person(#[graphql(context)] context: &Context, id: ID) -> Option<Person> {
+    async fn person(#[graphql(context)] context: &Context, id: ID) -> FieldResult<Option<Person>> {
         person::get(context, id).await
     }
 
-    async fn people(#[graphql(context)] context: &Context) -> Vec<Person> {
+    async fn people(#[graphql(context)] context: &Context) -> FieldResult<Vec<Person>> {
         person::list(context).await
     }
 
-    async fn location_readings(#[graphql(context)] context: &Context) -> Vec<LocationReading> {
+    async fn location_readings(
+        #[graphql(context)] context: &Context,
+    ) -> FieldResult<Vec<LocationReading>> {
         location_reading::list(context).await
     }
 }
@@ -78,7 +83,10 @@ pub struct Mutation;
 
 #[graphql_object(context = Context)]
 impl Mutation {
-    async fn create_company(#[graphql(context)] context: &Context, input: CompanyInput) -> Company {
+    async fn create_company(
+        #[graphql(context)] context: &Context,
+        input: CompanyInput,
+    ) -> FieldResult<Company> {
         company::create(context, input).await
     }
 
@@ -86,15 +94,18 @@ impl Mutation {
         #[graphql(context)] context: &Context,
         id: ID,
         input: CompanyInput,
-    ) -> Company {
+    ) -> FieldResult<Company> {
         company::replace(context, id, input).await
     }
 
-    async fn delete_company(#[graphql(context)] context: &Context, id: ID) -> ID {
+    async fn delete_company(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
         company::delete(context, id).await
     }
 
-    async fn create_person(#[graphql(context)] context: &Context, input: PersonInput) -> Person {
+    async fn create_person(
+        #[graphql(context)] context: &Context,
+        input: PersonInput,
+    ) -> FieldResult<Person> {
         person::create(context, input).await
     }
 
@@ -102,11 +113,11 @@ impl Mutation {
         #[graphql(context)] context: &Context,
         id: ID,
         input: PersonInput,
-    ) -> Person {
+    ) -> FieldResult<Person> {
         person::replace(context, id, input).await
     }
 
-    async fn delete_person(#[graphql(context)] context: &Context, id: ID) -> ID {
+    async fn delete_person(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
         person::delete(context, id).await
     }
 }
