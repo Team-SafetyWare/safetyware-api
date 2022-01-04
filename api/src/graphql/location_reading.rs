@@ -4,6 +4,7 @@ use crate::repo::location_reading;
 use chrono::{DateTime, Utc};
 use derive_more::From;
 use futures_util::TryStreamExt;
+use juniper::FieldResult;
 
 #[derive(Clone, From)]
 pub struct LocationReading(location_reading::LocationReading);
@@ -14,13 +15,12 @@ impl LocationReading {
         &self.0.timestamp
     }
 
-    pub async fn person(&self, context: &Context) -> Option<Person> {
-        context
+    pub async fn person(&self, context: &Context) -> FieldResult<Option<Person>> {
+        Ok(context
             .person_repo
             .find_one(&self.0.person_id)
-            .await
-            .unwrap()
-            .map(Into::into)
+            .await?
+            .map(Into::into))
     }
 
     pub fn coordinates(&self) -> &Vec<f64> {
@@ -28,14 +28,12 @@ impl LocationReading {
     }
 }
 
-pub async fn list(context: &Context) -> Vec<LocationReading> {
-    context
+pub async fn list(context: &Context) -> FieldResult<Vec<LocationReading>> {
+    Ok(context
         .location_reading_repo
         .find()
-        .await
-        .unwrap()
+        .await?
         .map_ok(Into::into)
         .try_collect()
-        .await
-        .unwrap()
+        .await?)
 }
