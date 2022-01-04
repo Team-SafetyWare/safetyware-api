@@ -11,7 +11,7 @@ Follow these steps if you need to run the API without making code changes.
    ```
    docker compose up --build
    ```
-3. Navigate to http://localhost:3001.
+3. Navigate to http://localhost:3001/graphiql.
 4. Load sample data as described later in this document (optional).
 
 ## Develop
