@@ -37,13 +37,10 @@ async fn test_get_company() {
 
         // Assert.
         let json: Value = serde_json::from_slice(res.body())?;
+        assert_eq!(json.dot_get::<String>("data.company.id")?, Some(company.id));
         assert_eq!(
-            json.dot_get::<String>("data.company.id")?.unwrap(),
-            company.id
-        );
-        assert_eq!(
-            json.dot_get::<String>("data.company.name")?.unwrap(),
-            company.name
+            json.dot_get::<String>("data.company.name")?,
+            Some(company.name)
         );
         Ok(())
     })
