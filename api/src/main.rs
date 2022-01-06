@@ -61,6 +61,7 @@ fn robots() -> BoxedFilter<(impl Reply,)> {
 }
 
 fn health(db: Database) -> BoxedFilter<(impl Reply,)> {
+    // Evil edit.
     warp::path("health")
         .and(warp_ext::with_clone(db))
         .then(move |db: Database| async move {
