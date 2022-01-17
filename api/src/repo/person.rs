@@ -1,6 +1,7 @@
 use crate::db::coll;
 use crate::repo::{DeleteError, DeleteResult, ReplaceError};
 use crate::repo::{ItemStream, ReplaceResult};
+use bson::Document;
 use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
@@ -13,12 +14,17 @@ pub struct Person {
     pub company_id: String,
 }
 
+#[derive(Default, Debug, Clone)]
+pub struct PersonFilter {
+    pub company_ids: Option<Vec<String>>,
+}
+
 #[async_trait::async_trait]
 pub trait PersonRepo {
     async fn insert_one(&self, person: &Person) -> anyhow::Result<()>;
     async fn replace_one(&self, person: &Person) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Person>>;
-    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Person>>>;
+    async fn find(&self, filter: &PersonFilter) -> anyhow::Result<Box<dyn ItemStream<Person>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
 
@@ -64,8 +70,12 @@ impl PersonRepo for MongoPersonRepo {
         Ok(found)
     }
 
-    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Person>>> {
-        let cursor = self.collection().find(None, None).await?;
+    async fn find(&self, filter: &PersonFilter) -> anyhow::Result<Box<dyn ItemStream<Person>>> {
+        let mut mongo_filter = Document::new();
+        if let Some(company_ids) = &filter.company_ids {
+            mongo_filter.insert("company_id", bson::doc! { "$in": company_ids });
+        }
+        let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_err(|e| e.into());
         Ok(Box::new(stream))
     }
