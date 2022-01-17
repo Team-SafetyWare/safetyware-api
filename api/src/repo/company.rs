@@ -1,10 +1,9 @@
-use crate::common::{GetId, HasId, SetId};
 use crate::db::coll;
-use crate::repo::op::{DeleteOne, Find, FindOne, InsertOne, ReplaceOne};
-use crate::repo::{mongo_op, DeleteResult};
+use crate::repo::{DeleteResult, ReplaceError, DeleteError};
 use crate::repo::{ItemStream, ReplaceResult};
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use futures_util::TryStreamExt;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Company {
@@ -13,26 +12,14 @@ pub struct Company {
     pub name: String,
 }
 
-impl HasId for Company {
-    type Id = String;
-}
-
-impl GetId for Company {
-    fn id(&self) -> &Self::Id {
-        &self.id
-    }
-}
-
-impl SetId for Company {
-    fn set_id(&mut self, id: Self::Id) {
-        self.id = id
-    }
-}
-
 #[async_trait::async_trait]
-pub trait CompanyRepo:
-    InsertOne<Company> + ReplaceOne<Company> + FindOne<Company> + Find<Company> + DeleteOne<Company>
+pub trait CompanyRepo
 {
+    async fn insert_one(&self, company: &Company) -> anyhow::Result<()>;
+    async fn replace_one(&self, company: &Company) -> ReplaceResult;
+    async fn find_one(&self, id: &str) -> anyhow::Result<Option<Company>>;
+    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Company>>>;
+    async fn delete_one(&self, id: &str) -> DeleteResult;
 }
 
 #[derive(Debug, Clone)]
@@ -50,39 +37,46 @@ impl MongoCompanyRepo {
     }
 }
 
-impl CompanyRepo for MongoCompanyRepo {}
-
 #[async_trait::async_trait]
-impl InsertOne<Company> for MongoCompanyRepo {
-    async fn insert_one(&self, item: &Company) -> anyhow::Result<()> {
-        mongo_op::insert_one(item, &self.collection()).await
+impl CompanyRepo for MongoCompanyRepo {
+    async fn insert_one(&self, company: &Company) -> anyhow::Result<()> {
+        self.collection().insert_one(company, None).await?;
+        Ok(())
     }
-}
 
-#[async_trait::async_trait]
-impl ReplaceOne<Company> for MongoCompanyRepo {
-    async fn replace_one(&self, item: &Company) -> ReplaceResult {
-        mongo_op::replace_one(item, &self.collection()).await
+    async fn replace_one(&self, company: &Company) -> ReplaceResult {
+        let id = &company.id;
+        let query = bson::doc! {"_id": id};
+        let res = self.collection()
+            .replace_one(query, company, None)
+            .await
+            .map_err(anyhow::Error::from)?;
+        match res.matched_count {
+            0 => Err(ReplaceError::NotFound),
+            _ => Ok(()),
+        }
     }
-}
 
-#[async_trait::async_trait]
-impl FindOne<Company> for MongoCompanyRepo {
-    async fn find_one(&self, id: &<Company as HasId>::Id) -> anyhow::Result<Option<Company>> {
-        mongo_op::find_one(id, &self.collection()).await
+    async fn find_one(&self, id: &str) -> anyhow::Result<Option<Company>> {
+        let filter = bson::doc! {"_id": id};
+        let found = self.collection().find_one(filter, None).await?;
+        Ok(found)
     }
-}
 
-#[async_trait::async_trait]
-impl Find<Company> for MongoCompanyRepo {
     async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Company>>> {
-        mongo_op::find(&self.collection()).await
+        let cursor = self.collection().find(None, None).await?;
+        let stream = cursor.map_err(|e| e.into());
+        Ok(Box::new(stream))
     }
-}
 
-#[async_trait::async_trait]
-impl DeleteOne<Company> for MongoCompanyRepo {
-    async fn delete_one(&self, id: &<Company as HasId>::Id) -> DeleteResult {
-        mongo_op::delete_one(id, &self.collection()).await
+    async fn delete_one(&self, id: &str) -> DeleteResult {
+        let res = self.collection()
+            .delete_one(bson::doc! {"_id": id}, None)
+            .await
+            .map_err(anyhow::Error::from)?;
+        match res.deleted_count {
+            0 => Err(DeleteError::NotFound),
+            _ => Ok(()),
+        }
     }
 }

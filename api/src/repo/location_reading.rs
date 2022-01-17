@@ -1,6 +1,5 @@
 use crate::db::coll;
-use crate::repo::op::Find;
-use crate::repo::{mongo_op, ItemStream};
+use crate::repo::{ItemStream};
 use chrono::{DateTime, Utc};
 use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
@@ -37,7 +36,9 @@ impl From<DbLocationReading> for LocationReading {
 }
 
 #[async_trait::async_trait]
-pub trait LocationReadingRepo: Find<LocationReading> {}
+pub trait LocationReadingRepo {
+    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>>;
+}
 
 #[derive(Debug, Clone)]
 pub struct MongoLocationReadingRepo {
@@ -54,13 +55,11 @@ impl MongoLocationReadingRepo {
     }
 }
 
-impl LocationReadingRepo for MongoLocationReadingRepo {}
-
 #[async_trait::async_trait]
-impl Find<LocationReading> for MongoLocationReadingRepo {
+impl LocationReadingRepo for MongoLocationReadingRepo {
     async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>> {
-        let mongo_stream = mongo_op::find(&self.collection()).await?;
-        let stream = mongo_stream.map_ok(Into::into);
+        let cursor = self.collection().find(None, None).await?;
+        let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
         Ok(Box::new(stream))
     }
 }
