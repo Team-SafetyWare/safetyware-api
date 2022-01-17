@@ -32,11 +32,7 @@ impl Company {
                 company_ids: Some(vec![self.0.id.clone()]),
             })
             .await?
-            .try_filter_map(|p| async move {
-                Ok(Some(p)
-                    .filter(|p| p.company_id == self.0.id)
-                    .map(Into::into))
-            })
+            .map_ok(Into::into)
             .try_collect()
             .await?)
     }
