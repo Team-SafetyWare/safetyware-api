@@ -1,6 +1,6 @@
 use crate::db::coll;
-use crate::repo::op::Find;
-use crate::repo::{mongo_op, ItemStream};
+use crate::repo::ItemStream;
+use bson::Document;
 use chrono::{DateTime, Utc};
 use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
@@ -36,8 +36,18 @@ impl From<DbLocationReading> for LocationReading {
     }
 }
 
+#[derive(Default, Debug, Clone)]
+pub struct LocationReadingFilter {
+    pub person_ids: Option<Vec<String>>,
+}
+
 #[async_trait::async_trait]
-pub trait LocationReadingRepo: Find<LocationReading> {}
+pub trait LocationReadingRepo {
+    async fn find(
+        &self,
+        filter: &LocationReadingFilter,
+    ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>>;
+}
 
 #[derive(Debug, Clone)]
 pub struct MongoLocationReadingRepo {
@@ -54,13 +64,18 @@ impl MongoLocationReadingRepo {
     }
 }
 
-impl LocationReadingRepo for MongoLocationReadingRepo {}
-
 #[async_trait::async_trait]
-impl Find<LocationReading> for MongoLocationReadingRepo {
-    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>> {
-        let mongo_stream = mongo_op::find(&self.collection()).await?;
-        let stream = mongo_stream.map_ok(Into::into);
+impl LocationReadingRepo for MongoLocationReadingRepo {
+    async fn find(
+        &self,
+        filter: &LocationReadingFilter,
+    ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>> {
+        let mut mongo_filter = Document::new();
+        if let Some(person_ids) = &filter.person_ids {
+            mongo_filter.insert("person_id", bson::doc! { "$in": person_ids });
+        }
+        let cursor = self.collection().find(mongo_filter, None).await?;
+        let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
         Ok(Box::new(stream))
     }
 }

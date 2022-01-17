@@ -2,6 +2,7 @@ use crate::crockford;
 use crate::graphql::person::Person;
 use crate::graphql::Context;
 use crate::repo::company;
+use crate::repo::person::PersonFilter;
 use derive_more::From;
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
@@ -25,16 +26,13 @@ impl Company {
     }
 
     pub async fn people(&self, context: &Context) -> FieldResult<Vec<Person>> {
-        // Todo: This is terribly inefficient.
         Ok(context
             .person_repo
-            .find()
-            .await?
-            .try_filter_map(|p| async move {
-                Ok(Some(p)
-                    .filter(|p| p.company_id == self.0.id)
-                    .map(Into::into))
+            .find(&PersonFilter {
+                company_ids: Some(vec![self.0.id.clone()]),
             })
+            .await?
+            .map_ok(Into::into)
             .try_collect()
             .await?)
     }
