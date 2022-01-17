@@ -1,9 +1,9 @@
 use crate::db::coll;
-use crate::repo::{DeleteResult, ReplaceError, DeleteError};
+use crate::repo::{DeleteError, DeleteResult, ReplaceError};
 use crate::repo::{ItemStream, ReplaceResult};
+use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
-use futures_util::TryStreamExt;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Company {
@@ -13,8 +13,7 @@ pub struct Company {
 }
 
 #[async_trait::async_trait]
-pub trait CompanyRepo
-{
+pub trait CompanyRepo {
     async fn insert_one(&self, company: &Company) -> anyhow::Result<()>;
     async fn replace_one(&self, company: &Company) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Company>>;
@@ -47,7 +46,8 @@ impl CompanyRepo for MongoCompanyRepo {
     async fn replace_one(&self, company: &Company) -> ReplaceResult {
         let id = &company.id;
         let query = bson::doc! {"_id": id};
-        let res = self.collection()
+        let res = self
+            .collection()
             .replace_one(query, company, None)
             .await
             .map_err(anyhow::Error::from)?;
@@ -70,7 +70,8 @@ impl CompanyRepo for MongoCompanyRepo {
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
-        let res = self.collection()
+        let res = self
+            .collection()
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
