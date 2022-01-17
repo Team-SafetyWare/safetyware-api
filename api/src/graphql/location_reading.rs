@@ -31,7 +31,7 @@ impl LocationReading {
 pub async fn list(context: &Context) -> FieldResult<Vec<LocationReading>> {
     Ok(context
         .location_reading_repo
-        .find()
+        .find(&Default::default())
         .await?
         .map_ok(Into::into)
         .try_collect()

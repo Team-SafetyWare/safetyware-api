@@ -2,6 +2,7 @@ use crate::crockford;
 use crate::graphql::company::Company;
 use crate::graphql::location_reading::LocationReading;
 use crate::graphql::Context;
+use crate::repo::location_reading::LocationReadingFilter;
 use crate::repo::person;
 use derive_more::From;
 use futures_util::TryStreamExt;
@@ -35,16 +36,13 @@ impl Person {
     }
 
     pub async fn location_readings(&self, context: &Context) -> FieldResult<Vec<LocationReading>> {
-        // Todo: This is terribly inefficient.
         Ok(context
             .location_reading_repo
-            .find()
-            .await?
-            .try_filter_map(|lr| async move {
-                Ok(Some(lr)
-                    .filter(|lr| lr.person_id == self.0.id)
-                    .map(Into::into))
+            .find(&LocationReadingFilter {
+                person_ids: Some(vec![self.0.id.clone()]),
             })
+            .await?
+            .map_ok(Into::into)
             .try_collect()
             .await?)
     }
