@@ -1,13 +1,16 @@
 pub mod company;
 pub mod location_reading;
 pub mod person;
+pub mod user_account;
 
 use crate::graphql::company::{Company, CompanyInput};
 use crate::graphql::location_reading::LocationReading;
 use crate::graphql::person::{Person, PersonInput};
+use crate::graphql::user_account::{UserAccount, UserAccountInput};
 use crate::repo::company::CompanyRepo;
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
+use crate::repo::user_account::UserAccountRepo;
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
 use juniper::{graphql_object, EmptySubscription, FieldResult, RootNode, ID};
@@ -45,6 +48,7 @@ pub struct Context {
     pub company_repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
     pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
     pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
+    pub user_account_repo: Arc<dyn UserAccountRepo + Send + Sync + 'static>,
 }
 
 impl juniper::Context for Context {}
@@ -76,6 +80,17 @@ impl Query {
         #[graphql(context)] context: &Context,
     ) -> FieldResult<Vec<LocationReading>> {
         location_reading::list(context).await
+    }
+
+    async fn user_account(
+        #[graphql(context)] context: &Context,
+        id: ID,
+    ) -> FieldResult<Option<UserAccount>> {
+        user_account::get(context, id).await
+    }
+
+    async fn user_accounts(#[graphql(context)] context: &Context) -> FieldResult<Vec<UserAccount>> {
+        user_account::list(context).await
     }
 }
 
@@ -119,5 +134,24 @@ impl Mutation {
 
     async fn delete_person(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
         person::delete(context, id).await
+    }
+
+    async fn create_user_account(
+        #[graphql(context)] context: &Context,
+        input: UserAccountInput,
+    ) -> FieldResult<UserAccount> {
+        user_account::create(context, input).await
+    }
+
+    async fn replace_user_account(
+        #[graphql(context)] context: &Context,
+        id: ID,
+        input: UserAccountInput,
+    ) -> FieldResult<UserAccount> {
+        user_account::replace(context, id, input).await
+    }
+
+    async fn delete_user_account(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        user_account::delete(context, id).await
     }
 }
