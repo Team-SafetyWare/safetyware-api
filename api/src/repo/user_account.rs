@@ -1,6 +1,7 @@
 use crate::db::coll;
 use crate::repo::{DeleteError, DeleteResult, ReplaceError};
 use crate::repo::{ItemStream, ReplaceResult};
+use bson::Document;
 use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
@@ -16,12 +17,20 @@ pub struct UserAccount {
     pub company_id: String,
 }
 
+#[derive(Default, Debug, Clone)]
+pub struct UserAccountFilter {
+    pub company_ids: Option<Vec<String>>,
+}
+
 #[async_trait::async_trait]
 pub trait UserAccountRepo {
     async fn insert_one(&self, user_account: &UserAccount) -> anyhow::Result<()>;
     async fn replace_one(&self, user_account: &UserAccount) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<UserAccount>>;
-    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>>;
+    async fn find(
+        &self,
+        filter: &UserAccountFilter,
+    ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
 
@@ -67,8 +76,15 @@ impl UserAccountRepo for MongoUserAccountRepo {
         Ok(found)
     }
 
-    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>> {
-        let cursor = self.collection().find(None, None).await?;
+    async fn find(
+        &self,
+        filter: &UserAccountFilter,
+    ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>> {
+        let mut mongo_filter = Document::new();
+        if let Some(company_ids) = &filter.company_ids {
+            mongo_filter.insert("company_id", bson::doc! { "$in": company_ids });
+        }
+        let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_err(|e| e.into());
         Ok(Box::new(stream))
     }
