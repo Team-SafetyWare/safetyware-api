@@ -8,6 +8,7 @@ pub mod coll {
     pub const COMPANY: &str = "company";
     pub const LOCATION_READING: &str = "location_reading";
     pub const PERSON: &str = "person";
+    pub const USER_ACCOUNT: &str = "user_account";
 }
 
 pub mod err_code {

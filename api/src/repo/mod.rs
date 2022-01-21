@@ -3,6 +3,7 @@ use futures_util::Stream;
 pub mod company;
 pub mod location_reading;
 pub mod person;
+pub mod user_account;
 
 pub trait ItemStream<T: Unpin + Send>: Stream<Item = anyhow::Result<T>> + Unpin + Send {}
 
