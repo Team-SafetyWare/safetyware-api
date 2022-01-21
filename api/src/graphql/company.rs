@@ -1,8 +1,10 @@
 use crate::crockford;
 use crate::graphql::person::Person;
+use crate::graphql::user_account::UserAccount;
 use crate::graphql::Context;
 use crate::repo::company;
 use crate::repo::person::PersonFilter;
+use crate::repo::user_account::UserAccountFilter;
 use derive_more::From;
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
@@ -29,6 +31,18 @@ impl Company {
         Ok(context
             .person_repo
             .find(&PersonFilter {
+                company_ids: Some(vec![self.0.id.clone()]),
+            })
+            .await?
+            .map_ok(Into::into)
+            .try_collect()
+            .await?)
+    }
+
+    pub async fn user_accounts(&self, context: &Context) -> FieldResult<Vec<UserAccount>> {
+        Ok(context
+            .user_account_repo
+            .find(&UserAccountFilter {
                 company_ids: Some(vec![self.0.id.clone()]),
             })
             .await?

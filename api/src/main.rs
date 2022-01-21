@@ -9,6 +9,7 @@ use crate::graphql::Context;
 use crate::repo::company::{CompanyRepo, MongoCompanyRepo};
 use crate::repo::location_reading::{LocationReadingRepo, MongoLocationReadingRepo};
 use crate::repo::person::{MongoPersonRepo, PersonRepo};
+use crate::repo::user_account::{MongoUserAccountRepo, UserAccountRepo};
 use crate::settings::Settings;
 use mongodb::Database;
 use std::env;
@@ -28,9 +29,16 @@ async fn main() -> anyhow::Result<()> {
     let company_repo = MongoCompanyRepo::new(db.clone());
     let person_repo = MongoPersonRepo::new(db.clone());
     let location_reading_repo = MongoLocationReadingRepo::new(db.clone());
-    let route = filter(db, company_repo, person_repo, location_reading_repo)
-        .with(log())
-        .with(cors());
+    let user_account_repo = MongoUserAccountRepo::new(db.clone());
+    let route = filter(
+        db,
+        company_repo,
+        person_repo,
+        location_reading_repo,
+        user_account_repo,
+    )
+    .with(log())
+    .with(cors());
     let port = get_port();
     warp::serve(route).run((Ipv4Addr::UNSPECIFIED, port)).await;
     Ok(())
@@ -41,11 +49,13 @@ fn filter(
     company_repo: impl CompanyRepo + Clone + Send + Sync + 'static,
     person_repo: impl PersonRepo + Clone + Send + Sync + 'static,
     location_reading_repo: impl LocationReadingRepo + Clone + Send + Sync + 'static,
+    user_account_repo: impl UserAccountRepo + Clone + Send + Sync + 'static,
 ) -> BoxedFilter<(impl Reply,)> {
     let graphql = graphql::graphql_filter(Context {
         company_repo: Arc::new(company_repo),
         person_repo: Arc::new(person_repo),
         location_reading_repo: Arc::new(location_reading_repo),
+        user_account_repo: Arc::new(user_account_repo),
     });
     let graphiql = graphql::graphiql_filter();
     let robots = robots();
