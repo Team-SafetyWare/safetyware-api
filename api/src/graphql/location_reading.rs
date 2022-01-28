@@ -7,7 +7,7 @@ use futures_util::TryStreamExt;
 use juniper::FieldResult;
 
 #[derive(Clone, From)]
-pub struct LocationReading(location_reading::LocationReading);
+pub struct LocationReading(pub location_reading::LocationReading);
 
 #[juniper::graphql_object(context = Context)]
 impl LocationReading {
@@ -29,11 +29,13 @@ impl LocationReading {
 }
 
 pub async fn list(context: &Context) -> FieldResult<Vec<LocationReading>> {
-    Ok(context
+    let mut vec: Vec<LocationReading> = context
         .location_reading_repo
         .find(&Default::default())
         .await?
         .map_ok(Into::into)
         .try_collect()
-        .await?)
+        .await?;
+    vec.sort_by_key(|l| l.0.timestamp);
+    Ok(vec)
 }
