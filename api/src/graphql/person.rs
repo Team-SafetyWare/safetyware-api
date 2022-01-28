@@ -2,7 +2,8 @@ use crate::crockford;
 use crate::graphql::company::Company;
 use crate::graphql::location_reading::LocationReading;
 use crate::graphql::Context;
-use crate::repo::location_reading::LocationReadingFilter;
+use crate::graphql::LocationReadingFilter;
+use crate::repo::location_reading::LocationReadingFilter as RepoLocationReadingFilter;
 use crate::repo::person;
 use derive_more::From;
 use futures_util::TryStreamExt;
@@ -35,10 +36,15 @@ impl Person {
             .map(Into::into))
     }
 
-    pub async fn location_readings(&self, context: &Context) -> FieldResult<Vec<LocationReading>> {
+    pub async fn location_readings(
+        &self,
+        context: &Context,
+        filter: Option<LocationReadingFilter>,
+    ) -> FieldResult<Vec<LocationReading>> {
+        let filter = filter.unwrap_or_default();
         let mut vec: Vec<LocationReading> = context
             .location_reading_repo
-            .find(&LocationReadingFilter {
+            .find(&RepoLocationReadingFilter {
                 person_ids: Some(vec![self.0.id.clone()]),
             })
             .await?
