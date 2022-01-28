@@ -10,7 +10,7 @@ use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
 #[derive(Clone, From)]
-pub struct Company(company::Company);
+pub struct Company(pub company::Company);
 
 #[derive(juniper::GraphQLInputObject)]
 pub struct CompanyInput {

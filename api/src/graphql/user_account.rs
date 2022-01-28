@@ -7,7 +7,7 @@ use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
 #[derive(Clone, From)]
-pub struct UserAccount(user_account::UserAccount);
+pub struct UserAccount(pub user_account::UserAccount);
 
 #[derive(juniper::GraphQLInputObject)]
 pub struct UserAccountInput {
