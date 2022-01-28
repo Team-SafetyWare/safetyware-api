@@ -4,7 +4,7 @@ pub mod person;
 pub mod user_account;
 
 use crate::graphql::company::{Company, CompanyInput};
-use crate::graphql::location_reading::LocationReading;
+use crate::graphql::location_reading::{LocationReading, LocationReadingFilter};
 use crate::graphql::person::{Person, PersonInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
 use crate::repo::company::CompanyRepo;
@@ -78,8 +78,9 @@ impl Query {
 
     async fn location_readings(
         #[graphql(context)] context: &Context,
+        filter: Option<LocationReadingFilter>,
     ) -> FieldResult<Vec<LocationReading>> {
-        location_reading::list(context).await
+        location_reading::list(context, filter).await
     }
 
     async fn user_account(

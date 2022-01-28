@@ -39,6 +39,8 @@ impl From<DbLocationReading> for LocationReading {
 #[derive(Default, Debug, Clone)]
 pub struct LocationReadingFilter {
     pub person_ids: Option<Vec<String>>,
+    pub min_timestamp: Option<DateTime<Utc>>,
+    pub max_timestamp: Option<DateTime<Utc>>,
 }
 
 #[async_trait::async_trait]
@@ -73,6 +75,22 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
         let mut mongo_filter = Document::new();
         if let Some(person_ids) = &filter.person_ids {
             mongo_filter.insert("person_id", bson::doc! { "$in": person_ids });
+        }
+        if let Some(min_timestamp) = &filter.min_timestamp {
+            mongo_filter
+                .entry("timestamp".to_string())
+                .or_insert(bson::doc! {}.into())
+                .as_document_mut()
+                .unwrap()
+                .insert("$gte", min_timestamp);
+        }
+        if let Some(max_timestamp) = &filter.max_timestamp {
+            mongo_filter
+                .entry("timestamp".to_string())
+                .or_insert(bson::doc! {}.into())
+                .as_document_mut()
+                .unwrap()
+                .insert("$lt", max_timestamp);
         }
         let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_ok(Into::into).map_err(|e| e.into());

@@ -1,6 +1,7 @@
 use crate::graphql::person::Person;
 use crate::graphql::Context;
 use crate::repo::location_reading;
+use crate::repo::location_reading::LocationReadingFilter as RepoLocationReadingFilter;
 use chrono::{DateTime, Utc};
 use derive_more::From;
 use futures_util::TryStreamExt;
@@ -8,6 +9,12 @@ use juniper::FieldResult;
 
 #[derive(Clone, From)]
 pub struct LocationReading(pub location_reading::LocationReading);
+
+#[derive(juniper::GraphQLInputObject, Default)]
+pub struct LocationReadingFilter {
+    pub min_timestamp: Option<DateTime<Utc>>,
+    pub max_timestamp: Option<DateTime<Utc>>,
+}
 
 #[juniper::graphql_object(context = Context)]
 impl LocationReading {
@@ -28,10 +35,18 @@ impl LocationReading {
     }
 }
 
-pub async fn list(context: &Context) -> FieldResult<Vec<LocationReading>> {
+pub async fn list(
+    context: &Context,
+    filter: Option<LocationReadingFilter>,
+) -> FieldResult<Vec<LocationReading>> {
+    let filter = filter.unwrap_or_default();
     let mut vec: Vec<LocationReading> = context
         .location_reading_repo
-        .find(&Default::default())
+        .find(&RepoLocationReadingFilter {
+            person_ids: None,
+            min_timestamp: filter.min_timestamp,
+            max_timestamp: filter.max_timestamp,
+        })
         .await?
         .map_ok(Into::into)
         .try_collect()
