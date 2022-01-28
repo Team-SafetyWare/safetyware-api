@@ -46,6 +46,8 @@ impl Person {
             .location_reading_repo
             .find(&RepoLocationReadingFilter {
                 person_ids: Some(vec![self.0.id.clone()]),
+                min_timestamp: filter.min_timestamp,
+                max_timestamp: filter.max_timestamp,
             })
             .await?
             .map_ok(Into::into)
