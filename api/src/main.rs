@@ -1,3 +1,4 @@
+pub mod blackline;
 pub mod crockford;
 pub mod db;
 pub mod graphql;
@@ -5,6 +6,7 @@ pub mod repo;
 pub mod settings;
 pub mod warp_ext;
 
+use crate::blackline::import;
 use crate::graphql::Context;
 use crate::repo::company::MongoCompanyRepo;
 use crate::repo::device::MongoDeviceRepo;
@@ -34,18 +36,28 @@ async fn main() -> anyhow::Result<()> {
         person_repo: Arc::new(MongoPersonRepo::new(db.clone())),
         user_account_repo: Arc::new(MongoUserAccountRepo::new(db.clone())),
     };
-    let route = filter(db, graphql_context).with(log()).with(cors());
+    let import_device_data_context = import::DeviceDataContext {
+        location_reading_repo: graphql_context.location_reading_repo.clone(),
+    };
+    let route = filter(db, graphql_context, import_device_data_context)
+        .with(log())
+        .with(cors());
     let port = get_port();
     warp::serve(route).run((Ipv4Addr::UNSPECIFIED, port)).await;
     Ok(())
 }
 
-fn filter(db: Database, graphql_context: Context) -> BoxedFilter<(impl Reply,)> {
-    let graphql = graphql::graphql_filter(graphql_context);
-    let graphiql = graphql::graphiql_filter();
-    let robots = robots();
-    let health = health(db);
-    graphql.or(graphiql).or(robots).or(health).boxed()
+fn filter(
+    db: Database,
+    graphql_context: Context,
+    import_device_data_context: import::DeviceDataContext,
+) -> BoxedFilter<(impl Reply,)> {
+    graphql::graphql_filter(graphql_context)
+        .or(graphql::graphiql_filter())
+        .or(import::device_data_filter(import_device_data_context))
+        .or(health(db))
+        .or(robots())
+        .boxed()
 }
 
 fn robots() -> BoxedFilter<(impl Reply,)> {
