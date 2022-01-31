@@ -40,7 +40,7 @@ pub async fn get(context: &Context, id: ID) -> FieldResult<Option<Device>> {
 pub async fn list(context: &Context) -> FieldResult<Vec<Device>> {
     Ok(context
         .device_repo
-        .find()
+        .find(&Default::default())
         .await?
         .map_ok(Into::into)
         .try_collect()
