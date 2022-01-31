@@ -37,6 +37,7 @@ async fn main() -> anyhow::Result<()> {
         user_account_repo: Arc::new(MongoUserAccountRepo::new(db.clone())),
     };
     let import_device_data_context = import::DeviceDataContext {
+        device_repo: graphql_context.device_repo.clone(),
         location_reading_repo: graphql_context.location_reading_repo.clone(),
     };
     let route = filter(db, graphql_context, import_device_data_context)
