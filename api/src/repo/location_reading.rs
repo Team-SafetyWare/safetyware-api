@@ -16,6 +16,7 @@ pub struct DbLocationReading {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DbLocation {
+    pub r#type: String,
     pub coordinates: Vec<f64>,
 }
 
@@ -36,6 +37,19 @@ impl From<DbLocationReading> for LocationReading {
     }
 }
 
+impl From<LocationReading> for DbLocationReading {
+    fn from(value: LocationReading) -> Self {
+        Self {
+            person_id: value.person_id,
+            timestamp: value.timestamp,
+            location: DbLocation {
+                r#type: "Point".to_string(),
+                coordinates: value.coordinates,
+            },
+        }
+    }
+}
+
 #[derive(Default, Debug, Clone)]
 pub struct LocationReadingFilter {
     pub person_ids: Option<Vec<String>>,
@@ -45,6 +59,8 @@ pub struct LocationReadingFilter {
 
 #[async_trait::async_trait]
 pub trait LocationReadingRepo {
+    async fn insert_many(&self, location_readings: &Vec<LocationReading>) -> anyhow::Result<()>;
+
     async fn find(
         &self,
         filter: &LocationReadingFilter,
@@ -68,6 +84,16 @@ impl MongoLocationReadingRepo {
 
 #[async_trait::async_trait]
 impl LocationReadingRepo for MongoLocationReadingRepo {
+    async fn insert_many(&self, location_readings: &Vec<LocationReading>) -> anyhow::Result<()> {
+        let db_readings: Vec<DbLocationReading> = location_readings
+            .clone()
+            .into_iter()
+            .map(|r| r.into())
+            .collect();
+        self.collection().insert_many(db_readings, None).await?;
+        Ok(())
+    }
+
     async fn find(
         &self,
         filter: &LocationReadingFilter,
