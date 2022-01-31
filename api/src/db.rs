@@ -6,6 +6,7 @@ pub const DB_NAME: &str = "sw";
 
 pub mod coll {
     pub const COMPANY: &str = "company";
+    pub const DEVICE: &str = "device";
     pub const LOCATION_READING: &str = "location_reading";
     pub const PERSON: &str = "person";
     pub const USER_ACCOUNT: &str = "user_account";
