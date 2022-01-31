@@ -10,6 +10,7 @@ use crate::blackline::import;
 use crate::graphql::Context;
 use crate::repo::company::MongoCompanyRepo;
 use crate::repo::device::MongoDeviceRepo;
+use crate::repo::gas_reading::MongoGasReadingRepo;
 use crate::repo::location_reading::MongoLocationReadingRepo;
 use crate::repo::person::MongoPersonRepo;
 use crate::repo::user_account::MongoUserAccountRepo;
@@ -32,6 +33,7 @@ async fn main() -> anyhow::Result<()> {
     let graphql_context = Context {
         company_repo: Arc::new(MongoCompanyRepo::new(db.clone())),
         device_repo: Arc::new(MongoDeviceRepo::new(db.clone())),
+        gas_reading_repo: Arc::new(MongoGasReadingRepo::new(db.clone())),
         location_reading_repo: Arc::new(MongoLocationReadingRepo::new(db.clone())),
         person_repo: Arc::new(MongoPersonRepo::new(db.clone())),
         user_account_repo: Arc::new(MongoUserAccountRepo::new(db.clone())),

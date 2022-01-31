@@ -1,5 +1,6 @@
 pub mod company;
 pub mod device;
+pub mod gas_reading;
 pub mod location_reading;
 pub mod person;
 pub mod user_account;
@@ -7,11 +8,13 @@ pub mod user_account;
 use crate::graphql::company::{Company, CompanyInput};
 use crate::graphql::device::Device;
 use crate::graphql::device::DeviceInput;
+use crate::graphql::gas_reading::{GasReading, GasReadingFilter};
 use crate::graphql::location_reading::{LocationReading, LocationReadingFilter};
 use crate::graphql::person::{Person, PersonInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
 use crate::repo::company::CompanyRepo;
 use crate::repo::device::DeviceRepo;
+use crate::repo::gas_reading::GasReadingRepo;
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
 use crate::repo::user_account::UserAccountRepo;
@@ -51,6 +54,7 @@ fn schema() -> Schema {
 pub struct Context {
     pub company_repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
     pub device_repo: Arc<dyn DeviceRepo + Send + Sync + 'static>,
+    pub gas_reading_repo: Arc<dyn GasReadingRepo + Send + Sync + 'static>,
     pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
     pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
     pub user_account_repo: Arc<dyn UserAccountRepo + Send + Sync + 'static>,
@@ -79,6 +83,13 @@ impl Query {
 
     async fn devices(#[graphql(context)] context: &Context) -> FieldResult<Vec<Device>> {
         device::list(context).await
+    }
+
+    async fn gas_readings(
+        #[graphql(context)] context: &Context,
+        filter: Option<GasReadingFilter>,
+    ) -> FieldResult<Vec<GasReading>> {
+        gas_reading::list(context, filter).await
     }
 
     async fn location_readings(
