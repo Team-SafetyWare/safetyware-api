@@ -1,6 +1,7 @@
 use crate::db::coll;
 use crate::repo::{DeleteError, DeleteResult, ReplaceError};
 use crate::repo::{ItemStream, ReplaceResult};
+use bson::Document;
 use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
@@ -12,12 +13,17 @@ pub struct Device {
     pub owner_id: String,
 }
 
+#[derive(Default, Debug, Clone)]
+pub struct DeviceFilter {
+    pub owner_ids: Option<Vec<String>>,
+}
+
 #[async_trait::async_trait]
 pub trait DeviceRepo {
     async fn insert_one(&self, device: &Device) -> anyhow::Result<()>;
     async fn replace_one(&self, device: &Device) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Device>>;
-    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Device>>>;
+    async fn find(&self, filter: &DeviceFilter) -> anyhow::Result<Box<dyn ItemStream<Device>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
 
@@ -63,8 +69,12 @@ impl DeviceRepo for MongoDeviceRepo {
         Ok(found)
     }
 
-    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Device>>> {
-        let cursor = self.collection().find(None, None).await?;
+    async fn find(&self, filter: &DeviceFilter) -> anyhow::Result<Box<dyn ItemStream<Device>>> {
+        let mut mongo_filter = Document::new();
+        if let Some(owner_ids) = &filter.owner_ids {
+            mongo_filter.insert("owner_id", bson::doc! { "$in": owner_ids });
+        }
+        let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_err(|e| e.into());
         Ok(Box::new(stream))
     }
