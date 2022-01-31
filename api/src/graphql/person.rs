@@ -15,7 +15,7 @@ pub struct Person(pub person::Person);
 #[derive(juniper::GraphQLInputObject)]
 pub struct PersonInput {
     name: String,
-    company_id: String,
+    company_id: ID,
 }
 
 #[juniper::graphql_object(context = Context)]
@@ -80,7 +80,7 @@ pub async fn create(context: &Context, input: PersonInput) -> FieldResult<Person
     let item = person::Person {
         id: crockford::random_id(),
         name: input.name,
-        company_id: input.company_id,
+        company_id: input.company_id.to_string(),
     };
     context.person_repo.insert_one(&item).await?;
     Ok(item.into())
@@ -90,7 +90,7 @@ pub async fn replace(context: &Context, id: ID, input: PersonInput) -> FieldResu
     let item = person::Person {
         id: id.to_string(),
         name: input.name,
-        company_id: input.company_id,
+        company_id: input.company_id.to_string(),
     };
     context.person_repo.replace_one(&item).await?;
     Ok(item.into())

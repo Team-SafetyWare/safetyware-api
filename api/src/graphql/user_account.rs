@@ -15,7 +15,7 @@ pub struct UserAccountInput {
     pub title: String,
     pub email: String,
     pub phone: String,
-    pub company_id: String,
+    pub company_id: ID,
 }
 
 #[juniper::graphql_object(context = Context)]
@@ -74,7 +74,7 @@ pub async fn create(context: &Context, input: UserAccountInput) -> FieldResult<U
         title: input.title,
         email: input.email,
         phone: input.phone,
-        company_id: input.company_id,
+        company_id: input.company_id.to_string(),
     };
     context.user_account_repo.insert_one(&item).await?;
     Ok(item.into())
@@ -91,7 +91,7 @@ pub async fn replace(
         title: input.title,
         email: input.email,
         phone: input.phone,
-        company_id: input.company_id,
+        company_id: input.company_id.to_string(),
     };
     context.user_account_repo.replace_one(&item).await?;
     Ok(item.into())
