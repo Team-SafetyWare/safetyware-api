@@ -1,13 +1,17 @@
 pub mod company;
+pub mod device;
 pub mod location_reading;
 pub mod person;
 pub mod user_account;
 
 use crate::graphql::company::{Company, CompanyInput};
+use crate::graphql::device::Device;
+use crate::graphql::device::DeviceInput;
 use crate::graphql::location_reading::{LocationReading, LocationReadingFilter};
 use crate::graphql::person::{Person, PersonInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
 use crate::repo::company::CompanyRepo;
+use crate::repo::device::DeviceRepo;
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
 use crate::repo::user_account::UserAccountRepo;
@@ -46,8 +50,9 @@ fn schema() -> Schema {
 #[derive(Clone)]
 pub struct Context {
     pub company_repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
-    pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
+    pub device_repo: Arc<dyn DeviceRepo + Send + Sync + 'static>,
     pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
+    pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
     pub user_account_repo: Arc<dyn UserAccountRepo + Send + Sync + 'static>,
 }
 
@@ -68,12 +73,12 @@ impl Query {
         company::list(context).await
     }
 
-    async fn person(#[graphql(context)] context: &Context, id: ID) -> FieldResult<Option<Person>> {
-        person::get(context, id).await
+    async fn device(#[graphql(context)] context: &Context, id: ID) -> FieldResult<Option<Device>> {
+        device::get(context, id).await
     }
 
-    async fn people(#[graphql(context)] context: &Context) -> FieldResult<Vec<Person>> {
-        person::list(context).await
+    async fn devices(#[graphql(context)] context: &Context) -> FieldResult<Vec<Device>> {
+        device::list(context).await
     }
 
     async fn location_readings(
@@ -81,6 +86,14 @@ impl Query {
         filter: Option<LocationReadingFilter>,
     ) -> FieldResult<Vec<LocationReading>> {
         location_reading::list(context, filter).await
+    }
+
+    async fn person(#[graphql(context)] context: &Context, id: ID) -> FieldResult<Option<Person>> {
+        person::get(context, id).await
+    }
+
+    async fn people(#[graphql(context)] context: &Context) -> FieldResult<Vec<Person>> {
+        person::list(context).await
     }
 
     async fn user_account(
@@ -116,6 +129,25 @@ impl Mutation {
 
     async fn delete_company(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
         company::delete(context, id).await
+    }
+
+    async fn create_device(
+        #[graphql(context)] context: &Context,
+        input: DeviceInput,
+    ) -> FieldResult<Device> {
+        device::create(context, input).await
+    }
+
+    async fn replace_device(
+        #[graphql(context)] context: &Context,
+        id: ID,
+        input: DeviceInput,
+    ) -> FieldResult<Device> {
+        device::replace(context, id, input).await
+    }
+
+    async fn delete_device(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        device::delete(context, id).await
     }
 
     async fn create_person(
