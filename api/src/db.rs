@@ -7,6 +7,7 @@ pub const DB_NAME: &str = "sw";
 pub mod coll {
     pub const COMPANY: &str = "company";
     pub const DEVICE: &str = "device";
+    pub const GAS_READING: &str = "gas_reading";
     pub const LOCATION_READING: &str = "location_reading";
     pub const PERSON: &str = "person";
     pub const USER_ACCOUNT: &str = "user_account";
@@ -61,6 +62,33 @@ pub async fn prepare_coll_location_reading(db: &Database) -> anyhow::Result<()> 
             IndexModel::builder()
                 .keys(bson::doc! { "person_id": 1 })
                 .build(),
+            None,
+        )
+        .await?;
+    collection
+        .create_index(
+            IndexModel::builder()
+                .keys(bson::doc! { "location": "2dsphere" })
+                .build(),
+            None,
+        )
+        .await?;
+    Ok(())
+}
+
+pub async fn prepare_coll_gas_reading(db: &Database) -> anyhow::Result<()> {
+    let collection = db.collection::<Document>(coll::GAS_READING);
+    collection
+        .create_index(
+            IndexModel::builder()
+                .keys(bson::doc! { "person_id": 1 })
+                .build(),
+            None,
+        )
+        .await?;
+    collection
+        .create_index(
+            IndexModel::builder().keys(bson::doc! { "gas": 1 }).build(),
             None,
         )
         .await?;
