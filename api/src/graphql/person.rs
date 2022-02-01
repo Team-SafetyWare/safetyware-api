@@ -1,8 +1,13 @@
 use crate::crockford;
 use crate::graphql::company::Company;
+use crate::graphql::device::Device;
+use crate::graphql::gas_reading::GasReading;
 use crate::graphql::location_reading::LocationReading;
 use crate::graphql::Context;
+use crate::graphql::GasReadingFilter;
 use crate::graphql::LocationReadingFilter;
+use crate::repo::device::DeviceFilter as RepoDeviceFilter;
+use crate::repo::gas_reading::GasReadingFilter as RepoGasReadingFilter;
 use crate::repo::location_reading::LocationReadingFilter as RepoLocationReadingFilter;
 use crate::repo::person;
 use derive_more::From;
@@ -34,6 +39,39 @@ impl Person {
             .find_one(&self.0.company_id)
             .await?
             .map(Into::into))
+    }
+
+    pub async fn devices(&self, context: &Context) -> FieldResult<Vec<Device>> {
+        Ok(context
+            .device_repo
+            .find(&RepoDeviceFilter {
+                owner_ids: Some(vec![self.0.id.clone()]),
+            })
+            .await?
+            .map_ok(Into::into)
+            .try_collect()
+            .await?)
+    }
+
+    pub async fn gas_readings(
+        &self,
+        context: &Context,
+        filter: Option<GasReadingFilter>,
+    ) -> FieldResult<Vec<GasReading>> {
+        let filter = filter.unwrap_or_default();
+        let mut vec: Vec<GasReading> = context
+            .gas_reading_repo
+            .find(&RepoGasReadingFilter {
+                person_ids: Some(vec![self.0.id.clone()]),
+                min_timestamp: filter.min_timestamp,
+                max_timestamp: filter.max_timestamp,
+            })
+            .await?
+            .map_ok(Into::into)
+            .try_collect()
+            .await?;
+        vec.sort_by_key(|l| l.0.timestamp);
+        Ok(vec)
     }
 
     pub async fn location_readings(
