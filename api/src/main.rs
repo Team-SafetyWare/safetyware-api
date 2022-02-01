@@ -40,6 +40,7 @@ async fn main() -> anyhow::Result<()> {
     };
     let import_device_data_context = import::DeviceDataContext {
         device_repo: graphql_context.device_repo.clone(),
+        gas_reading_repo: graphql_context.gas_reading_repo.clone(),
         location_reading_repo: graphql_context.location_reading_repo.clone(),
     };
     let route = filter(db, graphql_context, import_device_data_context)
