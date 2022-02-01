@@ -69,7 +69,7 @@ pub fn device_data_filter(context: DeviceDataContext) -> BoxedFilter<(Box<dyn Re
                         .iter()
                         .map(|e| event_gas_readings(e, &owner_id))
                         .map(|r| match r {
-                            Ok(v) => v.into_iter().map(|r| Ok(r)).collect::<Vec<_>>(),
+                            Ok(v) => v.into_iter().map(Ok).collect::<Vec<_>>(),
                             Err(e) => vec![Err(e)],
                         })
                         .flatten()
@@ -105,7 +105,7 @@ fn event_gas_readings(event: &DeviceEvent, person_id: &str) -> anyhow::Result<Ve
     if let Some(longitude) = &event.location_longitude {
         if let Some(latitude) = &event.location_latitude {
             if let Some(sensors) = &event.sensors {
-                return Ok(sensors
+                return sensors
                     .iter()
                     .map(|s| {
                         Ok(GasReading {
@@ -116,7 +116,7 @@ fn event_gas_readings(event: &DeviceEvent, person_id: &str) -> anyhow::Result<Ve
                             coordinates: vec![longitude.parse()?, latitude.parse()?],
                         })
                     })
-                    .collect::<anyhow::Result<_>>()?);
+                    .collect::<anyhow::Result<_>>();
             }
         }
     }
