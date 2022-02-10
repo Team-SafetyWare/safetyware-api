@@ -69,7 +69,7 @@ pub struct IncidentFilter {
 #[async_trait::async_trait]
 pub trait IncidentRepo {
     async fn insert_many(&self, incidents: &[Incident]) -> anyhow::Result<()>;
-
+    async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>>;
     async fn find(&self, filter: &IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>>;
 }
 
@@ -95,6 +95,12 @@ impl IncidentRepo for MongoIncidentRepo {
             incidents.to_vec().into_iter().map(|r| r.into()).collect();
         self.collection().insert_many(db_incidents, None).await?;
         Ok(())
+    }
+
+    async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>> {
+        let filter = bson::doc! {"_id": id};
+        let found = self.collection().find_one(filter, None).await?;
+        Ok(found.map(Into::into))
     }
 
     async fn find(&self, filter: &IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>> {
