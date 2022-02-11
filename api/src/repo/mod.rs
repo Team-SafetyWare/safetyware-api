@@ -4,6 +4,7 @@ pub mod company;
 pub mod device;
 pub mod gas_reading;
 pub mod incident;
+pub mod incident_stats;
 pub mod location_reading;
 pub mod person;
 pub mod user_account;
