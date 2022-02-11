@@ -2,6 +2,7 @@ pub mod company;
 pub mod device;
 pub mod gas_reading;
 pub mod incident;
+pub mod incident_stats;
 pub mod location_reading;
 pub mod person;
 pub mod user_account;
@@ -11,6 +12,7 @@ use crate::graphql::device::Device;
 use crate::graphql::device::DeviceInput;
 use crate::graphql::gas_reading::{GasReading, GasReadingFilter};
 use crate::graphql::incident::{Incident, IncidentFilter, IncidentInput};
+use crate::graphql::incident_stats::{IncidentStats, IncidentStatsFilter};
 use crate::graphql::location_reading::{LocationReading, LocationReadingFilter};
 use crate::graphql::person::{Person, PersonInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
@@ -18,6 +20,7 @@ use crate::repo::company::CompanyRepo;
 use crate::repo::device::DeviceRepo;
 use crate::repo::gas_reading::GasReadingRepo;
 use crate::repo::incident::IncidentRepo;
+use crate::repo::incident_stats::IncidentStatsRepo;
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
 use crate::repo::user_account::UserAccountRepo;
@@ -59,6 +62,7 @@ pub struct Context {
     pub device_repo: Arc<dyn DeviceRepo + Send + Sync + 'static>,
     pub gas_reading_repo: Arc<dyn GasReadingRepo + Send + Sync + 'static>,
     pub incident_repo: Arc<dyn IncidentRepo + Send + Sync + 'static>,
+    pub incident_stats_repo: Arc<dyn IncidentStatsRepo + Send + Sync + 'static>,
     pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
     pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
     pub user_account_repo: Arc<dyn UserAccountRepo + Send + Sync + 'static>,
@@ -108,6 +112,13 @@ impl Query {
         filter: Option<IncidentFilter>,
     ) -> FieldResult<Vec<Incident>> {
         incident::list(context, filter).await
+    }
+
+    async fn incident_stats(
+        #[graphql(context)] context: &Context,
+        filter: Option<IncidentStatsFilter>,
+    ) -> FieldResult<Vec<IncidentStats>> {
+        incident_stats::list(context, filter).await
     }
 
     async fn location_readings(
