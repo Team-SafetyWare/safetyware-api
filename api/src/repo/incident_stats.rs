@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IncidentStats {
     pub r#type: String,
-    pub count: i64,
+    pub count: i32,
 }
 
 #[derive(Default, Debug, Clone)]
