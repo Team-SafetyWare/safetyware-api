@@ -74,6 +74,7 @@ impl IncidentStatsRepo for MongoIncidentStatsRepo {
                 vec![
                     bson::doc! { "$match": mongo_filter },
                     bson::doc! { "$group": { "_id": "$type", "count": { "$sum": 1 } } },
+                    bson::doc! { "$set": { "type": "$_id" } },
                 ],
                 None,
             )
