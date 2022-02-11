@@ -10,8 +10,8 @@ pub struct Device(pub device::Device);
 
 #[derive(juniper::GraphQLInputObject)]
 pub struct DeviceInput {
-    id: ID,
-    owner_id: ID,
+    pub id: ID,
+    pub owner_id: ID,
 }
 
 #[juniper::graphql_object(context = Context)]
@@ -56,9 +56,9 @@ pub async fn create(context: &Context, input: DeviceInput) -> FieldResult<Device
     Ok(item.into())
 }
 
-pub async fn replace(context: &Context, id: ID, input: DeviceInput) -> FieldResult<Device> {
+pub async fn replace(context: &Context, input: DeviceInput) -> FieldResult<Device> {
     let item = device::Device {
-        id: id.to_string(),
+        id: input.id.to_string(),
         owner_id: input.owner_id.to_string(),
     };
     context.device_repo.replace_one(&item).await?;

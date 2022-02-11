@@ -1,3 +1,4 @@
+use crate::crockford;
 use crate::graphql::person::Person;
 use crate::graphql::Context;
 use crate::repo::incident;
@@ -9,6 +10,15 @@ use juniper::{FieldResult, ID};
 
 #[derive(Clone, From)]
 pub struct Incident(pub incident::Incident);
+
+#[derive(juniper::GraphQLInputObject)]
+pub struct IncidentInput {
+    pub id: ID,
+    pub timestamp: DateTime<Utc>,
+    pub person_id: ID,
+    pub coordinates: Vec<f64>,
+    pub r#type: String,
+}
 
 #[derive(juniper::GraphQLInputObject, Default)]
 pub struct IncidentFilter {
@@ -66,4 +76,36 @@ pub async fn list(context: &Context, filter: Option<IncidentFilter>) -> FieldRes
         .await?;
     vec.sort_by_key(|l| l.0.timestamp);
     Ok(vec)
+}
+
+pub async fn create(context: &Context, input: IncidentInput) -> FieldResult<Incident> {
+    let item = incident::Incident {
+        id: crockford::random_id(),
+        timestamp: input.timestamp,
+        person_id: input.person_id.to_string(),
+        coordinates: input.coordinates,
+        r#type: input.r#type,
+    };
+    context.incident_repo.insert_one(&item).await?;
+    Ok(item.into())
+}
+
+pub async fn replace(context: &Context, id: ID, input: IncidentInput) -> FieldResult<Incident> {
+    let item = incident::Incident {
+        id: id.to_string(),
+        timestamp: input.timestamp,
+        person_id: input.person_id.to_string(),
+        coordinates: input.coordinates,
+        r#type: input.r#type,
+    };
+    context.incident_repo.replace_one(&item).await?;
+    Ok(item.into())
+}
+
+pub async fn delete(context: &Context, id: ID) -> FieldResult<ID> {
+    context
+        .incident_repo
+        .delete_one(&id.clone().to_string())
+        .await?;
+    Ok(id)
 }
