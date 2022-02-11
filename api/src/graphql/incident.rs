@@ -13,7 +13,6 @@ pub struct Incident(pub incident::Incident);
 
 #[derive(juniper::GraphQLInputObject)]
 pub struct IncidentInput {
-    pub id: ID,
     pub timestamp: DateTime<Utc>,
     pub person_id: ID,
     pub coordinates: Vec<f64>,
