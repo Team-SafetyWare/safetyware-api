@@ -3,6 +3,7 @@ use futures_util::Stream;
 pub mod company;
 pub mod device;
 pub mod gas_reading;
+pub mod incident;
 pub mod location_reading;
 pub mod person;
 pub mod user_account;

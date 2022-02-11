@@ -14,7 +14,7 @@ pub struct Company(pub company::Company);
 
 #[derive(juniper::GraphQLInputObject)]
 pub struct CompanyInput {
-    name: String,
+    pub name: String,
 }
 
 #[juniper::graphql_object(context = Context)]

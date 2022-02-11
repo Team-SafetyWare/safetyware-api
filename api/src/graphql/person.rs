@@ -2,12 +2,14 @@ use crate::crockford;
 use crate::graphql::company::Company;
 use crate::graphql::device::Device;
 use crate::graphql::gas_reading::GasReading;
+use crate::graphql::incident::{Incident, IncidentFilter};
 use crate::graphql::location_reading::LocationReading;
 use crate::graphql::Context;
 use crate::graphql::GasReadingFilter;
 use crate::graphql::LocationReadingFilter;
 use crate::repo::device::DeviceFilter as RepoDeviceFilter;
 use crate::repo::gas_reading::GasReadingFilter as RepoGasReadingFilter;
+use crate::repo::incident::IncidentFilter as RepoIncidentFilter;
 use crate::repo::location_reading::LocationReadingFilter as RepoLocationReadingFilter;
 use crate::repo::person;
 use derive_more::From;
@@ -19,8 +21,8 @@ pub struct Person(pub person::Person);
 
 #[derive(juniper::GraphQLInputObject)]
 pub struct PersonInput {
-    name: String,
-    company_id: ID,
+    pub name: String,
+    pub company_id: ID,
 }
 
 #[juniper::graphql_object(context = Context)]
@@ -62,6 +64,27 @@ impl Person {
         let mut vec: Vec<GasReading> = context
             .gas_reading_repo
             .find(&RepoGasReadingFilter {
+                person_ids: Some(vec![self.0.id.clone()]),
+                min_timestamp: filter.min_timestamp,
+                max_timestamp: filter.max_timestamp,
+            })
+            .await?
+            .map_ok(Into::into)
+            .try_collect()
+            .await?;
+        vec.sort_by_key(|l| l.0.timestamp);
+        Ok(vec)
+    }
+
+    pub async fn incidents(
+        &self,
+        context: &Context,
+        filter: Option<IncidentFilter>,
+    ) -> FieldResult<Vec<Incident>> {
+        let filter = filter.unwrap_or_default();
+        let mut vec: Vec<Incident> = context
+            .incident_repo
+            .find(&RepoIncidentFilter {
                 person_ids: Some(vec![self.0.id.clone()]),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
