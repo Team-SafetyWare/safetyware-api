@@ -1,5 +1,5 @@
 use crate::db::coll;
-use crate::repo::ItemStream;
+use crate::repo::{DeleteError, DeleteResult, ItemStream, ReplaceError, ReplaceResult};
 use bson::Document;
 use chrono::{DateTime, Utc};
 use futures_util::TryStreamExt;
@@ -68,9 +68,12 @@ pub struct IncidentFilter {
 
 #[async_trait::async_trait]
 pub trait IncidentRepo {
+    async fn insert_one(&self, incident: &Incident) -> anyhow::Result<()>;
     async fn insert_many(&self, incidents: &[Incident]) -> anyhow::Result<()>;
+    async fn replace_one(&self, incident: &Incident) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>>;
     async fn find(&self, filter: &IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>>;
+    async fn delete_one(&self, id: &str) -> DeleteResult;
 }
 
 #[derive(Debug, Clone)]
@@ -90,11 +93,32 @@ impl MongoIncidentRepo {
 
 #[async_trait::async_trait]
 impl IncidentRepo for MongoIncidentRepo {
+    async fn insert_one(&self, incident: &Incident) -> anyhow::Result<()> {
+        let db_incident: DbIncident = incident.clone().into();
+        self.collection().insert_one(db_incident, None).await?;
+        Ok(())
+    }
+
     async fn insert_many(&self, incidents: &[Incident]) -> anyhow::Result<()> {
         let db_incidents: Vec<DbIncident> =
             incidents.to_vec().into_iter().map(|r| r.into()).collect();
         self.collection().insert_many(db_incidents, None).await?;
         Ok(())
+    }
+
+    async fn replace_one(&self, incident: &Incident) -> ReplaceResult {
+        let db_incident: DbIncident = incident.clone().into();
+        let id = &db_incident.id;
+        let query = bson::doc! {"_id": id};
+        let res = self
+            .collection()
+            .replace_one(query, db_incident, None)
+            .await
+            .map_err(anyhow::Error::from)?;
+        match res.matched_count {
+            0 => Err(ReplaceError::NotFound),
+            _ => Ok(()),
+        }
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>> {
@@ -127,5 +151,17 @@ impl IncidentRepo for MongoIncidentRepo {
         let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
         Ok(Box::new(stream))
+    }
+
+    async fn delete_one(&self, id: &str) -> DeleteResult {
+        let res = self
+            .collection()
+            .delete_one(bson::doc! {"_id": id}, None)
+            .await
+            .map_err(anyhow::Error::from)?;
+        match res.deleted_count {
+            0 => Err(DeleteError::NotFound),
+            _ => Ok(()),
+        }
     }
 }

@@ -10,7 +10,7 @@ use crate::graphql::company::{Company, CompanyInput};
 use crate::graphql::device::Device;
 use crate::graphql::device::DeviceInput;
 use crate::graphql::gas_reading::{GasReading, GasReadingFilter};
-use crate::graphql::incident::{Incident, IncidentFilter};
+use crate::graphql::incident::{Incident, IncidentFilter, IncidentInput};
 use crate::graphql::location_reading::{LocationReading, LocationReadingFilter};
 use crate::graphql::person::{Person, PersonInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
@@ -169,14 +169,32 @@ impl Mutation {
 
     async fn replace_device(
         #[graphql(context)] context: &Context,
-        id: ID,
         input: DeviceInput,
     ) -> FieldResult<Device> {
-        device::replace(context, id, input).await
+        device::replace(context, input).await
     }
 
     async fn delete_device(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
         device::delete(context, id).await
+    }
+
+    async fn create_incident(
+        #[graphql(context)] context: &Context,
+        input: IncidentInput,
+    ) -> FieldResult<Incident> {
+        incident::create(context, input).await
+    }
+
+    async fn replace_incident(
+        #[graphql(context)] context: &Context,
+        id: ID,
+        input: IncidentInput,
+    ) -> FieldResult<Incident> {
+        incident::replace(context, id, input).await
+    }
+
+    async fn delete_incident(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        incident::delete(context, id).await
     }
 
     async fn create_person(
