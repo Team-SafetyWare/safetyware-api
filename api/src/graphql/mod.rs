@@ -1,6 +1,7 @@
 pub mod company;
 pub mod device;
 pub mod gas_reading;
+pub mod incident;
 pub mod location_reading;
 pub mod person;
 pub mod user_account;
@@ -9,12 +10,14 @@ use crate::graphql::company::{Company, CompanyInput};
 use crate::graphql::device::Device;
 use crate::graphql::device::DeviceInput;
 use crate::graphql::gas_reading::{GasReading, GasReadingFilter};
+use crate::graphql::incident::{Incident, IncidentFilter, IncidentInput};
 use crate::graphql::location_reading::{LocationReading, LocationReadingFilter};
 use crate::graphql::person::{Person, PersonInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
 use crate::repo::company::CompanyRepo;
 use crate::repo::device::DeviceRepo;
 use crate::repo::gas_reading::GasReadingRepo;
+use crate::repo::incident::IncidentRepo;
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
 use crate::repo::user_account::UserAccountRepo;
@@ -55,6 +58,7 @@ pub struct Context {
     pub company_repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
     pub device_repo: Arc<dyn DeviceRepo + Send + Sync + 'static>,
     pub gas_reading_repo: Arc<dyn GasReadingRepo + Send + Sync + 'static>,
+    pub incident_repo: Arc<dyn IncidentRepo + Send + Sync + 'static>,
     pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
     pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
     pub user_account_repo: Arc<dyn UserAccountRepo + Send + Sync + 'static>,
@@ -90,6 +94,20 @@ impl Query {
         filter: Option<GasReadingFilter>,
     ) -> FieldResult<Vec<GasReading>> {
         gas_reading::list(context, filter).await
+    }
+
+    async fn incident(
+        #[graphql(context)] context: &Context,
+        id: ID,
+    ) -> FieldResult<Option<Incident>> {
+        incident::get(context, id).await
+    }
+
+    async fn incidents(
+        #[graphql(context)] context: &Context,
+        filter: Option<IncidentFilter>,
+    ) -> FieldResult<Vec<Incident>> {
+        incident::list(context, filter).await
     }
 
     async fn location_readings(
@@ -151,14 +169,32 @@ impl Mutation {
 
     async fn replace_device(
         #[graphql(context)] context: &Context,
-        id: ID,
         input: DeviceInput,
     ) -> FieldResult<Device> {
-        device::replace(context, id, input).await
+        device::replace(context, input).await
     }
 
     async fn delete_device(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
         device::delete(context, id).await
+    }
+
+    async fn create_incident(
+        #[graphql(context)] context: &Context,
+        input: IncidentInput,
+    ) -> FieldResult<Incident> {
+        incident::create(context, input).await
+    }
+
+    async fn replace_incident(
+        #[graphql(context)] context: &Context,
+        id: ID,
+        input: IncidentInput,
+    ) -> FieldResult<Incident> {
+        incident::replace(context, id, input).await
+    }
+
+    async fn delete_incident(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        incident::delete(context, id).await
     }
 
     async fn create_person(

@@ -8,6 +8,7 @@ pub mod coll {
     pub const COMPANY: &str = "company";
     pub const DEVICE: &str = "device";
     pub const GAS_READING: &str = "gas_reading";
+    pub const INCIDENT: &str = "incident";
     pub const LOCATION_READING: &str = "location_reading";
     pub const PERSON: &str = "person";
     pub const USER_ACCOUNT: &str = "user_account";
@@ -37,17 +38,54 @@ pub async fn test_connection(db: &Database) -> anyhow::Result<()> {
 }
 
 pub async fn prepare(db: &Database) -> anyhow::Result<()> {
-    prepare_coll_person(db).await?;
+    prepare_coll_gas_reading(db).await?;
+    prepare_coll_incident(db).await?;
     prepare_coll_location_reading(db).await?;
+    prepare_coll_person(db).await?;
     Ok(())
 }
 
-pub async fn prepare_coll_person(db: &Database) -> anyhow::Result<()> {
-    let collection = db.collection::<Document>(coll::PERSON);
+pub async fn prepare_coll_gas_reading(db: &Database) -> anyhow::Result<()> {
+    let collection = db.collection::<Document>(coll::GAS_READING);
     collection
         .create_index(
             IndexModel::builder()
-                .keys(bson::doc! { "company_id": 1 })
+                .keys(bson::doc! { "person_id": 1 })
+                .build(),
+            None,
+        )
+        .await?;
+    collection
+        .create_index(
+            IndexModel::builder().keys(bson::doc! { "gas": 1 }).build(),
+            None,
+        )
+        .await?;
+    collection
+        .create_index(
+            IndexModel::builder()
+                .keys(bson::doc! { "location": "2dsphere" })
+                .build(),
+            None,
+        )
+        .await?;
+    Ok(())
+}
+
+pub async fn prepare_coll_incident(db: &Database) -> anyhow::Result<()> {
+    let collection = db.collection::<Document>(coll::INCIDENT);
+    collection
+        .create_index(
+            IndexModel::builder()
+                .keys(bson::doc! { "person_id": 1 })
+                .build(),
+            None,
+        )
+        .await?;
+    collection
+        .create_index(
+            IndexModel::builder()
+                .keys(bson::doc! { "location": "2dsphere" })
                 .build(),
             None,
         )
@@ -76,26 +114,12 @@ pub async fn prepare_coll_location_reading(db: &Database) -> anyhow::Result<()> 
     Ok(())
 }
 
-pub async fn prepare_coll_gas_reading(db: &Database) -> anyhow::Result<()> {
-    let collection = db.collection::<Document>(coll::GAS_READING);
+pub async fn prepare_coll_person(db: &Database) -> anyhow::Result<()> {
+    let collection = db.collection::<Document>(coll::PERSON);
     collection
         .create_index(
             IndexModel::builder()
-                .keys(bson::doc! { "person_id": 1 })
-                .build(),
-            None,
-        )
-        .await?;
-    collection
-        .create_index(
-            IndexModel::builder().keys(bson::doc! { "gas": 1 }).build(),
-            None,
-        )
-        .await?;
-    collection
-        .create_index(
-            IndexModel::builder()
-                .keys(bson::doc! { "location": "2dsphere" })
+                .keys(bson::doc! { "company_id": 1 })
                 .build(),
             None,
         )
