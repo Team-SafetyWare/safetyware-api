@@ -16,6 +16,7 @@ use crate::graphql::incident::{Incident, IncidentFilter, IncidentInput};
 use crate::graphql::incident_stats::{IncidentStats, IncidentStatsFilter};
 use crate::graphql::location_reading::{LocationReading, LocationReadingFilter};
 use crate::graphql::person::{Person, PersonInput};
+use crate::graphql::team::{Team, TeamInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
 use crate::repo::company::CompanyRepo;
 use crate::repo::device::DeviceRepo;
@@ -139,6 +140,14 @@ impl Query {
         person::list(context).await
     }
 
+    async fn team(#[graphql(context)] context: &Context, id: ID) -> FieldResult<Option<Team>> {
+        team::get(context, id).await
+    }
+
+    async fn teams(#[graphql(context)] context: &Context) -> FieldResult<Vec<Team>> {
+        team::list(context).await
+    }
+
     async fn user_account(
         #[graphql(context)] context: &Context,
         id: ID,
@@ -228,6 +237,17 @@ impl Mutation {
 
     async fn delete_person(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
         person::delete(context, id).await
+    }
+
+    async fn create_team(
+        #[graphql(context)] context: &Context,
+        input: TeamInput,
+    ) -> FieldResult<Team> {
+        team::create(context, input).await
+    }
+
+    async fn delete_team(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        team::delete(context, id).await
     }
 
     async fn create_user_account(
