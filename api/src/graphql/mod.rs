@@ -5,6 +5,7 @@ pub mod incident;
 pub mod incident_stats;
 pub mod location_reading;
 pub mod person;
+pub mod team;
 pub mod user_account;
 
 use crate::graphql::company::{Company, CompanyInput};
@@ -23,6 +24,7 @@ use crate::repo::incident::IncidentRepo;
 use crate::repo::incident_stats::IncidentStatsRepo;
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
+use crate::repo::team::TeamRepo;
 use crate::repo::user_account::UserAccountRepo;
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
@@ -65,6 +67,7 @@ pub struct Context {
     pub incident_stats_repo: Arc<dyn IncidentStatsRepo + Send + Sync + 'static>,
     pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
     pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
+    pub team_repo: Arc<dyn TeamRepo + Send + Sync + 'static>,
     pub user_account_repo: Arc<dyn UserAccountRepo + Send + Sync + 'static>,
 }
 

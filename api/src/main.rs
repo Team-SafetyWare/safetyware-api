@@ -15,6 +15,7 @@ use crate::repo::incident::MongoIncidentRepo;
 use crate::repo::incident_stats::MongoIncidentStatsRepo;
 use crate::repo::location_reading::MongoLocationReadingRepo;
 use crate::repo::person::MongoPersonRepo;
+use crate::repo::team::MongoTeamRepo;
 use crate::repo::user_account::MongoUserAccountRepo;
 use crate::settings::Settings;
 use mongodb::Database;
@@ -40,6 +41,7 @@ async fn main() -> anyhow::Result<()> {
         incident_stats_repo: Arc::new(MongoIncidentStatsRepo::new(db.clone())),
         location_reading_repo: Arc::new(MongoLocationReadingRepo::new(db.clone())),
         person_repo: Arc::new(MongoPersonRepo::new(db.clone())),
+        team_repo: Arc::new(MongoTeamRepo::new(db.clone())),
         user_account_repo: Arc::new(MongoUserAccountRepo::new(db.clone())),
     };
     let import_device_data_context = import::DeviceDataContext {
