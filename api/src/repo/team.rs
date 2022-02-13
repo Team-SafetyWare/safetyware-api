@@ -1,6 +1,7 @@
 use crate::db::coll;
+use crate::repo::ItemStream;
 use crate::repo::{DeleteError, DeleteResult};
-use crate::repo::{ItemStream};
+use bson::Document;
 use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
@@ -13,11 +14,16 @@ pub struct Team {
     pub company_id: String,
 }
 
+#[derive(Default, Debug, Clone)]
+pub struct TeamFilter {
+    pub company_ids: Option<Vec<String>>,
+}
+
 #[async_trait::async_trait]
 pub trait TeamRepo {
     async fn insert_one(&self, team: &Team) -> anyhow::Result<()>;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Team>>;
-    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Team>>>;
+    async fn find(&self, filter: &TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
 
@@ -49,8 +55,12 @@ impl TeamRepo for MongoTeamRepo {
         Ok(found)
     }
 
-    async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Team>>> {
-        let cursor = self.collection().find(None, None).await?;
+    async fn find(&self, filter: &TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>> {
+        let mut mongo_filter = Document::new();
+        if let Some(company_ids) = &filter.company_ids {
+            mongo_filter.insert("company_id", bson::doc! { "$in": company_ids });
+        }
+        let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_err(|e| e.into());
         Ok(Box::new(stream))
     }
