@@ -1,9 +1,11 @@
 use crate::crockford;
 use crate::graphql::person::Person;
+use crate::graphql::team::Team;
 use crate::graphql::user_account::UserAccount;
 use crate::graphql::Context;
 use crate::repo::company;
 use crate::repo::person::PersonFilter;
+use crate::repo::team::TeamFilter;
 use crate::repo::user_account::UserAccountFilter;
 use derive_more::From;
 use futures_util::TryStreamExt;
@@ -31,6 +33,18 @@ impl Company {
         Ok(context
             .person_repo
             .find(&PersonFilter {
+                company_ids: Some(vec![self.0.id.clone()]),
+            })
+            .await?
+            .map_ok(Into::into)
+            .try_collect()
+            .await?)
+    }
+
+    pub async fn teams(&self, context: &Context) -> FieldResult<Vec<Team>> {
+        Ok(context
+            .team_repo
+            .find(&TeamFilter {
                 company_ids: Some(vec![self.0.id.clone()]),
             })
             .await?
