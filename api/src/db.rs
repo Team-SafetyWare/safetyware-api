@@ -11,6 +11,7 @@ pub mod coll {
     pub const INCIDENT: &str = "incident";
     pub const LOCATION_READING: &str = "location_reading";
     pub const PERSON: &str = "person";
+    pub const TEAM: &str = "team";
     pub const USER_ACCOUNT: &str = "user_account";
 }
 
