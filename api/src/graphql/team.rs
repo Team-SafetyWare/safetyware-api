@@ -1,11 +1,10 @@
 use crate::crockford;
 use crate::graphql::company::Company;
-
 use crate::graphql::Context;
-
+use crate::graphql::Person;
 use crate::repo::team;
-
 use derive_more::From;
+use futures_util::StreamExt;
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
@@ -34,6 +33,25 @@ impl Team {
             .find_one(&self.0.company_id)
             .await?
             .map(Into::into))
+    }
+
+    pub async fn people(&self, context: &Context) -> FieldResult<Vec<Person>> {
+        Ok(context
+            .team_repo
+            .find_people(&self.0.id)
+            .await?
+            .map_err(anyhow::Error::from)
+            .and_then(|tp| async move {
+                context
+                    .person_repo
+                    .find_one(&tp.person_id)
+                    .await
+                    .map_err(Into::into)
+            })
+            .filter_map(|o| async move { o.transpose() })
+            .map_ok(Into::into)
+            .try_collect()
+            .await?)
     }
 }
 
