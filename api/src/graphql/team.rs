@@ -20,17 +20,17 @@ pub struct TeamInput {
 #[juniper::graphql_object(context = Context)]
 impl Team {
     pub fn id(&self) -> ID {
-        self.0.id.clone().into()
+        self.id.clone().into()
     }
 
     pub fn name(&self) -> &str {
-        &self.0.name
+        &self.name
     }
 
     pub async fn company(&self, context: &Context) -> FieldResult<Option<Company>> {
         Ok(context
             .company_repo
-            .find_one(&self.0.company_id)
+            .find_one(&self.company_id)
             .await?
             .map(Into::into))
     }
@@ -38,7 +38,7 @@ impl Team {
     pub async fn people(&self, context: &Context) -> FieldResult<Vec<Person>> {
         Ok(context
             .team_repo
-            .find_people(&self.0.id)
+            .find_people(&self.id)
             .await?
             .map_err(anyhow::Error::from)
             .and_then(|tp| async move {

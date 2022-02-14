@@ -17,13 +17,13 @@ pub struct DeviceInput {
 #[juniper::graphql_object(context = Context)]
 impl Device {
     pub fn id(&self) -> ID {
-        self.0.id.clone().into()
+        self.id.clone().into()
     }
 
     pub async fn owner(&self, context: &Context) -> FieldResult<Option<Person>> {
         Ok(context
             .person_repo
-            .find_one(&self.0.owner_id)
+            .find_one(&self.owner_id)
             .await?
             .map(Into::into))
     }
