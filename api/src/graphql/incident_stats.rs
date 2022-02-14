@@ -2,11 +2,11 @@ use crate::graphql::Context;
 use crate::repo::incident_stats;
 use crate::repo::incident_stats::IncidentStatsFilter as RepoIncidentStatsFilter;
 use chrono::{DateTime, Utc};
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::FieldResult;
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct IncidentStats(pub incident_stats::IncidentStats);
 
 #[derive(juniper::GraphQLInputObject, Default)]

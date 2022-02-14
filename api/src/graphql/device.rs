@@ -1,11 +1,11 @@
 use crate::graphql::person::Person;
 use crate::graphql::Context;
 use crate::repo::device;
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct Device(pub device::Device);
 
 #[derive(juniper::GraphQLInputObject)]

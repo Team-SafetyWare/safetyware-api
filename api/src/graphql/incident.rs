@@ -4,11 +4,11 @@ use crate::graphql::Context;
 use crate::repo::incident;
 use crate::repo::incident::IncidentFilter as RepoIncidentFilter;
 use chrono::{DateTime, Utc};
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct Incident(pub incident::Incident);
 
 #[derive(juniper::GraphQLInputObject)]

@@ -2,11 +2,11 @@ use crate::crockford;
 use crate::graphql::company::Company;
 use crate::graphql::Context;
 use crate::repo::user_account;
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct UserAccount(pub user_account::UserAccount);
 
 #[derive(juniper::GraphQLInputObject)]

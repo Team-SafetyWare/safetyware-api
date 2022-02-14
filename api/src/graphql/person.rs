@@ -12,11 +12,11 @@ use crate::repo::gas_reading::GasReadingFilter as RepoGasReadingFilter;
 use crate::repo::incident::IncidentFilter as RepoIncidentFilter;
 use crate::repo::location_reading::LocationReadingFilter as RepoLocationReadingFilter;
 use crate::repo::person;
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct Person(pub person::Person);
 
 #[derive(juniper::GraphQLInputObject)]
