@@ -33,6 +33,8 @@ pub trait TeamRepo {
     async fn find(&self, filter: &TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
     async fn find_people(&self, team_id: &str) -> anyhow::Result<Box<dyn ItemStream<TeamPerson>>>;
+    async fn add_person(&self, team_id: &str, person_id: &str) -> anyhow::Result<()>;
+    async fn remove_person(&self, team_id: &str, person_id: &str) -> DeleteResult;
 }
 
 #[derive(Debug, Clone)]
@@ -94,5 +96,33 @@ impl TeamRepo for MongoTeamRepo {
         let cursor = self.person_collection().find(mongo_filter, None).await?;
         let stream = cursor.map_err(|e| e.into());
         Ok(Box::new(stream))
+    }
+
+    async fn add_person(&self, team_id: &str, person_id: &str) -> anyhow::Result<()> {
+        self.person_collection()
+            .insert_one(
+                TeamPerson {
+                    team_id: team_id.to_string(),
+                    person_id: person_id.to_string(),
+                },
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    async fn remove_person(&self, team_id: &str, person_id: &str) -> DeleteResult {
+        let res = self
+            .person_collection()
+            .delete_one(
+                bson::doc! { "team_id": team_id, "person_id": person_id, },
+                None,
+            )
+            .await
+            .map_err(anyhow::Error::from)?;
+        match res.deleted_count {
+            0 => Err(DeleteError::NotFound),
+            _ => Ok(()),
+        }
     }
 }
