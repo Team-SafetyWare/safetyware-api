@@ -1,11 +1,11 @@
 use crate::graphql::person::Person;
 use crate::graphql::Context;
 use crate::repo::device;
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct Device(pub device::Device);
 
 #[derive(juniper::GraphQLInputObject)]
@@ -17,24 +17,20 @@ pub struct DeviceInput {
 #[juniper::graphql_object(context = Context)]
 impl Device {
     pub fn id(&self) -> ID {
-        self.0.id.clone().into()
+        self.id.clone().into()
     }
 
     pub async fn owner(&self, context: &Context) -> FieldResult<Option<Person>> {
         Ok(context
             .person_repo
-            .find_one(&self.0.owner_id)
+            .find_one(&self.owner_id)
             .await?
             .map(Into::into))
     }
 }
 
 pub async fn get(context: &Context, id: ID) -> FieldResult<Option<Device>> {
-    Ok(context
-        .device_repo
-        .find_one(&id.to_string())
-        .await?
-        .map(Into::into))
+    Ok(context.device_repo.find_one(&*id).await?.map(Into::into))
 }
 
 pub async fn list(context: &Context) -> FieldResult<Vec<Device>> {

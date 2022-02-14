@@ -4,11 +4,11 @@ use crate::graphql::Context;
 use crate::repo::incident;
 use crate::repo::incident::IncidentFilter as RepoIncidentFilter;
 use chrono::{DateTime, Utc};
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct Incident(pub incident::Incident);
 
 #[derive(juniper::GraphQLInputObject)]
@@ -28,36 +28,32 @@ pub struct IncidentFilter {
 #[juniper::graphql_object(context = Context)]
 impl Incident {
     pub fn id(&self) -> ID {
-        self.0.id.clone().into()
+        self.id.clone().into()
     }
 
     pub fn timestamp(&self) -> &DateTime<Utc> {
-        &self.0.timestamp
+        &self.timestamp
     }
 
     pub async fn person(&self, context: &Context) -> FieldResult<Option<Person>> {
         Ok(context
             .person_repo
-            .find_one(&self.0.person_id)
+            .find_one(&self.person_id)
             .await?
             .map(Into::into))
     }
 
     pub fn coordinates(&self) -> &Vec<f64> {
-        &self.0.coordinates
+        &self.coordinates
     }
 
     pub fn r#type(&self) -> &str {
-        &self.0.r#type
+        &self.r#type
     }
 }
 
 pub async fn get(context: &Context, id: ID) -> FieldResult<Option<Incident>> {
-    Ok(context
-        .incident_repo
-        .find_one(&id.to_string())
-        .await?
-        .map(Into::into))
+    Ok(context.incident_repo.find_one(&*id).await?.map(Into::into))
 }
 
 pub async fn list(context: &Context, filter: Option<IncidentFilter>) -> FieldResult<Vec<Incident>> {
@@ -73,7 +69,7 @@ pub async fn list(context: &Context, filter: Option<IncidentFilter>) -> FieldRes
         .map_ok(Into::into)
         .try_collect()
         .await?;
-    vec.sort_by_key(|l| l.0.timestamp);
+    vec.sort_by_key(|l| l.timestamp);
     Ok(vec)
 }
 
