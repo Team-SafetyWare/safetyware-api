@@ -30,11 +30,7 @@ impl Device {
 }
 
 pub async fn get(context: &Context, id: ID) -> FieldResult<Option<Device>> {
-    Ok(context
-        .device_repo
-        .find_one(&id.to_string())
-        .await?
-        .map(Into::into))
+    Ok(context.device_repo.find_one(&*id).await?.map(Into::into))
 }
 
 pub async fn list(context: &Context) -> FieldResult<Vec<Device>> {

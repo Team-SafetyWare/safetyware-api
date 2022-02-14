@@ -120,11 +120,7 @@ impl Person {
 }
 
 pub async fn get(context: &Context, id: ID) -> FieldResult<Option<Person>> {
-    Ok(context
-        .person_repo
-        .find_one(&id.to_string())
-        .await?
-        .map(Into::into))
+    Ok(context.person_repo.find_one(&*id).await?.map(Into::into))
 }
 
 pub async fn list(context: &Context) -> FieldResult<Vec<Person>> {
