@@ -3,11 +3,11 @@ use crate::graphql::Context;
 use crate::repo::gas_reading;
 use crate::repo::gas_reading::GasReadingFilter as RepoGasReadingFilter;
 use chrono::{DateTime, Utc};
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::FieldResult;
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct GasReading(pub gas_reading::GasReading);
 
 #[derive(juniper::GraphQLInputObject, Default)]

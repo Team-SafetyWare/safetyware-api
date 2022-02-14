@@ -3,11 +3,11 @@ use crate::graphql::Context;
 use crate::repo::location_reading;
 use crate::repo::location_reading::LocationReadingFilter as RepoLocationReadingFilter;
 use chrono::{DateTime, Utc};
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::FieldResult;
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct LocationReading(pub location_reading::LocationReading);
 
 #[derive(juniper::GraphQLInputObject, Default)]

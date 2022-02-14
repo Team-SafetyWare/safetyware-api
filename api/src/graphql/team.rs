@@ -3,12 +3,12 @@ use crate::graphql::company::Company;
 use crate::graphql::Context;
 use crate::graphql::Person;
 use crate::repo::team;
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::StreamExt;
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct Team(pub team::Team);
 
 #[derive(juniper::GraphQLInputObject)]

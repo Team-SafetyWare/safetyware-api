@@ -7,11 +7,11 @@ use crate::repo::company;
 use crate::repo::person::PersonFilter;
 use crate::repo::team::TeamFilter;
 use crate::repo::user_account::UserAccountFilter;
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct Company(pub company::Company);
 
 #[derive(juniper::GraphQLInputObject)]
