@@ -76,12 +76,6 @@ pub async fn prepare_coll_person(db: &Database) -> anyhow::Result<()> {
     Ok(())
 }
 
-pub async fn prepare_coll_team(db: &Database) -> anyhow::Result<()> {
-    let collection = db.collection(coll::TEAM);
-    create_simple_index(&collection, "people.person_id", true).await?;
-    Ok(())
-}
-
 pub async fn create_simple_index(
     collection: &Collection<Document>,
     field: &str,
