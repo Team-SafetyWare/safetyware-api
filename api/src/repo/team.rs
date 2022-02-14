@@ -14,6 +14,13 @@ pub struct Team {
     pub company_id: String,
 }
 
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct TeamPerson {
+    #[serde(rename = "_id")]
+    pub team_id: String,
+    pub person_id: String,
+}
+
 #[derive(Default, Debug, Clone)]
 pub struct TeamFilter {
     pub company_ids: Option<Vec<String>>,
@@ -25,6 +32,7 @@ pub trait TeamRepo {
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Team>>;
     async fn find(&self, filter: &TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
+    async fn find_people(&self, team_id: &str) -> anyhow::Result<Box<dyn ItemStream<TeamPerson>>>;
 }
 
 #[derive(Debug, Clone)]
@@ -39,6 +47,10 @@ impl MongoTeamRepo {
 
     pub fn collection(&self) -> Collection<Team> {
         self.db.collection(coll::TEAM)
+    }
+
+    pub fn person_collection(&self) -> Collection<TeamPerson> {
+        self.db.collection(coll::TEAM_PERSON)
     }
 }
 
@@ -75,5 +87,12 @@ impl TeamRepo for MongoTeamRepo {
             0 => Err(DeleteError::NotFound),
             _ => Ok(()),
         }
+    }
+
+    async fn find_people(&self, team_id: &str) -> anyhow::Result<Box<dyn ItemStream<TeamPerson>>> {
+        let mongo_filter = bson::doc! { "team_id": team_id };
+        let cursor = self.person_collection().find(mongo_filter, None).await?;
+        let stream = cursor.map_err(|e| e.into());
+        Ok(Box::new(stream))
     }
 }

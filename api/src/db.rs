@@ -13,6 +13,7 @@ pub mod coll {
     pub const LOCATION_READING: &str = "location_reading";
     pub const PERSON: &str = "person";
     pub const TEAM: &str = "team";
+    pub const TEAM_PERSON: &str = "team_person";
     pub const USER_ACCOUNT: &str = "user_account";
 }
 
@@ -44,7 +45,7 @@ pub async fn prepare(db: &Database) -> anyhow::Result<()> {
     prepare_coll_incident(db).await?;
     prepare_coll_location_reading(db).await?;
     prepare_coll_person(db).await?;
-    prepare_coll_team(db).await?;
+    prepare_coll_team_person(db).await?;
     Ok(())
 }
 
@@ -76,6 +77,12 @@ pub async fn prepare_coll_person(db: &Database) -> anyhow::Result<()> {
     Ok(())
 }
 
+pub async fn prepare_coll_team_person(db: &Database) -> anyhow::Result<()> {
+    let collection = db.collection(coll::TEAM_PERSON);
+    create_simple_compound_index(&collection, "team_id", "person_id", true).await?;
+    Ok(())
+}
+
 pub async fn create_simple_index(
     collection: &Collection<Document>,
     field: &str,
@@ -85,6 +92,24 @@ pub async fn create_simple_index(
         .create_index(
             IndexModel::builder()
                 .keys(bson::doc! { field: 1 })
+                .options(Some(IndexOptions::builder().unique(Some(unique)).build()))
+                .build(),
+            None,
+        )
+        .await?;
+    Ok(())
+}
+
+pub async fn create_simple_compound_index(
+    collection: &Collection<Document>,
+    field_1: &str,
+    field_2: &str,
+    unique: bool,
+) -> anyhow::Result<()> {
+    collection
+        .create_index(
+            IndexModel::builder()
+                .keys(bson::doc! { field_1: 1, field_2: 1 })
                 .options(Some(IndexOptions::builder().unique(Some(unique)).build()))
                 .build(),
             None,
