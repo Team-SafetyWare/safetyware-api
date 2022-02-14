@@ -22,18 +22,18 @@ pub struct CompanyInput {
 #[juniper::graphql_object(context = Context)]
 impl Company {
     pub fn id(&self) -> ID {
-        self.0.id.clone().into()
+        self.id.clone().into()
     }
 
     pub fn name(&self) -> &str {
-        &self.0.name
+        &self.name
     }
 
     pub async fn people(&self, context: &Context) -> FieldResult<Vec<Person>> {
         Ok(context
             .person_repo
             .find(&PersonFilter {
-                company_ids: Some(vec![self.0.id.clone()]),
+                company_ids: Some(vec![self.id.clone()]),
             })
             .await?
             .map_ok(Into::into)
@@ -45,7 +45,7 @@ impl Company {
         Ok(context
             .team_repo
             .find(&TeamFilter {
-                company_ids: Some(vec![self.0.id.clone()]),
+                company_ids: Some(vec![self.id.clone()]),
             })
             .await?
             .map_ok(Into::into)
@@ -57,7 +57,7 @@ impl Company {
         Ok(context
             .user_account_repo
             .find(&UserAccountFilter {
-                company_ids: Some(vec![self.0.id.clone()]),
+                company_ids: Some(vec![self.id.clone()]),
             })
             .await?
             .map_ok(Into::into)

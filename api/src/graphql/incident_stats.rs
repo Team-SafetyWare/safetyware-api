@@ -19,11 +19,11 @@ pub struct IncidentStatsFilter {
 #[juniper::graphql_object(context = Context)]
 impl IncidentStats {
     pub fn r#type(&self) -> &str {
-        &self.0.r#type
+        &self.r#type
     }
 
     pub fn count(&self) -> i32 {
-        self.0.count
+        self.count
     }
 }
 

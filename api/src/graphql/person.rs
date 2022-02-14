@@ -28,17 +28,17 @@ pub struct PersonInput {
 #[juniper::graphql_object(context = Context)]
 impl Person {
     pub fn id(&self) -> ID {
-        self.0.id.clone().into()
+        self.id.clone().into()
     }
 
     pub fn name(&self) -> &str {
-        &self.0.name
+        &self.name
     }
 
     pub async fn company(&self, context: &Context) -> FieldResult<Option<Company>> {
         Ok(context
             .company_repo
-            .find_one(&self.0.company_id)
+            .find_one(&self.company_id)
             .await?
             .map(Into::into))
     }
@@ -47,7 +47,7 @@ impl Person {
         Ok(context
             .device_repo
             .find(&RepoDeviceFilter {
-                owner_ids: Some(vec![self.0.id.clone()]),
+                owner_ids: Some(vec![self.id.clone()]),
             })
             .await?
             .map_ok(Into::into)
@@ -64,7 +64,7 @@ impl Person {
         let mut vec: Vec<GasReading> = context
             .gas_reading_repo
             .find(&RepoGasReadingFilter {
-                person_ids: Some(vec![self.0.id.clone()]),
+                person_ids: Some(vec![self.id.clone()]),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
             })
@@ -72,7 +72,7 @@ impl Person {
             .map_ok(Into::into)
             .try_collect()
             .await?;
-        vec.sort_by_key(|l| l.0.timestamp);
+        vec.sort_by_key(|l| l.timestamp);
         Ok(vec)
     }
 
@@ -85,7 +85,7 @@ impl Person {
         let mut vec: Vec<Incident> = context
             .incident_repo
             .find(&RepoIncidentFilter {
-                person_ids: Some(vec![self.0.id.clone()]),
+                person_ids: Some(vec![self.id.clone()]),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
             })
@@ -93,7 +93,7 @@ impl Person {
             .map_ok(Into::into)
             .try_collect()
             .await?;
-        vec.sort_by_key(|l| l.0.timestamp);
+        vec.sort_by_key(|l| l.timestamp);
         Ok(vec)
     }
 
@@ -106,7 +106,7 @@ impl Person {
         let mut vec: Vec<LocationReading> = context
             .location_reading_repo
             .find(&RepoLocationReadingFilter {
-                person_ids: Some(vec![self.0.id.clone()]),
+                person_ids: Some(vec![self.id.clone()]),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
             })
@@ -114,7 +114,7 @@ impl Person {
             .map_ok(Into::into)
             .try_collect()
             .await?;
-        vec.sort_by_key(|l| l.0.timestamp);
+        vec.sort_by_key(|l| l.timestamp);
         Ok(vec)
     }
 }
