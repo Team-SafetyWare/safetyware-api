@@ -1,5 +1,6 @@
 use crate::crockford;
 use bson::Document;
+use mongodb::options::IndexOptions;
 use mongodb::{Client, Collection, Database, IndexModel};
 
 pub const DB_NAME: &str = "sw";
@@ -49,45 +50,49 @@ pub async fn prepare(db: &Database) -> anyhow::Result<()> {
 
 pub async fn prepare_coll_gas_reading(db: &Database) -> anyhow::Result<()> {
     let collection = db.collection(coll::GAS_READING);
-    create_simple_index(&collection, "person_id").await?;
-    create_simple_index(&collection, "gas").await?;
+    create_simple_index(&collection, "person_id", false).await?;
+    create_simple_index(&collection, "gas", false).await?;
     create_2dsphere_index(&collection, "location").await?;
     Ok(())
 }
 
 pub async fn prepare_coll_incident(db: &Database) -> anyhow::Result<()> {
     let collection = db.collection(coll::INCIDENT);
-    create_simple_index(&collection, "person_id").await?;
+    create_simple_index(&collection, "person_id", false).await?;
     create_2dsphere_index(&collection, "location").await?;
     Ok(())
 }
 
 pub async fn prepare_coll_location_reading(db: &Database) -> anyhow::Result<()> {
     let collection = db.collection(coll::LOCATION_READING);
-    create_simple_index(&collection, "person_id").await?;
+    create_simple_index(&collection, "person_id", false).await?;
     create_2dsphere_index(&collection, "location").await?;
     Ok(())
 }
 
 pub async fn prepare_coll_person(db: &Database) -> anyhow::Result<()> {
     let collection = db.collection(coll::PERSON);
-    create_simple_index(&collection, "company_id").await?;
+    create_simple_index(&collection, "company_id", false).await?;
     Ok(())
 }
 
 pub async fn prepare_coll_team(db: &Database) -> anyhow::Result<()> {
     let collection = db.collection(coll::TEAM);
-    create_simple_index(&collection, "people.person_id").await?;
+    create_simple_index(&collection, "people.person_id", true).await?;
     Ok(())
 }
 
 pub async fn create_simple_index(
     collection: &Collection<Document>,
     field: &str,
+    unique: bool,
 ) -> anyhow::Result<()> {
     collection
         .create_index(
-            IndexModel::builder().keys(bson::doc! { field: 1 }).build(),
+            IndexModel::builder()
+                .keys(bson::doc! { field: 1 })
+                .options(Some(IndexOptions::builder().unique(Some(unique)).build()))
+                .build(),
             None,
         )
         .await?;
