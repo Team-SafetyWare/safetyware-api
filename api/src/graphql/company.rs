@@ -1,15 +1,17 @@
 use crate::crockford;
 use crate::graphql::person::Person;
+use crate::graphql::team::Team;
 use crate::graphql::user_account::UserAccount;
 use crate::graphql::Context;
 use crate::repo::company;
 use crate::repo::person::PersonFilter;
+use crate::repo::team::TeamFilter;
 use crate::repo::user_account::UserAccountFilter;
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct Company(pub company::Company);
 
 #[derive(juniper::GraphQLInputObject)]
@@ -20,18 +22,30 @@ pub struct CompanyInput {
 #[juniper::graphql_object(context = Context)]
 impl Company {
     pub fn id(&self) -> ID {
-        self.0.id.clone().into()
+        self.id.clone().into()
     }
 
     pub fn name(&self) -> &str {
-        &self.0.name
+        &self.name
     }
 
     pub async fn people(&self, context: &Context) -> FieldResult<Vec<Person>> {
         Ok(context
             .person_repo
             .find(&PersonFilter {
-                company_ids: Some(vec![self.0.id.clone()]),
+                company_ids: Some(vec![self.id.clone()]),
+            })
+            .await?
+            .map_ok(Into::into)
+            .try_collect()
+            .await?)
+    }
+
+    pub async fn teams(&self, context: &Context) -> FieldResult<Vec<Team>> {
+        Ok(context
+            .team_repo
+            .find(&TeamFilter {
+                company_ids: Some(vec![self.id.clone()]),
             })
             .await?
             .map_ok(Into::into)
@@ -43,7 +57,7 @@ impl Company {
         Ok(context
             .user_account_repo
             .find(&UserAccountFilter {
-                company_ids: Some(vec![self.0.id.clone()]),
+                company_ids: Some(vec![self.id.clone()]),
             })
             .await?
             .map_ok(Into::into)
@@ -53,11 +67,7 @@ impl Company {
 }
 
 pub async fn get(context: &Context, id: ID) -> FieldResult<Option<Company>> {
-    Ok(context
-        .company_repo
-        .find_one(&id.to_string())
-        .await?
-        .map(Into::into))
+    Ok(context.company_repo.find_one(&*id).await?.map(Into::into))
 }
 
 pub async fn list(context: &Context) -> FieldResult<Vec<Company>> {

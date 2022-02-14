@@ -5,6 +5,7 @@ pub mod incident;
 pub mod incident_stats;
 pub mod location_reading;
 pub mod person;
+pub mod team;
 pub mod user_account;
 
 use crate::graphql::company::{Company, CompanyInput};
@@ -15,6 +16,7 @@ use crate::graphql::incident::{Incident, IncidentFilter, IncidentInput};
 use crate::graphql::incident_stats::{IncidentStats, IncidentStatsFilter};
 use crate::graphql::location_reading::{LocationReading, LocationReadingFilter};
 use crate::graphql::person::{Person, PersonInput};
+use crate::graphql::team::{Team, TeamInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
 use crate::repo::company::CompanyRepo;
 use crate::repo::device::DeviceRepo;
@@ -23,6 +25,7 @@ use crate::repo::incident::IncidentRepo;
 use crate::repo::incident_stats::IncidentStatsRepo;
 use crate::repo::location_reading::LocationReadingRepo;
 use crate::repo::person::PersonRepo;
+use crate::repo::team::TeamRepo;
 use crate::repo::user_account::UserAccountRepo;
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
@@ -65,6 +68,7 @@ pub struct Context {
     pub incident_stats_repo: Arc<dyn IncidentStatsRepo + Send + Sync + 'static>,
     pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
     pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
+    pub team_repo: Arc<dyn TeamRepo + Send + Sync + 'static>,
     pub user_account_repo: Arc<dyn UserAccountRepo + Send + Sync + 'static>,
 }
 
@@ -134,6 +138,14 @@ impl Query {
 
     async fn people(#[graphql(context)] context: &Context) -> FieldResult<Vec<Person>> {
         person::list(context).await
+    }
+
+    async fn team(#[graphql(context)] context: &Context, id: ID) -> FieldResult<Option<Team>> {
+        team::get(context, id).await
+    }
+
+    async fn teams(#[graphql(context)] context: &Context) -> FieldResult<Vec<Team>> {
+        team::list(context).await
     }
 
     async fn user_account(
@@ -225,6 +237,33 @@ impl Mutation {
 
     async fn delete_person(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
         person::delete(context, id).await
+    }
+
+    async fn create_team(
+        #[graphql(context)] context: &Context,
+        input: TeamInput,
+    ) -> FieldResult<Team> {
+        team::create(context, input).await
+    }
+
+    async fn delete_team(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        team::delete(context, id).await
+    }
+
+    pub async fn team_add_person(
+        context: &Context,
+        team_id: ID,
+        person_id: ID,
+    ) -> FieldResult<Option<Team>> {
+        team::add_person(context, team_id, person_id).await
+    }
+
+    pub async fn team_remove_person(
+        context: &Context,
+        team_id: ID,
+        person_id: ID,
+    ) -> FieldResult<Option<Team>> {
+        team::remove_person(context, team_id, person_id).await
     }
 
     async fn create_user_account(

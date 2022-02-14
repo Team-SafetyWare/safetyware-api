@@ -2,11 +2,11 @@ use crate::crockford;
 use crate::graphql::company::Company;
 use crate::graphql::Context;
 use crate::repo::user_account;
-use derive_more::From;
+use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
 
-#[derive(Clone, From)]
+#[derive(Clone, From, Deref, DerefMut)]
 pub struct UserAccount(pub user_account::UserAccount);
 
 #[derive(juniper::GraphQLInputObject)]
@@ -21,29 +21,29 @@ pub struct UserAccountInput {
 #[juniper::graphql_object(context = Context)]
 impl UserAccount {
     pub fn id(&self) -> ID {
-        self.0.id.clone().into()
+        self.id.clone().into()
     }
 
     pub fn name(&self) -> &str {
-        &self.0.name
+        &self.name
     }
 
     pub fn title(&self) -> &str {
-        &self.0.title
+        &self.title
     }
 
     pub fn email(&self) -> &str {
-        &self.0.email
+        &self.email
     }
 
     pub fn phone(&self) -> &str {
-        &self.0.phone
+        &self.phone
     }
 
     pub async fn company(&self, context: &Context) -> FieldResult<Option<Company>> {
         Ok(context
             .company_repo
-            .find_one(&self.0.company_id)
+            .find_one(&self.company_id)
             .await?
             .map(Into::into))
     }
@@ -52,7 +52,7 @@ impl UserAccount {
 pub async fn get(context: &Context, id: ID) -> FieldResult<Option<UserAccount>> {
     Ok(context
         .user_account_repo
-        .find_one(&id.to_string())
+        .find_one(&*id)
         .await?
         .map(Into::into))
 }
