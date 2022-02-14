@@ -52,7 +52,7 @@ impl UserAccount {
 pub async fn get(context: &Context, id: ID) -> FieldResult<Option<UserAccount>> {
     Ok(context
         .user_account_repo
-        .find_one(&id.to_string())
+        .find_one(&*id)
         .await?
         .map(Into::into))
 }

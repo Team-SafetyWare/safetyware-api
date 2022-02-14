@@ -56,11 +56,7 @@ impl Team {
 }
 
 pub async fn get(context: &Context, id: ID) -> FieldResult<Option<Team>> {
-    Ok(context
-        .team_repo
-        .find_one(&id.to_string())
-        .await?
-        .map(Into::into))
+    Ok(context.team_repo.find_one(&*id).await?.map(Into::into))
 }
 
 pub async fn list(context: &Context) -> FieldResult<Vec<Team>> {
