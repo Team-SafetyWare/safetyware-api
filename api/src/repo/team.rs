@@ -16,7 +16,6 @@ pub struct Team {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct TeamPerson {
-    #[serde(rename = "_id")]
     pub team_id: String,
     pub person_id: String,
 }
