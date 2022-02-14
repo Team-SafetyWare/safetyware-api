@@ -72,3 +72,24 @@ pub async fn delete(context: &Context, id: ID) -> FieldResult<ID> {
         .await?;
     Ok(id)
 }
+
+pub async fn add_person(
+    context: &Context,
+    team_id: ID,
+    person_id: ID,
+) -> FieldResult<Option<Team>> {
+    context.team_repo.add_person(&*team_id, &*person_id).await?;
+    Ok(get(context, team_id).await?)
+}
+
+pub async fn remove_person(
+    context: &Context,
+    team_id: ID,
+    person_id: ID,
+) -> FieldResult<Option<Team>> {
+    context
+        .team_repo
+        .remove_person(&*team_id, &*person_id)
+        .await?;
+    Ok(get(context, team_id).await?)
+}

@@ -250,6 +250,22 @@ impl Mutation {
         team::delete(context, id).await
     }
 
+    pub async fn team_add_person(
+        context: &Context,
+        team_id: ID,
+        person_id: ID,
+    ) -> FieldResult<Option<Team>> {
+        team::add_person(context, team_id, person_id).await
+    }
+
+    pub async fn team_remove_person(
+        context: &Context,
+        team_id: ID,
+        person_id: ID,
+    ) -> FieldResult<Option<Team>> {
+        team::remove_person(context, team_id, person_id).await
+    }
+
     async fn create_user_account(
         #[graphql(context)] context: &Context,
         input: UserAccountInput,
