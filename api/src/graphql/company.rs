@@ -1,9 +1,11 @@
 use crate::crockford;
+use crate::graphql::incident_stats::{IncidentStats, IncidentStatsFilter};
 use crate::graphql::person::Person;
 use crate::graphql::team::Team;
 use crate::graphql::user_account::UserAccount;
 use crate::graphql::Context;
 use crate::repo::company;
+use crate::repo::incident_stats::IncidentStatsFilter as RepoIncidentStatsFilter;
 use crate::repo::person::PersonFilter;
 use crate::repo::team::TeamFilter;
 use crate::repo::user_account::UserAccountFilter;
@@ -27,6 +29,34 @@ impl Company {
 
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    pub async fn incident_stats(
+        &self,
+        context: &Context,
+        filter: Option<IncidentStatsFilter>,
+    ) -> FieldResult<Vec<IncidentStats>> {
+        let filter = filter.unwrap_or_default();
+        let people_ids = context
+            .person_repo
+            .find(&PersonFilter {
+                company_ids: Some(vec![self.id.clone()]),
+            })
+            .await?
+            .map_ok(|p| p.id)
+            .try_collect()
+            .await?;
+        Ok(context
+            .incident_stats_repo
+            .find(&RepoIncidentStatsFilter {
+                person_ids: Some(people_ids),
+                min_timestamp: filter.min_timestamp,
+                max_timestamp: filter.max_timestamp,
+            })
+            .await?
+            .map_ok(Into::into)
+            .try_collect()
+            .await?)
     }
 
     pub async fn people(&self, context: &Context) -> FieldResult<Vec<Person>> {
