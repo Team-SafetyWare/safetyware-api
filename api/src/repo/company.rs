@@ -1,6 +1,6 @@
 use crate::db::coll;
 use crate::repo::mongo_util::{FindStream, FromDeletedCount, FromMatchedCount};
-use crate::repo::{DeleteResult};
+use crate::repo::DeleteResult;
 use crate::repo::{ItemStream, ReplaceResult};
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
@@ -14,8 +14,8 @@ pub struct Company {
 
 #[async_trait::async_trait]
 pub trait CompanyRepo {
-    async fn insert_one(&self, company: &Company) -> anyhow::Result<()>;
-    async fn replace_one(&self, company: &Company) -> ReplaceResult;
+    async fn insert_one(&self, company: Company) -> anyhow::Result<()>;
+    async fn replace_one(&self, company: Company) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Company>>;
     async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Company>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
@@ -38,12 +38,12 @@ impl MongoCompanyRepo {
 
 #[async_trait::async_trait]
 impl CompanyRepo for MongoCompanyRepo {
-    async fn insert_one(&self, company: &Company) -> anyhow::Result<()> {
+    async fn insert_one(&self, company: Company) -> anyhow::Result<()> {
         self.collection().insert_one(company, None).await?;
         Ok(())
     }
 
-    async fn replace_one(&self, company: &Company) -> ReplaceResult {
+    async fn replace_one(&self, company: Company) -> ReplaceResult {
         let res = self
             .collection()
             .replace_one(bson::doc! {"_id": &company.id}, company, None)
