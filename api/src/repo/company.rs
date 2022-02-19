@@ -1,6 +1,6 @@
 use crate::db::coll;
 use crate::repo::mongo_util::{FindStream, FromDeletedCount, FromMatchedCount};
-use crate::repo::{DeleteError, DeleteResult, ReplaceError};
+use crate::repo::{DeleteResult};
 use crate::repo::{ItemStream, ReplaceResult};
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};

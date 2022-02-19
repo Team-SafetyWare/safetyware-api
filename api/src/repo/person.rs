@@ -1,6 +1,6 @@
 use crate::db::coll;
 use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
-use crate::repo::{DeleteError, DeleteResult, ReplaceError};
+use crate::repo::{DeleteResult};
 use crate::repo::{ItemStream, ReplaceResult};
 use bson::Document;
 use mongodb::{Collection, Database};
