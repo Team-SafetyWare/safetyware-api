@@ -107,19 +107,11 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
     ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>> {
         let mut mongo_filter = Document::new();
         if filter.person_ids.is_some() || filter.team_ids.is_some() {
-            let person_ids: Vec<String> = stream::iter(filter.team_ids.unwrap_or_default())
-                .map(|team_id| async move { self.team_repo.find_people(&team_id).await })
-                .buffered(10)
-                .try_flatten()
-                .map_ok(|tp| tp.person_id)
-                .chain(stream::iter(
-                    filter.person_ids.unwrap_or_default().into_iter().map(Ok),
-                ))
-                .try_collect::<HashSet<String>>()
-                .await?
-                .into_iter()
-                .collect();
-            mongo_filter.insert("person_id", bson::doc! { "$in": person_ids });
+            mongo_filter.insert(
+                "person_id",
+                filter_util::person_or_team(filter.person_ids, filter.team_ids, &self.team_repo)
+                    .await?,
+            );
         }
         mongo_filter.insert(
             "timestamp",
