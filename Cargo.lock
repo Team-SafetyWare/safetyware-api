@@ -58,7 +58,6 @@ dependencies = [
  "config",
  "derive_more",
  "env_logger",
- "futures",
  "futures-util",
  "json_dotpath",
  "juniper",
@@ -70,7 +69,6 @@ dependencies = [
  "serde_json",
  "thiserror",
  "tokio",
- "tokio-stream",
  "warp",
 ]
 
