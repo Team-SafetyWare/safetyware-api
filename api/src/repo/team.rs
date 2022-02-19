@@ -29,7 +29,7 @@ pub struct TeamFilter {
 pub trait TeamRepo {
     async fn insert_one(&self, team: &Team) -> anyhow::Result<()>;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Team>>;
-    async fn find(&self, filter: &TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>>;
+    async fn find(&self, filter: TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
     async fn find_people(&self, team_id: &str) -> anyhow::Result<Box<dyn ItemStream<TeamPerson>>>;
     async fn add_person(&self, team_id: &str, person_id: &str) -> anyhow::Result<()>;
@@ -68,9 +68,9 @@ impl TeamRepo for MongoTeamRepo {
         Ok(found)
     }
 
-    async fn find(&self, filter: &TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>> {
+    async fn find(&self, filter: TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>> {
         let mut mongo_filter = Document::new();
-        if let Some(company_ids) = &filter.company_ids {
+        if let Some(company_ids) = filter.company_ids {
             mongo_filter.insert("company_id", bson::doc! { "$in": company_ids });
         }
         let cursor = self.collection().find(mongo_filter, None).await?;

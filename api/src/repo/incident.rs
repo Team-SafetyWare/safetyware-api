@@ -1,5 +1,7 @@
 use crate::db::coll;
-use crate::repo::{DeleteError, DeleteResult, ItemStream, ReplaceError, ReplaceResult};
+use crate::repo::{
+    filter_util, DeleteError, DeleteResult, ItemStream, ReplaceError, ReplaceResult,
+};
 use bson::Document;
 use chrono::{DateTime, Utc};
 use futures_util::TryStreamExt;
@@ -72,7 +74,7 @@ pub trait IncidentRepo {
     async fn insert_many(&self, incidents: &[Incident]) -> anyhow::Result<()>;
     async fn replace_one(&self, incident: &Incident) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>>;
-    async fn find(&self, filter: &IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>>;
+    async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
 
@@ -127,27 +129,13 @@ impl IncidentRepo for MongoIncidentRepo {
         Ok(found.map(Into::into))
     }
 
-    async fn find(&self, filter: &IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>> {
+    async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>> {
         let mut mongo_filter = Document::new();
-        if let Some(person_ids) = &filter.person_ids {
-            mongo_filter.insert("person_id", bson::doc! { "$in": person_ids });
-        }
-        if let Some(min_timestamp) = &filter.min_timestamp {
-            mongo_filter
-                .entry("timestamp".to_string())
-                .or_insert(bson::doc! {}.into())
-                .as_document_mut()
-                .unwrap()
-                .insert("$gte", min_timestamp);
-        }
-        if let Some(max_timestamp) = &filter.max_timestamp {
-            mongo_filter
-                .entry("timestamp".to_string())
-                .or_insert(bson::doc! {}.into())
-                .as_document_mut()
-                .unwrap()
-                .insert("$lt", max_timestamp);
-        }
+        mongo_filter.insert("person_id", filter_util::people(filter.person_ids));
+        mongo_filter.insert(
+            "timestamp",
+            filter_util::clamp_timestamp(filter.min_timestamp, filter.max_timestamp),
+        );
         let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
         Ok(Box::new(stream))
