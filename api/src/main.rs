@@ -21,7 +21,6 @@ use crate::settings::Settings;
 use mongodb::Database;
 use std::env;
 use std::net::Ipv4Addr;
-use std::sync::Arc;
 use warp::cors::Cors;
 use warp::filters::BoxedFilter;
 use warp::{Filter, Reply};
