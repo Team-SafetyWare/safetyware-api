@@ -1,6 +1,6 @@
 use crate::db::coll;
-use crate::repo::filter_util::InsertOpt;
-use crate::repo::{filter_util, ItemStream};
+use crate::repo::mongo_util::{filter, InsertOpt};
+use crate::repo::ItemStream;
 use bson::Document;
 use chrono::{DateTime, Utc};
 use futures_util::TryStreamExt;
@@ -108,10 +108,10 @@ impl GasReadingRepo for MongoGasReadingRepo {
         filter: GasReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<GasReading>>> {
         let mut mongo_filter = Document::new();
-        mongo_filter.insert_opt("person_id", filter_util::one_of(filter.person_ids));
+        mongo_filter.insert_opt("person_id", filter::one_of(filter.person_ids));
         mongo_filter.insert_opt(
             "timestamp",
-            filter_util::clamp(filter.min_timestamp, filter.max_timestamp),
+            filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );
         let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_ok(Into::into).map_err(|e| e.into());

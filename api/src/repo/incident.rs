@@ -1,8 +1,6 @@
 use crate::db::coll;
-use crate::repo::filter_util::InsertOpt;
-use crate::repo::{
-    filter_util, DeleteError, DeleteResult, ItemStream, ReplaceError, ReplaceResult,
-};
+use crate::repo::mongo_util::{filter, InsertOpt};
+use crate::repo::{DeleteError, DeleteResult, ItemStream, ReplaceError, ReplaceResult};
 use bson::Document;
 use chrono::{DateTime, Utc};
 use futures_util::TryStreamExt;
@@ -132,10 +130,10 @@ impl IncidentRepo for MongoIncidentRepo {
 
     async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>> {
         let mut mongo_filter = Document::new();
-        mongo_filter.insert_opt("person_id", filter_util::one_of(filter.person_ids));
+        mongo_filter.insert_opt("person_id", filter::one_of(filter.person_ids));
         mongo_filter.insert_opt(
             "timestamp",
-            filter_util::clamp(filter.min_timestamp, filter.max_timestamp),
+            filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );
         let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_ok(Into::into).map_err(|e| e.into());

@@ -2,11 +2,11 @@ use futures_util::Stream;
 
 pub mod company;
 pub mod device;
-pub mod filter_util;
 pub mod gas_reading;
 pub mod incident;
 pub mod incident_stats;
 pub mod location_reading;
+pub mod mongo_util;
 pub mod person;
 pub mod team;
 pub mod user_account;
