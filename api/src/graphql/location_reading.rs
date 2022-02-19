@@ -12,6 +12,7 @@ pub struct LocationReading(pub location_reading::LocationReading);
 
 #[derive(juniper::GraphQLInputObject, Default)]
 pub struct LocationReadingFilter {
+    pub team_ids: Option<Vec<String>>,
     pub min_timestamp: Option<DateTime<Utc>>,
     pub max_timestamp: Option<DateTime<Utc>>,
 }
@@ -42,8 +43,9 @@ pub async fn list(
     let filter = filter.unwrap_or_default();
     let mut vec: Vec<LocationReading> = context
         .location_reading_repo
-        .find(&RepoLocationReadingFilter {
+        .find(RepoLocationReadingFilter {
             person_ids: None,
+            team_ids: None,
             min_timestamp: filter.min_timestamp,
             max_timestamp: filter.max_timestamp,
         })

@@ -1,10 +1,12 @@
 use crate::db::coll;
+use crate::repo::team::{MongoTeamRepo, TeamRepo};
 use crate::repo::ItemStream;
 use bson::Document;
 use chrono::{DateTime, Utc};
-use futures_util::TryStreamExt;
+use futures_util::{stream, StreamExt, TryStreamExt};
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DbLocationReading {
@@ -53,6 +55,7 @@ impl From<LocationReading> for DbLocationReading {
 #[derive(Default, Debug, Clone)]
 pub struct LocationReadingFilter {
     pub person_ids: Option<Vec<String>>,
+    pub team_ids: Option<Vec<String>>,
     pub min_timestamp: Option<DateTime<Utc>>,
     pub max_timestamp: Option<DateTime<Utc>>,
 }
@@ -63,18 +66,22 @@ pub trait LocationReadingRepo {
 
     async fn find(
         &self,
-        filter: &LocationReadingFilter,
+        filter: LocationReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>>;
 }
 
 #[derive(Debug, Clone)]
 pub struct MongoLocationReadingRepo {
     pub db: Database,
+    pub team_repo: MongoTeamRepo,
 }
 
 impl MongoLocationReadingRepo {
     pub fn new(db: Database) -> Self {
-        Self { db }
+        Self {
+            team_repo: MongoTeamRepo::new(db.clone()),
+            db,
+        }
     }
 
     pub fn collection(&self) -> Collection<DbLocationReading> {
@@ -96,13 +103,25 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
 
     async fn find(
         &self,
-        filter: &LocationReadingFilter,
+        filter: LocationReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>> {
         let mut mongo_filter = Document::new();
-        if let Some(person_ids) = &filter.person_ids {
+        if filter.person_ids.is_some() || filter.team_ids.is_some() {
+            let person_ids: Vec<String> = stream::iter(filter.team_ids.unwrap_or_default())
+                .map(|team_id| async move { self.team_repo.find_people(&team_id).await })
+                .buffered(10)
+                .try_flatten()
+                .map_ok(|tp| tp.person_id)
+                .chain(stream::iter(
+                    filter.person_ids.unwrap_or_default().into_iter().map(Ok),
+                ))
+                .try_collect::<HashSet<String>>()
+                .await?
+                .into_iter()
+                .collect();
             mongo_filter.insert("person_id", bson::doc! { "$in": person_ids });
         }
-        if let Some(min_timestamp) = &filter.min_timestamp {
+        if let Some(min_timestamp) = filter.min_timestamp {
             mongo_filter
                 .entry("timestamp".to_string())
                 .or_insert(bson::doc! {}.into())
@@ -110,7 +129,7 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
                 .unwrap()
                 .insert("$gte", min_timestamp);
         }
-        if let Some(max_timestamp) = &filter.max_timestamp {
+        if let Some(max_timestamp) = filter.max_timestamp {
             mongo_filter
                 .entry("timestamp".to_string())
                 .or_insert(bson::doc! {}.into())

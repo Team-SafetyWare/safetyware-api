@@ -60,7 +60,7 @@ pub async fn list(context: &Context, filter: Option<IncidentFilter>) -> FieldRes
     let filter = filter.unwrap_or_default();
     let mut vec: Vec<Incident> = context
         .incident_repo
-        .find(&RepoIncidentFilter {
+        .find(RepoIncidentFilter {
             person_ids: None,
             min_timestamp: filter.min_timestamp,
             max_timestamp: filter.max_timestamp,
