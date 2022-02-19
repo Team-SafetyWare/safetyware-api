@@ -21,7 +21,6 @@ use crate::settings::Settings;
 use mongodb::Database;
 use std::env;
 use std::net::Ipv4Addr;
-use std::sync::Arc;
 use warp::cors::Cors;
 use warp::filters::BoxedFilter;
 use warp::{Filter, Reply};
@@ -34,15 +33,15 @@ async fn main() -> anyhow::Result<()> {
     let settings = Settings::read();
     let db = db::connect_and_prepare(&settings.db_uri).await?;
     let graphql_context = Context {
-        company_repo: Arc::new(MongoCompanyRepo::new(db.clone())),
-        device_repo: Arc::new(MongoDeviceRepo::new(db.clone())),
-        gas_reading_repo: Arc::new(MongoGasReadingRepo::new(db.clone())),
-        incident_repo: Arc::new(MongoIncidentRepo::new(db.clone())),
-        incident_stats_repo: Arc::new(MongoIncidentStatsRepo::new(db.clone())),
-        location_reading_repo: Arc::new(MongoLocationReadingRepo::new(db.clone())),
-        person_repo: Arc::new(MongoPersonRepo::new(db.clone())),
-        team_repo: Arc::new(MongoTeamRepo::new(db.clone())),
-        user_account_repo: Arc::new(MongoUserAccountRepo::new(db.clone())),
+        company_repo: MongoCompanyRepo::new(db.clone()).into(),
+        device_repo: MongoDeviceRepo::new(db.clone()).into(),
+        gas_reading_repo: MongoGasReadingRepo::new(db.clone()).into(),
+        incident_repo: MongoIncidentRepo::new(db.clone()).into(),
+        incident_stats_repo: MongoIncidentStatsRepo::new(db.clone()).into(),
+        location_reading_repo: MongoLocationReadingRepo::new(db.clone()).into(),
+        person_repo: MongoPersonRepo::new(db.clone()).into(),
+        team_repo: MongoTeamRepo::new(db.clone()).into(),
+        user_account_repo: MongoUserAccountRepo::new(db.clone()).into(),
     };
     let import_device_data_context = import::DeviceDataContext {
         device_repo: graphql_context.device_repo.clone(),

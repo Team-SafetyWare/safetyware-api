@@ -75,7 +75,7 @@ pub async fn create(context: &Context, input: TeamInput) -> FieldResult<Team> {
         name: input.name,
         company_id: input.company_id,
     };
-    context.team_repo.insert_one(&item).await?;
+    context.team_repo.insert_one(item.clone()).await?;
     Ok(item.into())
 }
 

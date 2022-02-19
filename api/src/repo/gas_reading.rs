@@ -1,10 +1,11 @@
 use crate::db::coll;
-use crate::repo::{filter_util, ItemStream};
+use crate::repo::mongo_util::{filter, FindStream, InsertOpt};
+use crate::repo::ItemStream;
 use bson::Document;
 use chrono::{DateTime, Utc};
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DbGasReading {
@@ -67,13 +68,17 @@ pub struct GasReadingFilter {
 
 #[async_trait::async_trait]
 pub trait GasReadingRepo {
-    async fn insert_many(&self, gas_readings: &[GasReading]) -> anyhow::Result<()>;
+    async fn insert_many(&self, gas_readings: Vec<GasReading>) -> anyhow::Result<()>;
 
     async fn find(
         &self,
         filter: GasReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<GasReading>>>;
 }
+
+pub type DynGasReadingRepo = dyn GasReadingRepo + Send + Sync + 'static;
+
+pub type ArcGasReadingRepo = Arc<DynGasReadingRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoGasReadingRepo {
@@ -92,12 +97,8 @@ impl MongoGasReadingRepo {
 
 #[async_trait::async_trait]
 impl GasReadingRepo for MongoGasReadingRepo {
-    async fn insert_many(&self, gas_readings: &[GasReading]) -> anyhow::Result<()> {
-        let db_readings: Vec<DbGasReading> = gas_readings
-            .to_vec()
-            .into_iter()
-            .map(|r| r.into())
-            .collect();
+    async fn insert_many(&self, gas_readings: Vec<GasReading>) -> anyhow::Result<()> {
+        let db_readings: Vec<DbGasReading> = gas_readings.into_iter().map(Into::into).collect();
         self.collection().insert_many(db_readings, None).await?;
         Ok(())
     }
@@ -107,13 +108,17 @@ impl GasReadingRepo for MongoGasReadingRepo {
         filter: GasReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<GasReading>>> {
         let mut mongo_filter = Document::new();
-        mongo_filter.insert("person_id", filter_util::people(filter.person_ids));
-        mongo_filter.insert(
+        mongo_filter.insert_opt("person_id", filter::one_of(filter.person_ids));
+        mongo_filter.insert_opt(
             "timestamp",
-            filter_util::clamp_timestamp(filter.min_timestamp, filter.max_timestamp),
+            filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );
-        let cursor = self.collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
-        Ok(Box::new(stream))
+        self.collection().find_stream(mongo_filter, None).await
+    }
+}
+
+impl From<MongoGasReadingRepo> for ArcGasReadingRepo {
+    fn from(value: MongoGasReadingRepo) -> Self {
+        Arc::new(value)
     }
 }

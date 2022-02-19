@@ -1,10 +1,11 @@
 use crate::db::coll;
-use crate::repo::{DeleteError, DeleteResult, ReplaceError};
+use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
+use crate::repo::DeleteResult;
 use crate::repo::{ItemStream, ReplaceResult};
 use bson::Document;
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Device {
@@ -20,12 +21,16 @@ pub struct DeviceFilter {
 
 #[async_trait::async_trait]
 pub trait DeviceRepo {
-    async fn insert_one(&self, device: &Device) -> anyhow::Result<()>;
-    async fn replace_one(&self, device: &Device) -> ReplaceResult;
+    async fn insert_one(&self, device: Device) -> anyhow::Result<()>;
+    async fn replace_one(&self, device: Device) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Device>>;
     async fn find(&self, filter: DeviceFilter) -> anyhow::Result<Box<dyn ItemStream<Device>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
+
+pub type DynDeviceRepo = dyn DeviceRepo + Send + Sync + 'static;
+
+pub type ArcDeviceRepo = Arc<DynDeviceRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoDeviceRepo {
@@ -44,39 +49,31 @@ impl MongoDeviceRepo {
 
 #[async_trait::async_trait]
 impl DeviceRepo for MongoDeviceRepo {
-    async fn insert_one(&self, device: &Device) -> anyhow::Result<()> {
+    async fn insert_one(&self, device: Device) -> anyhow::Result<()> {
         self.collection().insert_one(device, None).await?;
         Ok(())
     }
 
-    async fn replace_one(&self, device: &Device) -> ReplaceResult {
-        let id = &device.id;
-        let query = bson::doc! {"_id": id};
+    async fn replace_one(&self, device: Device) -> ReplaceResult {
         let res = self
             .collection()
-            .replace_one(query, device, None)
+            .replace_one(bson::doc! {"_id": &device.id}, device, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.matched_count {
-            0 => Err(ReplaceError::NotFound),
-            _ => Ok(()),
-        }
+        ReplaceResult::from_matched_count(res.matched_count)
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Device>> {
-        let filter = bson::doc! {"_id": id};
-        let found = self.collection().find_one(filter, None).await?;
-        Ok(found)
+        Ok(self
+            .collection()
+            .find_one(bson::doc! {"_id": id}, None)
+            .await?)
     }
 
     async fn find(&self, filter: DeviceFilter) -> anyhow::Result<Box<dyn ItemStream<Device>>> {
         let mut mongo_filter = Document::new();
-        if let Some(owner_ids) = filter.owner_ids {
-            mongo_filter.insert("owner_id", bson::doc! { "$in": owner_ids });
-        }
-        let cursor = self.collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_err(|e| e.into());
-        Ok(Box::new(stream))
+        mongo_filter.insert_opt("owner_id", filter::one_of(filter.owner_ids));
+        self.collection().find_stream(mongo_filter, None).await
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
@@ -85,9 +82,12 @@ impl DeviceRepo for MongoDeviceRepo {
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
+    }
+}
+
+impl From<MongoDeviceRepo> for ArcDeviceRepo {
+    fn from(value: MongoDeviceRepo) -> Self {
+        Arc::new(value)
     }
 }

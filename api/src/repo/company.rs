@@ -1,9 +1,10 @@
 use crate::db::coll;
-use crate::repo::{DeleteError, DeleteResult, ReplaceError};
+use crate::repo::mongo_util::{FindStream, FromDeletedCount, FromMatchedCount};
+use crate::repo::DeleteResult;
 use crate::repo::{ItemStream, ReplaceResult};
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Company {
@@ -14,12 +15,16 @@ pub struct Company {
 
 #[async_trait::async_trait]
 pub trait CompanyRepo {
-    async fn insert_one(&self, company: &Company) -> anyhow::Result<()>;
-    async fn replace_one(&self, company: &Company) -> ReplaceResult;
+    async fn insert_one(&self, company: Company) -> anyhow::Result<()>;
+    async fn replace_one(&self, company: Company) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Company>>;
     async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Company>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
+
+pub type DynCompanyRepo = dyn CompanyRepo + Send + Sync + 'static;
+
+pub type ArcCompanyRepo = Arc<DynCompanyRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoCompanyRepo {
@@ -38,35 +43,29 @@ impl MongoCompanyRepo {
 
 #[async_trait::async_trait]
 impl CompanyRepo for MongoCompanyRepo {
-    async fn insert_one(&self, company: &Company) -> anyhow::Result<()> {
+    async fn insert_one(&self, company: Company) -> anyhow::Result<()> {
         self.collection().insert_one(company, None).await?;
         Ok(())
     }
 
-    async fn replace_one(&self, company: &Company) -> ReplaceResult {
-        let id = &company.id;
-        let query = bson::doc! {"_id": id};
+    async fn replace_one(&self, company: Company) -> ReplaceResult {
         let res = self
             .collection()
-            .replace_one(query, company, None)
+            .replace_one(bson::doc! {"_id": &company.id}, company, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.matched_count {
-            0 => Err(ReplaceError::NotFound),
-            _ => Ok(()),
-        }
+        ReplaceResult::from_matched_count(res.matched_count)
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Company>> {
-        let filter = bson::doc! {"_id": id};
-        let found = self.collection().find_one(filter, None).await?;
-        Ok(found)
+        Ok(self
+            .collection()
+            .find_one(bson::doc! {"_id": id}, None)
+            .await?)
     }
 
     async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Company>>> {
-        let cursor = self.collection().find(None, None).await?;
-        let stream = cursor.map_err(|e| e.into());
-        Ok(Box::new(stream))
+        self.collection().find_stream(None, None).await
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
@@ -75,9 +74,12 @@ impl CompanyRepo for MongoCompanyRepo {
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
+    }
+}
+
+impl From<MongoCompanyRepo> for ArcCompanyRepo {
+    fn from(value: MongoCompanyRepo) -> Self {
+        Arc::new(value)
     }
 }

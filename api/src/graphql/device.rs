@@ -48,7 +48,7 @@ pub async fn create(context: &Context, input: DeviceInput) -> FieldResult<Device
         id: input.id.to_string(),
         owner_id: input.owner_id.to_string(),
     };
-    context.device_repo.insert_one(&item).await?;
+    context.device_repo.insert_one(item.clone()).await?;
     Ok(item.into())
 }
 
@@ -57,7 +57,7 @@ pub async fn replace(context: &Context, input: DeviceInput) -> FieldResult<Devic
         id: input.id.to_string(),
         owner_id: input.owner_id.to_string(),
     };
-    context.device_repo.replace_one(&item).await?;
+    context.device_repo.replace_one(item.clone()).await?;
     Ok(item.into())
 }
 

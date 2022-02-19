@@ -48,7 +48,7 @@ impl Company {
             .await?;
         Ok(context
             .incident_stats_repo
-            .find(&RepoIncidentStatsFilter {
+            .find(RepoIncidentStatsFilter {
                 person_ids: Some(person_ids),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
@@ -115,7 +115,7 @@ pub async fn create(context: &Context, input: CompanyInput) -> FieldResult<Compa
         id: crockford::random_id(),
         name: input.name,
     };
-    context.company_repo.insert_one(&item).await?;
+    context.company_repo.insert_one(item.clone()).await?;
     Ok(item.into())
 }
 
@@ -124,7 +124,7 @@ pub async fn replace(context: &Context, id: ID, input: CompanyInput) -> FieldRes
         id: id.to_string(),
         name: input.name,
     };
-    context.company_repo.replace_one(&item).await?;
+    context.company_repo.replace_one(item.clone()).await?;
     Ok(item.into())
 }
 

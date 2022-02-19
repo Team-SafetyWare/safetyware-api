@@ -18,19 +18,18 @@ use crate::graphql::location_reading::{LocationReading, LocationReadingFilter};
 use crate::graphql::person::{Person, PersonInput};
 use crate::graphql::team::{Team, TeamInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
-use crate::repo::company::CompanyRepo;
-use crate::repo::device::DeviceRepo;
-use crate::repo::gas_reading::GasReadingRepo;
-use crate::repo::incident::IncidentRepo;
-use crate::repo::incident_stats::IncidentStatsRepo;
-use crate::repo::location_reading::LocationReadingRepo;
-use crate::repo::person::PersonRepo;
-use crate::repo::team::TeamRepo;
-use crate::repo::user_account::UserAccountRepo;
+use crate::repo::company::ArcCompanyRepo;
+use crate::repo::device::ArcDeviceRepo;
+use crate::repo::gas_reading::ArcGasReadingRepo;
+use crate::repo::incident::ArcIncidentRepo;
+use crate::repo::incident_stats::ArcIncidentStatsRepo;
+use crate::repo::location_reading::ArcLocationReadingRepo;
+use crate::repo::person::ArcPersonRepo;
+use crate::repo::team::ArcTeamRepo;
+use crate::repo::user_account::ArcUserAccountRepo;
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
 use juniper::{graphql_object, EmptySubscription, FieldResult, RootNode, ID};
-use std::sync::Arc;
 use warp::filters::BoxedFilter;
 use warp::http::Response;
 use warp::{Filter, Reply};
@@ -61,15 +60,15 @@ fn schema() -> Schema {
 
 #[derive(Clone)]
 pub struct Context {
-    pub company_repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
-    pub device_repo: Arc<dyn DeviceRepo + Send + Sync + 'static>,
-    pub gas_reading_repo: Arc<dyn GasReadingRepo + Send + Sync + 'static>,
-    pub incident_repo: Arc<dyn IncidentRepo + Send + Sync + 'static>,
-    pub incident_stats_repo: Arc<dyn IncidentStatsRepo + Send + Sync + 'static>,
-    pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
-    pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
-    pub team_repo: Arc<dyn TeamRepo + Send + Sync + 'static>,
-    pub user_account_repo: Arc<dyn UserAccountRepo + Send + Sync + 'static>,
+    pub company_repo: ArcCompanyRepo,
+    pub device_repo: ArcDeviceRepo,
+    pub gas_reading_repo: ArcGasReadingRepo,
+    pub incident_repo: ArcIncidentRepo,
+    pub incident_stats_repo: ArcIncidentStatsRepo,
+    pub location_reading_repo: ArcLocationReadingRepo,
+    pub person_repo: ArcPersonRepo,
+    pub team_repo: ArcTeamRepo,
+    pub user_account_repo: ArcUserAccountRepo,
 }
 
 impl juniper::Context for Context {}

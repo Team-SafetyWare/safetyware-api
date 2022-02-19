@@ -1,10 +1,11 @@
 use crate::db::coll;
-use crate::repo::{filter_util, ItemStream};
+use crate::repo::mongo_util::{filter, FindStream, InsertOpt};
+use crate::repo::ItemStream;
 use bson::Document;
 use chrono::{DateTime, Utc};
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DbLocationReading {
@@ -59,13 +60,17 @@ pub struct LocationReadingFilter {
 
 #[async_trait::async_trait]
 pub trait LocationReadingRepo {
-    async fn insert_many(&self, location_readings: &[LocationReading]) -> anyhow::Result<()>;
+    async fn insert_many(&self, location_readings: Vec<LocationReading>) -> anyhow::Result<()>;
 
     async fn find(
         &self,
         filter: LocationReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>>;
 }
+
+pub type DynLocationReadingRepo = dyn LocationReadingRepo + Send + Sync + 'static;
+
+pub type ArcLocationReadingRepo = Arc<DynLocationReadingRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoLocationReadingRepo {
@@ -84,12 +89,9 @@ impl MongoLocationReadingRepo {
 
 #[async_trait::async_trait]
 impl LocationReadingRepo for MongoLocationReadingRepo {
-    async fn insert_many(&self, location_readings: &[LocationReading]) -> anyhow::Result<()> {
-        let db_readings: Vec<DbLocationReading> = location_readings
-            .to_vec()
-            .into_iter()
-            .map(|r| r.into())
-            .collect();
+    async fn insert_many(&self, location_readings: Vec<LocationReading>) -> anyhow::Result<()> {
+        let db_readings: Vec<DbLocationReading> =
+            location_readings.into_iter().map(|r| r.into()).collect();
         self.collection().insert_many(db_readings, None).await?;
         Ok(())
     }
@@ -99,13 +101,17 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
         filter: LocationReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>> {
         let mut mongo_filter = Document::new();
-        mongo_filter.insert("person_id", filter_util::people(filter.person_ids));
-        mongo_filter.insert(
+        mongo_filter.insert_opt("person_id", filter::one_of(filter.person_ids));
+        mongo_filter.insert_opt(
             "timestamp",
-            filter_util::clamp_timestamp(filter.min_timestamp, filter.max_timestamp),
+            filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );
-        let cursor = self.collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
-        Ok(Box::new(stream))
+        self.collection().find_stream(mongo_filter, None).await
+    }
+}
+
+impl From<MongoLocationReadingRepo> for ArcLocationReadingRepo {
+    fn from(value: MongoLocationReadingRepo) -> Self {
+        Arc::new(value)
     }
 }
