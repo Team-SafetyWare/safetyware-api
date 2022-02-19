@@ -76,7 +76,7 @@ pub async fn create(context: &Context, input: UserAccountInput) -> FieldResult<U
         phone: input.phone,
         company_id: input.company_id.to_string(),
     };
-    context.user_account_repo.insert_one(&item).await?;
+    context.user_account_repo.insert_one(item.clone()).await?;
     Ok(item.into())
 }
 
@@ -93,7 +93,7 @@ pub async fn replace(
         phone: input.phone,
         company_id: input.company_id.to_string(),
     };
-    context.user_account_repo.replace_one(&item).await?;
+    context.user_account_repo.replace_one(item.clone()).await?;
     Ok(item.into())
 }
 
