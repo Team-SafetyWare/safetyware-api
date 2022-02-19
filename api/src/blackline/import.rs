@@ -74,7 +74,7 @@ pub fn device_data_filter(context: DeviceDataContext) -> BoxedFilter<(Box<dyn Re
                         })
                         .flatten()
                         .collect::<anyhow::Result<Vec<GasReading>>>()?;
-                    context.gas_reading_repo.insert_many(&gas_readings).await?;
+                    context.gas_reading_repo.insert_many(gas_readings).await?;
                     Ok(warp::reply().boxed())
                 } else {
                     Err(anyhow::anyhow!("device not found"))
