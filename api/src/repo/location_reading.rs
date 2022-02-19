@@ -1,5 +1,4 @@
 use crate::db::coll;
-use crate::repo::team::MongoTeamRepo;
 use crate::repo::{filter_util, ItemStream};
 use bson::Document;
 use chrono::{DateTime, Utc};
@@ -54,7 +53,6 @@ impl From<LocationReading> for DbLocationReading {
 #[derive(Default, Debug, Clone)]
 pub struct LocationReadingFilter {
     pub person_ids: Option<Vec<String>>,
-    pub team_ids: Option<Vec<String>>,
     pub min_timestamp: Option<DateTime<Utc>>,
     pub max_timestamp: Option<DateTime<Utc>>,
 }
@@ -72,15 +70,11 @@ pub trait LocationReadingRepo {
 #[derive(Debug, Clone)]
 pub struct MongoLocationReadingRepo {
     pub db: Database,
-    pub team_repo: MongoTeamRepo,
 }
 
 impl MongoLocationReadingRepo {
     pub fn new(db: Database) -> Self {
-        Self {
-            team_repo: MongoTeamRepo::new(db.clone()),
-            db,
-        }
+        Self { db }
     }
 
     pub fn collection(&self) -> Collection<DbLocationReading> {
@@ -105,12 +99,8 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
         filter: LocationReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>> {
         let mut mongo_filter = Document::new();
-        if filter.person_ids.is_some() || filter.team_ids.is_some() {
-            mongo_filter.insert(
-                "person_id",
-                filter_util::person_or_team(filter.person_ids, filter.team_ids, &self.team_repo)
-                    .await?,
-            );
+        if let Some(person_ids) = filter.person_ids {
+            mongo_filter.insert("person_id", bson::doc! { "$in": person_ids });
         }
         mongo_filter.insert(
             "timestamp",
