@@ -59,7 +59,7 @@ pub struct LocationReadingFilter {
 
 #[async_trait::async_trait]
 pub trait LocationReadingRepo {
-    async fn insert_many(&self, location_readings: &[LocationReading]) -> anyhow::Result<()>;
+    async fn insert_many(&self, location_readings: Vec<LocationReading>) -> anyhow::Result<()>;
 
     async fn find(
         &self,
@@ -84,12 +84,9 @@ impl MongoLocationReadingRepo {
 
 #[async_trait::async_trait]
 impl LocationReadingRepo for MongoLocationReadingRepo {
-    async fn insert_many(&self, location_readings: &[LocationReading]) -> anyhow::Result<()> {
-        let db_readings: Vec<DbLocationReading> = location_readings
-            .to_vec()
-            .into_iter()
-            .map(|r| r.into())
-            .collect();
+    async fn insert_many(&self, location_readings: Vec<LocationReading>) -> anyhow::Result<()> {
+        let db_readings: Vec<DbLocationReading> =
+            location_readings.into_iter().map(|r| r.into()).collect();
         self.collection().insert_many(db_readings, None).await?;
         Ok(())
     }

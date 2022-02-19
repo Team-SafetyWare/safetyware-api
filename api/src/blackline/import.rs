@@ -61,7 +61,7 @@ pub fn device_data_filter(context: DeviceDataContext) -> BoxedFilter<(Box<dyn Re
                         .collect::<anyhow::Result<Vec<LocationReading>>>()?;
                     context
                         .location_reading_repo
-                        .insert_many(&location_readings)
+                        .insert_many(location_readings)
                         .await?;
                     let gas_readings = device_data
                         .device
