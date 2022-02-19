@@ -27,7 +27,7 @@ pub struct TeamFilter {
 
 #[async_trait::async_trait]
 pub trait TeamRepo {
-    async fn insert_one(&self, team: &Team) -> anyhow::Result<()>;
+    async fn insert_one(&self, team: Team) -> anyhow::Result<()>;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Team>>;
     async fn find(&self, filter: TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
@@ -57,7 +57,7 @@ impl MongoTeamRepo {
 
 #[async_trait::async_trait]
 impl TeamRepo for MongoTeamRepo {
-    async fn insert_one(&self, team: &Team) -> anyhow::Result<()> {
+    async fn insert_one(&self, team: Team) -> anyhow::Result<()> {
         self.collection().insert_one(team, None).await?;
         Ok(())
     }
