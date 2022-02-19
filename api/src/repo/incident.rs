@@ -1,5 +1,5 @@
 use crate::db::coll;
-use crate::repo::mongo_util::{filter, FindStream, InsertOpt};
+use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
 use crate::repo::{DeleteError, DeleteResult, ItemStream, ReplaceError, ReplaceResult};
 use bson::Document;
 use chrono::{DateTime, Utc};
@@ -113,10 +113,7 @@ impl IncidentRepo for MongoIncidentRepo {
             .replace_one(bson::doc! {"_id": &db_incident.id}, db_incident, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.matched_count {
-            0 => Err(ReplaceError::NotFound),
-            _ => Ok(()),
-        }
+        ReplaceResult::from_matched_count(res.matched_count)
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>> {
@@ -143,9 +140,6 @@ impl IncidentRepo for MongoIncidentRepo {
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
     }
 }

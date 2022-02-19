@@ -1,5 +1,5 @@
 use crate::db::coll;
-use crate::repo::mongo_util::{filter, FindStream, InsertOpt};
+use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
 use crate::repo::ItemStream;
 use crate::repo::{DeleteError, DeleteResult};
 use bson::Document;
@@ -81,10 +81,7 @@ impl TeamRepo for MongoTeamRepo {
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
     }
 
     async fn find_people(&self, team_id: &str) -> anyhow::Result<Box<dyn ItemStream<TeamPerson>>> {
@@ -115,9 +112,6 @@ impl TeamRepo for MongoTeamRepo {
             )
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
     }
 }

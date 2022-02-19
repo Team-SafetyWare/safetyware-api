@@ -1,5 +1,5 @@
 use crate::db::coll;
-use crate::repo::mongo_util::{filter, FindStream, InsertOpt};
+use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
 use crate::repo::{DeleteError, DeleteResult, ReplaceError};
 use crate::repo::{ItemStream, ReplaceResult};
 use bson::Document;
@@ -55,10 +55,7 @@ impl DeviceRepo for MongoDeviceRepo {
             .replace_one(bson::doc! {"_id": &device.id}, device, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.matched_count {
-            0 => Err(ReplaceError::NotFound),
-            _ => Ok(()),
-        }
+        ReplaceResult::from_matched_count(res.matched_count)
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Device>> {
@@ -80,9 +77,6 @@ impl DeviceRepo for MongoDeviceRepo {
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
     }
 }
