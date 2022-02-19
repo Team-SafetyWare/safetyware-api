@@ -6,6 +6,7 @@ use chrono::{DateTime, Utc};
 use futures_util::{StreamExt, TryStreamExt};
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IncidentStats {
@@ -27,6 +28,10 @@ pub trait IncidentStatsRepo {
         filter: IncidentStatsFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<IncidentStats>>>;
 }
+
+pub type DynIncidentStatsRepo = dyn IncidentStatsRepo + Send + Sync + 'static;
+
+pub type ArcIncidentStatsRepo = Arc<DynIncidentStatsRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoIncidentStatsRepo {
@@ -70,5 +75,11 @@ impl IncidentStatsRepo for MongoIncidentStatsRepo {
             .map_err(anyhow::Error::from)
             .map(|r| r.and_then(|d| bson::from_document(d).map_err(Into::into)));
         Ok(Box::new(stream))
+    }
+}
+
+impl From<MongoIncidentStatsRepo> for ArcIncidentStatsRepo {
+    fn from(value: MongoIncidentStatsRepo) -> Self {
+        Arc::new(value)
     }
 }

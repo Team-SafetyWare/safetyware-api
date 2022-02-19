@@ -5,6 +5,7 @@ use bson::Document;
 use chrono::{DateTime, Utc};
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DbLocationReading {
@@ -67,6 +68,10 @@ pub trait LocationReadingRepo {
     ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>>;
 }
 
+pub type DynLocationReadingRepo = dyn LocationReadingRepo + Send + Sync + 'static;
+
+pub type ArcLocationReadingRepo = Arc<DynLocationReadingRepo>;
+
 #[derive(Debug, Clone)]
 pub struct MongoLocationReadingRepo {
     pub db: Database,
@@ -102,5 +107,11 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
             filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );
         self.collection().find_stream(mongo_filter, None).await
+    }
+}
+
+impl From<MongoLocationReadingRepo> for ArcLocationReadingRepo {
+    fn from(value: MongoLocationReadingRepo) -> Self {
+        Arc::new(value)
     }
 }

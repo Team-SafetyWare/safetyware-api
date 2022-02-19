@@ -5,6 +5,7 @@ use bson::Document;
 use chrono::{DateTime, Utc};
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DbGasReading {
@@ -75,6 +76,10 @@ pub trait GasReadingRepo {
     ) -> anyhow::Result<Box<dyn ItemStream<GasReading>>>;
 }
 
+pub type DynGasReadingRepo = dyn GasReadingRepo + Send + Sync + 'static;
+
+pub type ArcGasReadingRepo = Arc<DynGasReadingRepo>;
+
 #[derive(Debug, Clone)]
 pub struct MongoGasReadingRepo {
     pub db: Database,
@@ -109,5 +114,11 @@ impl GasReadingRepo for MongoGasReadingRepo {
             filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );
         self.collection().find_stream(mongo_filter, None).await
+    }
+}
+
+impl From<MongoGasReadingRepo> for ArcGasReadingRepo {
+    fn from(value: MongoGasReadingRepo) -> Self {
+        Arc::new(value)
     }
 }

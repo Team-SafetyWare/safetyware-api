@@ -5,6 +5,7 @@ use crate::repo::{ItemStream, ReplaceResult};
 use bson::Document;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Device {
@@ -26,6 +27,10 @@ pub trait DeviceRepo {
     async fn find(&self, filter: DeviceFilter) -> anyhow::Result<Box<dyn ItemStream<Device>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
+
+pub type DynDeviceRepo = dyn DeviceRepo + Send + Sync + 'static;
+
+pub type ArcDeviceRepo = Arc<DynDeviceRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoDeviceRepo {
@@ -78,5 +83,11 @@ impl DeviceRepo for MongoDeviceRepo {
             .await
             .map_err(anyhow::Error::from)?;
         DeleteResult::from_deleted_count(res.deleted_count)
+    }
+}
+
+impl From<MongoDeviceRepo> for ArcDeviceRepo {
+    fn from(value: MongoDeviceRepo) -> Self {
+        Arc::new(value)
     }
 }
