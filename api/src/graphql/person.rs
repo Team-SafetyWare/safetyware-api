@@ -46,7 +46,7 @@ impl Person {
     pub async fn devices(&self, context: &Context) -> FieldResult<Vec<Device>> {
         Ok(context
             .device_repo
-            .find(&RepoDeviceFilter {
+            .find(RepoDeviceFilter {
                 owner_ids: Some(vec![self.id.clone()]),
             })
             .await?
@@ -63,7 +63,7 @@ impl Person {
         let filter = filter.unwrap_or_default();
         let mut vec: Vec<GasReading> = context
             .gas_reading_repo
-            .find(&RepoGasReadingFilter {
+            .find(RepoGasReadingFilter {
                 person_ids: Some(vec![self.id.clone()]),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
@@ -84,7 +84,7 @@ impl Person {
         let filter = filter.unwrap_or_default();
         let mut vec: Vec<Incident> = context
             .incident_repo
-            .find(&RepoIncidentFilter {
+            .find(RepoIncidentFilter {
                 person_ids: Some(vec![self.id.clone()]),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
@@ -105,8 +105,9 @@ impl Person {
         let filter = filter.unwrap_or_default();
         let mut vec: Vec<LocationReading> = context
             .location_reading_repo
-            .find(&RepoLocationReadingFilter {
+            .find(RepoLocationReadingFilter {
                 person_ids: Some(vec![self.id.clone()]),
+                team_ids: filter.team_ids,
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
             })
@@ -126,7 +127,7 @@ pub async fn get(context: &Context, id: ID) -> FieldResult<Option<Person>> {
 pub async fn list(context: &Context) -> FieldResult<Vec<Person>> {
     Ok(context
         .person_repo
-        .find(&Default::default())
+        .find(Default::default())
         .await?
         .map_ok(Into::into)
         .try_collect()

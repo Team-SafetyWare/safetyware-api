@@ -29,7 +29,7 @@ pub trait UserAccountRepo {
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<UserAccount>>;
     async fn find(
         &self,
-        filter: &UserAccountFilter,
+        filter: UserAccountFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
@@ -78,10 +78,10 @@ impl UserAccountRepo for MongoUserAccountRepo {
 
     async fn find(
         &self,
-        filter: &UserAccountFilter,
+        filter: UserAccountFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>> {
         let mut mongo_filter = Document::new();
-        if let Some(company_ids) = &filter.company_ids {
+        if let Some(company_ids) = filter.company_ids {
             mongo_filter.insert("company_id", bson::doc! { "$in": company_ids });
         }
         let cursor = self.collection().find(mongo_filter, None).await?;

@@ -72,7 +72,7 @@ pub trait IncidentRepo {
     async fn insert_many(&self, incidents: &[Incident]) -> anyhow::Result<()>;
     async fn replace_one(&self, incident: &Incident) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>>;
-    async fn find(&self, filter: &IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>>;
+    async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
 
@@ -127,12 +127,12 @@ impl IncidentRepo for MongoIncidentRepo {
         Ok(found.map(Into::into))
     }
 
-    async fn find(&self, filter: &IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>> {
+    async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>> {
         let mut mongo_filter = Document::new();
-        if let Some(person_ids) = &filter.person_ids {
+        if let Some(person_ids) = filter.person_ids {
             mongo_filter.insert("person_id", bson::doc! { "$in": person_ids });
         }
-        if let Some(min_timestamp) = &filter.min_timestamp {
+        if let Some(min_timestamp) = filter.min_timestamp {
             mongo_filter
                 .entry("timestamp".to_string())
                 .or_insert(bson::doc! {}.into())
@@ -140,7 +140,7 @@ impl IncidentRepo for MongoIncidentRepo {
                 .unwrap()
                 .insert("$gte", min_timestamp);
         }
-        if let Some(max_timestamp) = &filter.max_timestamp {
+        if let Some(max_timestamp) = filter.max_timestamp {
             mongo_filter
                 .entry("timestamp".to_string())
                 .or_insert(bson::doc! {}.into())
