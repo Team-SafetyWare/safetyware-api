@@ -68,9 +68,9 @@ pub struct IncidentFilter {
 
 #[async_trait::async_trait]
 pub trait IncidentRepo {
-    async fn insert_one(&self, incident: &Incident) -> anyhow::Result<()>;
-    async fn insert_many(&self, incidents: &[Incident]) -> anyhow::Result<()>;
-    async fn replace_one(&self, incident: &Incident) -> ReplaceResult;
+    async fn insert_one(&self, incident: Incident) -> anyhow::Result<()>;
+    async fn insert_many(&self, incidents: Vec<Incident>) -> anyhow::Result<()>;
+    async fn replace_one(&self, incident: Incident) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>>;
     async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
@@ -93,21 +93,20 @@ impl MongoIncidentRepo {
 
 #[async_trait::async_trait]
 impl IncidentRepo for MongoIncidentRepo {
-    async fn insert_one(&self, incident: &Incident) -> anyhow::Result<()> {
-        let db_incident: DbIncident = incident.clone().into();
+    async fn insert_one(&self, incident: Incident) -> anyhow::Result<()> {
+        let db_incident: DbIncident = incident.into();
         self.collection().insert_one(db_incident, None).await?;
         Ok(())
     }
 
-    async fn insert_many(&self, incidents: &[Incident]) -> anyhow::Result<()> {
-        let db_incidents: Vec<DbIncident> =
-            incidents.to_vec().into_iter().map(|r| r.into()).collect();
+    async fn insert_many(&self, incidents: Vec<Incident>) -> anyhow::Result<()> {
+        let db_incidents: Vec<DbIncident> = incidents.into_iter().map(Into::into).collect();
         self.collection().insert_many(db_incidents, None).await?;
         Ok(())
     }
 
-    async fn replace_one(&self, incident: &Incident) -> ReplaceResult {
-        let db_incident: DbIncident = incident.clone().into();
+    async fn replace_one(&self, incident: Incident) -> ReplaceResult {
+        let db_incident: DbIncident = incident.into();
         let res = self
             .collection()
             .replace_one(bson::doc! {"_id": &db_incident.id}, db_incident, None)

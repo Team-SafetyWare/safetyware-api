@@ -81,7 +81,7 @@ pub async fn create(context: &Context, input: IncidentInput) -> FieldResult<Inci
         coordinates: input.coordinates,
         r#type: input.r#type,
     };
-    context.incident_repo.insert_one(&item).await?;
+    context.incident_repo.insert_one(item.clone()).await?;
     Ok(item.into())
 }
 
@@ -93,7 +93,7 @@ pub async fn replace(context: &Context, id: ID, input: IncidentInput) -> FieldRe
         coordinates: input.coordinates,
         r#type: input.r#type,
     };
-    context.incident_repo.replace_one(&item).await?;
+    context.incident_repo.replace_one(item.clone()).await?;
     Ok(item.into())
 }
 
