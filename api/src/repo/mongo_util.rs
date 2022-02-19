@@ -1,4 +1,4 @@
-use crate::repo::ItemStream;
+use crate::repo::{DeleteError, DeleteResult, ItemStream, ReplaceError, ReplaceResult};
 use bson::{Bson, Document};
 use futures_util::TryStreamExt;
 use mongodb::options::FindOptions;
@@ -56,6 +56,32 @@ impl<D: DeserializeOwned + Unpin + Send + Sync + 'static> FindStream for Collect
         let cursor = self.find(filter, options).await?;
         let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
         Ok(Box::new(stream))
+    }
+}
+
+pub trait FromMatchedCount {
+    fn from_matched_count(matched_count: u64) -> Self;
+}
+
+impl FromMatchedCount for ReplaceResult {
+    fn from_matched_count(matched_count: u64) -> Self {
+        match matched_count {
+            0 => Err(ReplaceError::NotFound),
+            _ => Ok(()),
+        }
+    }
+}
+
+pub trait FromDeletedCount {
+    fn from_deleted_count(deleted_count: u64) -> Self;
+}
+
+impl FromDeletedCount for DeleteResult {
+    fn from_deleted_count(deleted_count: u64) -> Self {
+        match deleted_count {
+            0 => Err(DeleteError::NotFound),
+            _ => Ok(()),
+        }
     }
 }
 

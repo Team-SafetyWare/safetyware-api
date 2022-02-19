@@ -1,5 +1,5 @@
 use crate::db::coll;
-use crate::repo::mongo_util::FindStream;
+use crate::repo::mongo_util::{FindStream, FromDeletedCount, FromMatchedCount};
 use crate::repo::{DeleteError, DeleteResult, ReplaceError};
 use crate::repo::{ItemStream, ReplaceResult};
 use mongodb::{Collection, Database};
@@ -49,10 +49,7 @@ impl CompanyRepo for MongoCompanyRepo {
             .replace_one(bson::doc! {"_id": &company.id}, company, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.matched_count {
-            0 => Err(ReplaceError::NotFound),
-            _ => Ok(()),
-        }
+        ReplaceResult::from_matched_count(res.matched_count)
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Company>> {
@@ -72,9 +69,6 @@ impl CompanyRepo for MongoCompanyRepo {
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
     }
 }
