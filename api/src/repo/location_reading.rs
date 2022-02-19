@@ -1,4 +1,5 @@
 use crate::db::coll;
+use crate::repo::filter_util::InsertOpt;
 use crate::repo::{filter_util, ItemStream};
 use bson::Document;
 use chrono::{DateTime, Utc};
@@ -100,9 +101,9 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
     ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>> {
         let mut mongo_filter = Document::new();
         mongo_filter.insert("person_id", filter_util::people(filter.person_ids));
-        mongo_filter.insert(
+        mongo_filter.insert_opt(
             "timestamp",
-            filter_util::clamp_timestamp(filter.min_timestamp, filter.max_timestamp),
+            filter_util::clamp_time(filter.min_timestamp, filter.max_timestamp),
         );
         let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
