@@ -50,11 +50,9 @@ impl DeviceRepo for MongoDeviceRepo {
     }
 
     async fn replace_one(&self, device: &Device) -> ReplaceResult {
-        let id = &device.id;
-        let query = bson::doc! {"_id": id};
         let res = self
             .collection()
-            .replace_one(query, device, None)
+            .replace_one(bson::doc! {"_id": &device.id}, device, None)
             .await
             .map_err(anyhow::Error::from)?;
         match res.matched_count {
@@ -64,9 +62,10 @@ impl DeviceRepo for MongoDeviceRepo {
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Device>> {
-        let filter = bson::doc! {"_id": id};
-        let found = self.collection().find_one(filter, None).await?;
-        Ok(found)
+        Ok(self
+            .collection()
+            .find_one(bson::doc! {"_id": id}, None)
+            .await?)
     }
 
     async fn find(&self, filter: DeviceFilter) -> anyhow::Result<Box<dyn ItemStream<Device>>> {

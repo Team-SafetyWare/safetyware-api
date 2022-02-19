@@ -3,7 +3,6 @@ use crate::repo::mongo_util::{filter, FindStream, InsertOpt};
 use crate::repo::ItemStream;
 use crate::repo::{DeleteError, DeleteResult};
 use bson::Document;
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 
@@ -64,9 +63,10 @@ impl TeamRepo for MongoTeamRepo {
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Team>> {
-        let filter = bson::doc! {"_id": id};
-        let found = self.collection().find_one(filter, None).await?;
-        Ok(found)
+        Ok(self
+            .collection()
+            .find_one(bson::doc! {"_id": id}, None)
+            .await?)
     }
 
     async fn find(&self, filter: TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>> {
@@ -88,10 +88,9 @@ impl TeamRepo for MongoTeamRepo {
     }
 
     async fn find_people(&self, team_id: &str) -> anyhow::Result<Box<dyn ItemStream<TeamPerson>>> {
-        let mongo_filter = bson::doc! { "team_id": team_id };
-        let cursor = self.person_collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_err(|e| e.into());
-        Ok(Box::new(stream))
+        self.person_collection()
+            .find_stream(bson::doc! { "team_id": team_id }, None)
+            .await
     }
 
     async fn add_person(&self, team_id: &str, person_id: &str) -> anyhow::Result<()> {
