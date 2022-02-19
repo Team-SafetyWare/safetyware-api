@@ -103,9 +103,6 @@ pub mod filter {
     }
 
     pub fn one_of<T: Into<Bson>>(values: Option<Vec<T>>) -> Option<Bson> {
-        match values {
-            None => None,
-            Some(values) => Some((bson::doc! { "$in":  values }).into()),
-        }
+        values.map(|v| (bson::doc! { "$in":  v }).into())
     }
 }
