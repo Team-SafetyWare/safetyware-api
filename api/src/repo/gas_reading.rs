@@ -67,7 +67,7 @@ pub struct GasReadingFilter {
 
 #[async_trait::async_trait]
 pub trait GasReadingRepo {
-    async fn insert_many(&self, gas_readings: &[GasReading]) -> anyhow::Result<()>;
+    async fn insert_many(&self, gas_readings: Vec<GasReading>) -> anyhow::Result<()>;
 
     async fn find(
         &self,
@@ -92,12 +92,8 @@ impl MongoGasReadingRepo {
 
 #[async_trait::async_trait]
 impl GasReadingRepo for MongoGasReadingRepo {
-    async fn insert_many(&self, gas_readings: &[GasReading]) -> anyhow::Result<()> {
-        let db_readings: Vec<DbGasReading> = gas_readings
-            .to_vec()
-            .into_iter()
-            .map(|r| r.into())
-            .collect();
+    async fn insert_many(&self, gas_readings: Vec<GasReading>) -> anyhow::Result<()> {
+        let db_readings: Vec<DbGasReading> = gas_readings.into_iter().map(Into::into).collect();
         self.collection().insert_many(db_readings, None).await?;
         Ok(())
     }
