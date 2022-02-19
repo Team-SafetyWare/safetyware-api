@@ -108,11 +108,9 @@ impl IncidentRepo for MongoIncidentRepo {
 
     async fn replace_one(&self, incident: &Incident) -> ReplaceResult {
         let db_incident: DbIncident = incident.clone().into();
-        let id = &db_incident.id;
-        let query = bson::doc! {"_id": id};
         let res = self
             .collection()
-            .replace_one(query, db_incident, None)
+            .replace_one(bson::doc! {"_id": &db_incident.id}, db_incident, None)
             .await
             .map_err(anyhow::Error::from)?;
         match res.matched_count {
@@ -122,9 +120,11 @@ impl IncidentRepo for MongoIncidentRepo {
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>> {
-        let filter = bson::doc! {"_id": id};
-        let found = self.collection().find_one(filter, None).await?;
-        Ok(found.map(Into::into))
+        Ok(self
+            .collection()
+            .find_one(bson::doc! {"_id": id}, None)
+            .await?
+            .map(Into::into))
     }
 
     async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>> {
