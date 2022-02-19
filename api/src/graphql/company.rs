@@ -48,7 +48,7 @@ impl Company {
             .await?;
         Ok(context
             .incident_stats_repo
-            .find(&RepoIncidentStatsFilter {
+            .find(RepoIncidentStatsFilter {
                 person_ids: Some(person_ids),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,

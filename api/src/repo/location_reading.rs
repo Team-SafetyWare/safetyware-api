@@ -1,9 +1,8 @@
 use crate::db::coll;
-use crate::repo::mongo_util::{filter, InsertOpt};
+use crate::repo::mongo_util::{filter, FindStream, InsertOpt};
 use crate::repo::ItemStream;
 use bson::Document;
 use chrono::{DateTime, Utc};
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 
@@ -105,8 +104,6 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
             "timestamp",
             filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );
-        let cursor = self.collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
-        Ok(Box::new(stream))
+        self.collection().find_stream(mongo_filter, None).await
     }
 }

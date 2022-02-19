@@ -1,4 +1,5 @@
 use crate::db::coll;
+use crate::repo::mongo_util::{filter, FindStream, InsertOpt};
 use crate::repo::ItemStream;
 use crate::repo::{DeleteError, DeleteResult};
 use bson::Document;
@@ -70,12 +71,8 @@ impl TeamRepo for MongoTeamRepo {
 
     async fn find(&self, filter: TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>> {
         let mut mongo_filter = Document::new();
-        if let Some(company_ids) = filter.company_ids {
-            mongo_filter.insert("company_id", bson::doc! { "$in": company_ids });
-        }
-        let cursor = self.collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_err(|e| e.into());
-        Ok(Box::new(stream))
+        mongo_filter.insert_opt("company_id", filter::one_of(filter.company_ids));
+        self.collection().find_stream(mongo_filter, None).await
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {

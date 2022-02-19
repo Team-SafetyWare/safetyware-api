@@ -1,8 +1,8 @@
 use crate::db::coll;
+use crate::repo::mongo_util::{filter, FindStream, InsertOpt};
 use crate::repo::{DeleteError, DeleteResult, ReplaceError};
 use crate::repo::{ItemStream, ReplaceResult};
 use bson::Document;
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 
@@ -72,12 +72,8 @@ impl PersonRepo for MongoPersonRepo {
 
     async fn find(&self, filter: PersonFilter) -> anyhow::Result<Box<dyn ItemStream<Person>>> {
         let mut mongo_filter = Document::new();
-        if let Some(company_ids) = filter.company_ids {
-            mongo_filter.insert("company_id", bson::doc! { "$in": company_ids });
-        }
-        let cursor = self.collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_err(|e| e.into());
-        Ok(Box::new(stream))
+        mongo_filter.insert_opt("company_id", filter::one_of(filter.company_ids));
+        self.collection().find_stream(mongo_filter, None).await
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
