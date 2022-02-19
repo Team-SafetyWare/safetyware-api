@@ -1,7 +1,7 @@
 use crate::repo::team::TeamRepo;
 use bson::{Bson, Document};
 use chrono::{DateTime, Utc};
-use futures_util::{stream, StreamExt, TryFutureExt, TryStreamExt};
+use futures_util::{stream, StreamExt, TryStreamExt};
 use std::collections::HashSet;
 
 const MAX_CONCURRENT_DB_CALLS: usize = 10;
@@ -23,7 +23,7 @@ pub fn clamp_timestamp(
 pub async fn person_or_team(
     person_ids: Option<Vec<String>>,
     team_ids: Option<Vec<String>>,
-    team_repo: &dyn TeamRepo + Send + Sync,
+    team_repo: &(dyn TeamRepo + Send + Sync),
 ) -> anyhow::Result<Bson> {
     let person_ids = person_ids.unwrap_or_default();
     let team_ids = team_ids.unwrap_or_default();

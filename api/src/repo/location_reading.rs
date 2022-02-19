@@ -1,12 +1,11 @@
 use crate::db::coll;
-use crate::repo::team::{MongoTeamRepo, TeamRepo};
+use crate::repo::team::MongoTeamRepo;
 use crate::repo::{filter_util, ItemStream};
 use bson::Document;
 use chrono::{DateTime, Utc};
-use futures_util::{stream, StreamExt, TryStreamExt};
+use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DbLocationReading {
