@@ -24,8 +24,8 @@ pub struct UserAccountFilter {
 
 #[async_trait::async_trait]
 pub trait UserAccountRepo {
-    async fn insert_one(&self, user_account: &UserAccount) -> anyhow::Result<()>;
-    async fn replace_one(&self, user_account: &UserAccount) -> ReplaceResult;
+    async fn insert_one(&self, user_account: UserAccount) -> anyhow::Result<()>;
+    async fn replace_one(&self, user_account: UserAccount) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<UserAccount>>;
     async fn find(
         &self,
@@ -51,12 +51,12 @@ impl MongoUserAccountRepo {
 
 #[async_trait::async_trait]
 impl UserAccountRepo for MongoUserAccountRepo {
-    async fn insert_one(&self, user_account: &UserAccount) -> anyhow::Result<()> {
+    async fn insert_one(&self, user_account: UserAccount) -> anyhow::Result<()> {
         self.collection().insert_one(user_account, None).await?;
         Ok(())
     }
 
-    async fn replace_one(&self, user_account: &UserAccount) -> ReplaceResult {
+    async fn replace_one(&self, user_account: UserAccount) -> ReplaceResult {
         let res = self
             .collection()
             .replace_one(bson::doc! {"_id": &user_account.id}, user_account, None)
