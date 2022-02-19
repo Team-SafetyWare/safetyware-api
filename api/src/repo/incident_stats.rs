@@ -1,4 +1,5 @@
 use crate::db::coll;
+use crate::repo::mongo_util::{filter, InsertOpt};
 use crate::repo::ItemStream;
 use bson::Document;
 use chrono::{DateTime, Utc};
@@ -23,7 +24,7 @@ pub struct IncidentStatsFilter {
 pub trait IncidentStatsRepo {
     async fn find(
         &self,
-        filter: &IncidentStatsFilter,
+        filter: IncidentStatsFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<IncidentStats>>>;
 }
 
@@ -46,28 +47,14 @@ impl MongoIncidentStatsRepo {
 impl IncidentStatsRepo for MongoIncidentStatsRepo {
     async fn find(
         &self,
-        filter: &IncidentStatsFilter,
+        filter: IncidentStatsFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<IncidentStats>>> {
         let mut mongo_filter = Document::new();
-        if let Some(person_ids) = &filter.person_ids {
-            mongo_filter.insert("person_id", bson::doc! { "$in": person_ids });
-        }
-        if let Some(min_timestamp) = &filter.min_timestamp {
-            mongo_filter
-                .entry("timestamp".to_string())
-                .or_insert(bson::doc! {}.into())
-                .as_document_mut()
-                .unwrap()
-                .insert("$gte", min_timestamp);
-        }
-        if let Some(max_timestamp) = &filter.max_timestamp {
-            mongo_filter
-                .entry("timestamp".to_string())
-                .or_insert(bson::doc! {}.into())
-                .as_document_mut()
-                .unwrap()
-                .insert("$lt", max_timestamp);
-        }
+        mongo_filter.insert_opt("person_id", filter::one_of(filter.person_ids));
+        mongo_filter.insert(
+            "timestamp",
+            filter::clamp(filter.min_timestamp, filter.max_timestamp),
+        );
         let cursor = self
             .collection()
             .aggregate(

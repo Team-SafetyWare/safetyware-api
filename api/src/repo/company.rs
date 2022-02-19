@@ -1,7 +1,7 @@
 use crate::db::coll;
+use crate::repo::mongo_util::FindStream;
 use crate::repo::{DeleteError, DeleteResult, ReplaceError};
 use crate::repo::{ItemStream, ReplaceResult};
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 
@@ -64,9 +64,7 @@ impl CompanyRepo for MongoCompanyRepo {
     }
 
     async fn find(&self) -> anyhow::Result<Box<dyn ItemStream<Company>>> {
-        let cursor = self.collection().find(None, None).await?;
-        let stream = cursor.map_err(|e| e.into());
-        Ok(Box::new(stream))
+        self.collection().find_stream(None, None).await
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
