@@ -103,7 +103,7 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
         mongo_filter.insert_opt("person_id", filter_util::one_of(filter.person_ids));
         mongo_filter.insert_opt(
             "timestamp",
-            filter_util::clamp_time(filter.min_timestamp, filter.max_timestamp),
+            filter_util::clamp(filter.min_timestamp, filter.max_timestamp),
         );
         let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_ok(Into::into).map_err(|e| e.into());

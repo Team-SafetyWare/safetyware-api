@@ -22,18 +22,13 @@ impl InsertOpt for Document {
     }
 }
 
-pub fn clamp_time(
-    min_timestamp: Option<DateTime<Utc>>,
-    max_timestamp: Option<DateTime<Utc>>,
-) -> Option<Bson> {
+pub fn clamp<T: Into<Bson>>(min_inclusive: Option<T>, max_exclusive: Option<T>) -> Option<Bson> {
     let mut doc: Option<Document> = None;
-    if let Some(min_timestamp) = min_timestamp {
-        doc.get_or_insert_with(Default::default)
-            .insert("$gte", min_timestamp);
+    if let Some(min) = min_inclusive {
+        doc.get_or_insert_with(Default::default).insert("$gte", min);
     }
-    if let Some(max_timestamp) = max_timestamp {
-        doc.get_or_insert_with(Default::default)
-            .insert("$lt", max_timestamp);
+    if let Some(max) = max_exclusive {
+        doc.get_or_insert_with(Default::default).insert("$lt", max);
     }
     doc.map(Into::into)
 }
