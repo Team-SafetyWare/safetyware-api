@@ -34,7 +34,7 @@ pub async fn list(
     let filter = filter.unwrap_or_default();
     Ok(context
         .incident_stats_repo
-        .find(&RepoIncidentStatsFilter {
+        .find(RepoIncidentStatsFilter {
             person_ids: None,
             min_timestamp: filter.min_timestamp,
             max_timestamp: filter.max_timestamp,

@@ -1,12 +1,11 @@
 use crate::db::coll;
-use crate::repo::{
-    filter_util, DeleteError, DeleteResult, ItemStream, ReplaceError, ReplaceResult,
-};
+use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
+use crate::repo::{DeleteResult, ItemStream, ReplaceResult};
 use bson::Document;
 use chrono::{DateTime, Utc};
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DbIncident {
@@ -70,13 +69,17 @@ pub struct IncidentFilter {
 
 #[async_trait::async_trait]
 pub trait IncidentRepo {
-    async fn insert_one(&self, incident: &Incident) -> anyhow::Result<()>;
-    async fn insert_many(&self, incidents: &[Incident]) -> anyhow::Result<()>;
-    async fn replace_one(&self, incident: &Incident) -> ReplaceResult;
+    async fn insert_one(&self, incident: Incident) -> anyhow::Result<()>;
+    async fn insert_many(&self, incidents: Vec<Incident>) -> anyhow::Result<()>;
+    async fn replace_one(&self, incident: Incident) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>>;
     async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
+
+pub type DynIncidentRepo = dyn IncidentRepo + Send + Sync + 'static;
+
+pub type ArcIncidentRepo = Arc<DynIncidentRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoIncidentRepo {
@@ -95,50 +98,44 @@ impl MongoIncidentRepo {
 
 #[async_trait::async_trait]
 impl IncidentRepo for MongoIncidentRepo {
-    async fn insert_one(&self, incident: &Incident) -> anyhow::Result<()> {
-        let db_incident: DbIncident = incident.clone().into();
+    async fn insert_one(&self, incident: Incident) -> anyhow::Result<()> {
+        let db_incident: DbIncident = incident.into();
         self.collection().insert_one(db_incident, None).await?;
         Ok(())
     }
 
-    async fn insert_many(&self, incidents: &[Incident]) -> anyhow::Result<()> {
-        let db_incidents: Vec<DbIncident> =
-            incidents.to_vec().into_iter().map(|r| r.into()).collect();
+    async fn insert_many(&self, incidents: Vec<Incident>) -> anyhow::Result<()> {
+        let db_incidents: Vec<DbIncident> = incidents.into_iter().map(Into::into).collect();
         self.collection().insert_many(db_incidents, None).await?;
         Ok(())
     }
 
-    async fn replace_one(&self, incident: &Incident) -> ReplaceResult {
-        let db_incident: DbIncident = incident.clone().into();
-        let id = &db_incident.id;
-        let query = bson::doc! {"_id": id};
+    async fn replace_one(&self, incident: Incident) -> ReplaceResult {
+        let db_incident: DbIncident = incident.into();
         let res = self
             .collection()
-            .replace_one(query, db_incident, None)
+            .replace_one(bson::doc! {"_id": &db_incident.id}, db_incident, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.matched_count {
-            0 => Err(ReplaceError::NotFound),
-            _ => Ok(()),
-        }
+        ReplaceResult::from_matched_count(res.matched_count)
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>> {
-        let filter = bson::doc! {"_id": id};
-        let found = self.collection().find_one(filter, None).await?;
-        Ok(found.map(Into::into))
+        Ok(self
+            .collection()
+            .find_one(bson::doc! {"_id": id}, None)
+            .await?
+            .map(Into::into))
     }
 
     async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>> {
         let mut mongo_filter = Document::new();
-        mongo_filter.insert("person_id", filter_util::people(filter.person_ids));
-        mongo_filter.insert(
+        mongo_filter.insert_opt("person_id", filter::one_of(filter.person_ids));
+        mongo_filter.insert_opt(
             "timestamp",
-            filter_util::clamp_timestamp(filter.min_timestamp, filter.max_timestamp),
+            filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );
-        let cursor = self.collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
-        Ok(Box::new(stream))
+        self.collection().find_stream(mongo_filter, None).await
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
@@ -147,9 +144,12 @@ impl IncidentRepo for MongoIncidentRepo {
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
+    }
+}
+
+impl From<MongoIncidentRepo> for ArcIncidentRepo {
+    fn from(value: MongoIncidentRepo) -> Self {
+        Arc::new(value)
     }
 }

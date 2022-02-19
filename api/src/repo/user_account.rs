@@ -1,10 +1,11 @@
 use crate::db::coll;
-use crate::repo::{DeleteError, DeleteResult, ReplaceError};
+use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
+use crate::repo::DeleteResult;
 use crate::repo::{ItemStream, ReplaceResult};
 use bson::Document;
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct UserAccount {
@@ -24,8 +25,8 @@ pub struct UserAccountFilter {
 
 #[async_trait::async_trait]
 pub trait UserAccountRepo {
-    async fn insert_one(&self, user_account: &UserAccount) -> anyhow::Result<()>;
-    async fn replace_one(&self, user_account: &UserAccount) -> ReplaceResult;
+    async fn insert_one(&self, user_account: UserAccount) -> anyhow::Result<()>;
+    async fn replace_one(&self, user_account: UserAccount) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<UserAccount>>;
     async fn find(
         &self,
@@ -33,6 +34,10 @@ pub trait UserAccountRepo {
     ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
+
+pub type DynUserAccountRepo = dyn UserAccountRepo + Send + Sync + 'static;
+
+pub type ArcUserAccountRepo = Arc<DynUserAccountRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoUserAccountRepo {
@@ -51,29 +56,25 @@ impl MongoUserAccountRepo {
 
 #[async_trait::async_trait]
 impl UserAccountRepo for MongoUserAccountRepo {
-    async fn insert_one(&self, user_account: &UserAccount) -> anyhow::Result<()> {
+    async fn insert_one(&self, user_account: UserAccount) -> anyhow::Result<()> {
         self.collection().insert_one(user_account, None).await?;
         Ok(())
     }
 
-    async fn replace_one(&self, user_account: &UserAccount) -> ReplaceResult {
-        let id = &user_account.id;
-        let query = bson::doc! {"_id": id};
+    async fn replace_one(&self, user_account: UserAccount) -> ReplaceResult {
         let res = self
             .collection()
-            .replace_one(query, user_account, None)
+            .replace_one(bson::doc! {"_id": &user_account.id}, user_account, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.matched_count {
-            0 => Err(ReplaceError::NotFound),
-            _ => Ok(()),
-        }
+        ReplaceResult::from_matched_count(res.matched_count)
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<UserAccount>> {
-        let filter = bson::doc! {"_id": id};
-        let found = self.collection().find_one(filter, None).await?;
-        Ok(found)
+        Ok(self
+            .collection()
+            .find_one(bson::doc! {"_id": id}, None)
+            .await?)
     }
 
     async fn find(
@@ -81,12 +82,8 @@ impl UserAccountRepo for MongoUserAccountRepo {
         filter: UserAccountFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>> {
         let mut mongo_filter = Document::new();
-        if let Some(company_ids) = filter.company_ids {
-            mongo_filter.insert("company_id", bson::doc! { "$in": company_ids });
-        }
-        let cursor = self.collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_err(|e| e.into());
-        Ok(Box::new(stream))
+        mongo_filter.insert_opt("company_id", filter::one_of(filter.company_ids));
+        self.collection().find_stream(mongo_filter, None).await
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
@@ -95,9 +92,12 @@ impl UserAccountRepo for MongoUserAccountRepo {
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
+    }
+}
+
+impl From<MongoUserAccountRepo> for ArcUserAccountRepo {
+    fn from(value: MongoUserAccountRepo) -> Self {
+        Arc::new(value)
     }
 }

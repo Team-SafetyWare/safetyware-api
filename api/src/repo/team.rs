@@ -1,10 +1,11 @@
 use crate::db::coll;
+use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, InsertOpt};
+use crate::repo::DeleteResult;
 use crate::repo::ItemStream;
-use crate::repo::{DeleteError, DeleteResult};
 use bson::Document;
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Team {
@@ -27,7 +28,7 @@ pub struct TeamFilter {
 
 #[async_trait::async_trait]
 pub trait TeamRepo {
-    async fn insert_one(&self, team: &Team) -> anyhow::Result<()>;
+    async fn insert_one(&self, team: Team) -> anyhow::Result<()>;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Team>>;
     async fn find(&self, filter: TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
@@ -35,6 +36,10 @@ pub trait TeamRepo {
     async fn add_person(&self, team_id: &str, person_id: &str) -> anyhow::Result<()>;
     async fn remove_person(&self, team_id: &str, person_id: &str) -> DeleteResult;
 }
+
+pub type DynTeamRepo = dyn TeamRepo + Send + Sync + 'static;
+
+pub type ArcTeamRepo = Arc<DynTeamRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoTeamRepo {
@@ -57,25 +62,22 @@ impl MongoTeamRepo {
 
 #[async_trait::async_trait]
 impl TeamRepo for MongoTeamRepo {
-    async fn insert_one(&self, team: &Team) -> anyhow::Result<()> {
+    async fn insert_one(&self, team: Team) -> anyhow::Result<()> {
         self.collection().insert_one(team, None).await?;
         Ok(())
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Team>> {
-        let filter = bson::doc! {"_id": id};
-        let found = self.collection().find_one(filter, None).await?;
-        Ok(found)
+        Ok(self
+            .collection()
+            .find_one(bson::doc! {"_id": id}, None)
+            .await?)
     }
 
     async fn find(&self, filter: TeamFilter) -> anyhow::Result<Box<dyn ItemStream<Team>>> {
         let mut mongo_filter = Document::new();
-        if let Some(company_ids) = filter.company_ids {
-            mongo_filter.insert("company_id", bson::doc! { "$in": company_ids });
-        }
-        let cursor = self.collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_err(|e| e.into());
-        Ok(Box::new(stream))
+        mongo_filter.insert_opt("company_id", filter::one_of(filter.company_ids));
+        self.collection().find_stream(mongo_filter, None).await
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
@@ -84,17 +86,13 @@ impl TeamRepo for MongoTeamRepo {
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
     }
 
     async fn find_people(&self, team_id: &str) -> anyhow::Result<Box<dyn ItemStream<TeamPerson>>> {
-        let mongo_filter = bson::doc! { "team_id": team_id };
-        let cursor = self.person_collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_err(|e| e.into());
-        Ok(Box::new(stream))
+        self.person_collection()
+            .find_stream(bson::doc! { "team_id": team_id }, None)
+            .await
     }
 
     async fn add_person(&self, team_id: &str, person_id: &str) -> anyhow::Result<()> {
@@ -119,9 +117,12 @@ impl TeamRepo for MongoTeamRepo {
             )
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
+    }
+}
+
+impl From<MongoTeamRepo> for ArcTeamRepo {
+    fn from(value: MongoTeamRepo) -> Self {
+        Arc::new(value)
     }
 }

@@ -1,10 +1,11 @@
 use crate::db::coll;
-use crate::repo::{DeleteError, DeleteResult, ReplaceError};
+use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
+use crate::repo::DeleteResult;
 use crate::repo::{ItemStream, ReplaceResult};
 use bson::Document;
-use futures_util::TryStreamExt;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Person {
@@ -21,12 +22,16 @@ pub struct PersonFilter {
 
 #[async_trait::async_trait]
 pub trait PersonRepo {
-    async fn insert_one(&self, person: &Person) -> anyhow::Result<()>;
-    async fn replace_one(&self, person: &Person) -> ReplaceResult;
+    async fn insert_one(&self, person: Person) -> anyhow::Result<()>;
+    async fn replace_one(&self, person: Person) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Person>>;
     async fn find(&self, filter: PersonFilter) -> anyhow::Result<Box<dyn ItemStream<Person>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
+
+pub type DynPersonRepo = dyn PersonRepo + Send + Sync + 'static;
+
+pub type ArcPersonRepo = Arc<DynPersonRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoPersonRepo {
@@ -45,39 +50,31 @@ impl MongoPersonRepo {
 
 #[async_trait::async_trait]
 impl PersonRepo for MongoPersonRepo {
-    async fn insert_one(&self, person: &Person) -> anyhow::Result<()> {
+    async fn insert_one(&self, person: Person) -> anyhow::Result<()> {
         self.collection().insert_one(person, None).await?;
         Ok(())
     }
 
-    async fn replace_one(&self, person: &Person) -> ReplaceResult {
-        let id = &person.id;
-        let query = bson::doc! {"_id": id};
+    async fn replace_one(&self, person: Person) -> ReplaceResult {
         let res = self
             .collection()
-            .replace_one(query, person, None)
+            .replace_one(bson::doc! {"_id": &person.id}, person, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.matched_count {
-            0 => Err(ReplaceError::NotFound),
-            _ => Ok(()),
-        }
+        ReplaceResult::from_matched_count(res.matched_count)
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Person>> {
-        let filter = bson::doc! {"_id": id};
-        let found = self.collection().find_one(filter, None).await?;
-        Ok(found)
+        Ok(self
+            .collection()
+            .find_one(bson::doc! {"_id": id}, None)
+            .await?)
     }
 
     async fn find(&self, filter: PersonFilter) -> anyhow::Result<Box<dyn ItemStream<Person>>> {
         let mut mongo_filter = Document::new();
-        if let Some(company_ids) = filter.company_ids {
-            mongo_filter.insert("company_id", bson::doc! { "$in": company_ids });
-        }
-        let cursor = self.collection().find(mongo_filter, None).await?;
-        let stream = cursor.map_err(|e| e.into());
-        Ok(Box::new(stream))
+        mongo_filter.insert_opt("company_id", filter::one_of(filter.company_ids));
+        self.collection().find_stream(mongo_filter, None).await
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
@@ -86,9 +83,12 @@ impl PersonRepo for MongoPersonRepo {
             .delete_one(bson::doc! {"_id": id}, None)
             .await
             .map_err(anyhow::Error::from)?;
-        match res.deleted_count {
-            0 => Err(DeleteError::NotFound),
-            _ => Ok(()),
-        }
+        DeleteResult::from_deleted_count(res.deleted_count)
+    }
+}
+
+impl From<MongoPersonRepo> for ArcPersonRepo {
+    fn from(value: MongoPersonRepo) -> Self {
+        Arc::new(value)
     }
 }
