@@ -21,8 +21,8 @@ pub struct PersonFilter {
 
 #[async_trait::async_trait]
 pub trait PersonRepo {
-    async fn insert_one(&self, person: &Person) -> anyhow::Result<()>;
-    async fn replace_one(&self, person: &Person) -> ReplaceResult;
+    async fn insert_one(&self, person: Person) -> anyhow::Result<()>;
+    async fn replace_one(&self, person: Person) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Person>>;
     async fn find(&self, filter: PersonFilter) -> anyhow::Result<Box<dyn ItemStream<Person>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
@@ -45,12 +45,12 @@ impl MongoPersonRepo {
 
 #[async_trait::async_trait]
 impl PersonRepo for MongoPersonRepo {
-    async fn insert_one(&self, person: &Person) -> anyhow::Result<()> {
+    async fn insert_one(&self, person: Person) -> anyhow::Result<()> {
         self.collection().insert_one(person, None).await?;
         Ok(())
     }
 
-    async fn replace_one(&self, person: &Person) -> ReplaceResult {
+    async fn replace_one(&self, person: Person) -> ReplaceResult {
         let res = self
             .collection()
             .replace_one(bson::doc! {"_id": &person.id}, person, None)
