@@ -108,7 +108,7 @@ impl GasReadingRepo for MongoGasReadingRepo {
         filter: GasReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<GasReading>>> {
         let mut mongo_filter = Document::new();
-        mongo_filter.insert("person_id", filter_util::people(filter.person_ids));
+        mongo_filter.insert_opt("person_id", filter_util::one_of(filter.person_ids));
         mongo_filter.insert_opt(
             "timestamp",
             filter_util::clamp_time(filter.min_timestamp, filter.max_timestamp),

@@ -38,10 +38,9 @@ pub fn clamp_time(
     doc.map(Into::into)
 }
 
-pub fn people(person_ids: Option<Vec<String>>) -> Bson {
-    let mut doc = Document::new();
-    if let Some(person_ids) = person_ids {
-        doc.insert("$in", person_ids);
+pub fn one_of<T: Into<Bson>>(values: Option<Vec<T>>) -> Option<Bson> {
+    match values {
+        None => None,
+        Some(values) => Some((bson::doc! { "$in":  values }).into()),
     }
-    doc.into()
 }
