@@ -99,9 +99,7 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
         filter: LocationReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>> {
         let mut mongo_filter = Document::new();
-        if let Some(person_ids) = filter.person_ids {
-            mongo_filter.insert("person_id", bson::doc! { "$in": person_ids });
-        }
+        mongo_filter.insert("person_id", filter_util::people(filter.person_ids));
         mongo_filter.insert(
             "timestamp",
             filter_util::clamp_timestamp(filter.min_timestamp, filter.max_timestamp),

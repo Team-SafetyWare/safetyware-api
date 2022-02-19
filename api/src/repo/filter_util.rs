@@ -14,3 +14,11 @@ pub fn clamp_timestamp(
     }
     doc.into()
 }
+
+pub fn people(person_ids: Option<Vec<String>>) -> Bson {
+    let mut doc = Document::new();
+    if let Some(person_ids) = person_ids {
+        doc.insert("$in", person_ids);
+    }
+    doc.into()
+}
