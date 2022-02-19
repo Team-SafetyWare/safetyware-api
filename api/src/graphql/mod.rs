@@ -18,7 +18,7 @@ use crate::graphql::location_reading::{LocationReading, LocationReadingFilter};
 use crate::graphql::person::{Person, PersonInput};
 use crate::graphql::team::{Team, TeamInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
-use crate::repo::company::CompanyRepo;
+use crate::repo::company::ArcCompanyRepo;
 use crate::repo::device::DeviceRepo;
 use crate::repo::gas_reading::GasReadingRepo;
 use crate::repo::incident::IncidentRepo;
@@ -61,7 +61,7 @@ fn schema() -> Schema {
 
 #[derive(Clone)]
 pub struct Context {
-    pub company_repo: Arc<dyn CompanyRepo + Send + Sync + 'static>,
+    pub company_repo: ArcCompanyRepo,
     pub device_repo: Arc<dyn DeviceRepo + Send + Sync + 'static>,
     pub gas_reading_repo: Arc<dyn GasReadingRepo + Send + Sync + 'static>,
     pub incident_repo: Arc<dyn IncidentRepo + Send + Sync + 'static>,

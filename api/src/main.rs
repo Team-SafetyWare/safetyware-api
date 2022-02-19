@@ -34,7 +34,7 @@ async fn main() -> anyhow::Result<()> {
     let settings = Settings::read();
     let db = db::connect_and_prepare(&settings.db_uri).await?;
     let graphql_context = Context {
-        company_repo: Arc::new(MongoCompanyRepo::new(db.clone())),
+        company_repo: MongoCompanyRepo::new(db.clone()).into(),
         device_repo: Arc::new(MongoDeviceRepo::new(db.clone())),
         gas_reading_repo: Arc::new(MongoGasReadingRepo::new(db.clone())),
         incident_repo: Arc::new(MongoIncidentRepo::new(db.clone())),
