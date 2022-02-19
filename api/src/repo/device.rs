@@ -1,6 +1,6 @@
 use crate::db::coll;
 use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
-use crate::repo::{DeleteResult};
+use crate::repo::DeleteResult;
 use crate::repo::{ItemStream, ReplaceResult};
 use bson::Document;
 use mongodb::{Collection, Database};
@@ -20,8 +20,8 @@ pub struct DeviceFilter {
 
 #[async_trait::async_trait]
 pub trait DeviceRepo {
-    async fn insert_one(&self, device: &Device) -> anyhow::Result<()>;
-    async fn replace_one(&self, device: &Device) -> ReplaceResult;
+    async fn insert_one(&self, device: Device) -> anyhow::Result<()>;
+    async fn replace_one(&self, device: Device) -> ReplaceResult;
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Device>>;
     async fn find(&self, filter: DeviceFilter) -> anyhow::Result<Box<dyn ItemStream<Device>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
@@ -44,12 +44,12 @@ impl MongoDeviceRepo {
 
 #[async_trait::async_trait]
 impl DeviceRepo for MongoDeviceRepo {
-    async fn insert_one(&self, device: &Device) -> anyhow::Result<()> {
+    async fn insert_one(&self, device: Device) -> anyhow::Result<()> {
         self.collection().insert_one(device, None).await?;
         Ok(())
     }
 
-    async fn replace_one(&self, device: &Device) -> ReplaceResult {
+    async fn replace_one(&self, device: Device) -> ReplaceResult {
         let res = self
             .collection()
             .replace_one(bson::doc! {"_id": &device.id}, device, None)
