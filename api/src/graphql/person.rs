@@ -107,7 +107,6 @@ impl Person {
             .location_reading_repo
             .find(RepoLocationReadingFilter {
                 person_ids: Some(vec![self.id.clone()]),
-                team_ids: filter.team_ids,
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
             })
