@@ -5,6 +5,7 @@ use crate::repo::ItemStream;
 use bson::Document;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Team {
@@ -35,6 +36,10 @@ pub trait TeamRepo {
     async fn add_person(&self, team_id: &str, person_id: &str) -> anyhow::Result<()>;
     async fn remove_person(&self, team_id: &str, person_id: &str) -> DeleteResult;
 }
+
+pub type DynTeamRepo = dyn TeamRepo + Send + Sync + 'static;
+
+pub type ArcTeamRepo = Arc<DynTeamRepo>;
 
 #[derive(Debug, Clone)]
 pub struct MongoTeamRepo {
@@ -113,5 +118,11 @@ impl TeamRepo for MongoTeamRepo {
             .await
             .map_err(anyhow::Error::from)?;
         DeleteResult::from_deleted_count(res.deleted_count)
+    }
+}
+
+impl From<MongoTeamRepo> for ArcTeamRepo {
+    fn from(value: MongoTeamRepo) -> Self {
+        Arc::new(value)
     }
 }

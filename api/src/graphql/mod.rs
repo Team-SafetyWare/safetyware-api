@@ -19,14 +19,14 @@ use crate::graphql::person::{Person, PersonInput};
 use crate::graphql::team::{Team, TeamInput};
 use crate::graphql::user_account::{UserAccount, UserAccountInput};
 use crate::repo::company::ArcCompanyRepo;
-use crate::repo::device::DeviceRepo;
-use crate::repo::gas_reading::GasReadingRepo;
-use crate::repo::incident::IncidentRepo;
-use crate::repo::incident_stats::IncidentStatsRepo;
-use crate::repo::location_reading::LocationReadingRepo;
-use crate::repo::person::PersonRepo;
-use crate::repo::team::TeamRepo;
-use crate::repo::user_account::UserAccountRepo;
+use crate::repo::device::{ArcDeviceRepo, DeviceRepo};
+use crate::repo::gas_reading::{ArcGasReadingRepo, GasReadingRepo};
+use crate::repo::incident::{ArcIncidentRepo, IncidentRepo};
+use crate::repo::incident_stats::{ArcIncidentStatsRepo, IncidentStatsRepo};
+use crate::repo::location_reading::{ArcLocationReadingRepo, LocationReadingRepo};
+use crate::repo::person::{ArcPersonRepo, PersonRepo};
+use crate::repo::team::{ArcTeamRepo, TeamRepo};
+use crate::repo::user_account::{ArcUserAccountRepo, UserAccountRepo};
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
 use juniper::{graphql_object, EmptySubscription, FieldResult, RootNode, ID};
@@ -62,14 +62,14 @@ fn schema() -> Schema {
 #[derive(Clone)]
 pub struct Context {
     pub company_repo: ArcCompanyRepo,
-    pub device_repo: Arc<dyn DeviceRepo + Send + Sync + 'static>,
-    pub gas_reading_repo: Arc<dyn GasReadingRepo + Send + Sync + 'static>,
-    pub incident_repo: Arc<dyn IncidentRepo + Send + Sync + 'static>,
-    pub incident_stats_repo: Arc<dyn IncidentStatsRepo + Send + Sync + 'static>,
-    pub location_reading_repo: Arc<dyn LocationReadingRepo + Send + Sync + 'static>,
-    pub person_repo: Arc<dyn PersonRepo + Send + Sync + 'static>,
-    pub team_repo: Arc<dyn TeamRepo + Send + Sync + 'static>,
-    pub user_account_repo: Arc<dyn UserAccountRepo + Send + Sync + 'static>,
+    pub device_repo: ArcDeviceRepo,
+    pub gas_reading_repo: ArcGasReadingRepo,
+    pub incident_repo: ArcIncidentRepo,
+    pub incident_stats_repo: ArcIncidentStatsRepo,
+    pub location_reading_repo: ArcLocationReadingRepo,
+    pub person_repo: ArcPersonRepo,
+    pub team_repo: ArcTeamRepo,
+    pub user_account_repo: ArcUserAccountRepo,
 }
 
 impl juniper::Context for Context {}

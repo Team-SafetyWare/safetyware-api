@@ -5,6 +5,7 @@ use bson::Document;
 use chrono::{DateTime, Utc};
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DbIncident {
@@ -76,6 +77,10 @@ pub trait IncidentRepo {
     async fn delete_one(&self, id: &str) -> DeleteResult;
 }
 
+pub type DynIncidentRepo = dyn IncidentRepo + Send + Sync + 'static;
+
+pub type ArcIncidentRepo = Arc<DynIncidentRepo>;
+
 #[derive(Debug, Clone)]
 pub struct MongoIncidentRepo {
     pub db: Database,
@@ -140,5 +145,11 @@ impl IncidentRepo for MongoIncidentRepo {
             .await
             .map_err(anyhow::Error::from)?;
         DeleteResult::from_deleted_count(res.deleted_count)
+    }
+}
+
+impl From<MongoIncidentRepo> for ArcIncidentRepo {
+    fn from(value: MongoIncidentRepo) -> Self {
+        Arc::new(value)
     }
 }
