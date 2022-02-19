@@ -139,7 +139,7 @@ pub async fn create(context: &Context, input: PersonInput) -> FieldResult<Person
         name: input.name,
         company_id: input.company_id.to_string(),
     };
-    context.person_repo.insert_one(&item).await?;
+    context.person_repo.insert_one(item.clone()).await?;
     Ok(item.into())
 }
 
@@ -149,7 +149,7 @@ pub async fn replace(context: &Context, id: ID, input: PersonInput) -> FieldResu
         name: input.name,
         company_id: input.company_id.to_string(),
     };
-    context.person_repo.replace_one(&item).await?;
+    context.person_repo.replace_one(item.clone()).await?;
     Ok(item.into())
 }
 
