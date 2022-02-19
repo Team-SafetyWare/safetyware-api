@@ -1,5 +1,5 @@
 use crate::db::coll;
-use crate::repo::ItemStream;
+use crate::repo::{filter_util, ItemStream};
 use bson::Document;
 use chrono::{DateTime, Utc};
 use futures_util::TryStreamExt;
@@ -71,7 +71,7 @@ pub trait GasReadingRepo {
 
     async fn find(
         &self,
-        filter: &GasReadingFilter,
+        filter: GasReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<GasReading>>>;
 }
 
@@ -104,28 +104,14 @@ impl GasReadingRepo for MongoGasReadingRepo {
 
     async fn find(
         &self,
-        filter: &GasReadingFilter,
+        filter: GasReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<GasReading>>> {
         let mut mongo_filter = Document::new();
-        if let Some(person_ids) = &filter.person_ids {
-            mongo_filter.insert("person_id", bson::doc! { "$in": person_ids });
-        }
-        if let Some(min_timestamp) = &filter.min_timestamp {
-            mongo_filter
-                .entry("timestamp".to_string())
-                .or_insert(bson::doc! {}.into())
-                .as_document_mut()
-                .unwrap()
-                .insert("$gte", min_timestamp);
-        }
-        if let Some(max_timestamp) = &filter.max_timestamp {
-            mongo_filter
-                .entry("timestamp".to_string())
-                .or_insert(bson::doc! {}.into())
-                .as_document_mut()
-                .unwrap()
-                .insert("$lt", max_timestamp);
-        }
+        mongo_filter.insert("person_id", filter_util::people(filter.person_ids));
+        mongo_filter.insert(
+            "timestamp",
+            filter_util::clamp_timestamp(filter.min_timestamp, filter.max_timestamp),
+        );
         let cursor = self.collection().find(mongo_filter, None).await?;
         let stream = cursor.map_ok(Into::into).map_err(|e| e.into());
         Ok(Box::new(stream))

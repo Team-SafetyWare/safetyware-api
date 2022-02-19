@@ -62,7 +62,7 @@ pub async fn get(context: &Context, id: ID) -> FieldResult<Option<Team>> {
 pub async fn list(context: &Context) -> FieldResult<Vec<Team>> {
     Ok(context
         .team_repo
-        .find(&Default::default())
+        .find(Default::default())
         .await?
         .map_ok(Into::into)
         .try_collect()

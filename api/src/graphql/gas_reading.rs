@@ -50,7 +50,7 @@ pub async fn list(
     let filter = filter.unwrap_or_default();
     let mut vec: Vec<GasReading> = context
         .gas_reading_repo
-        .find(&RepoGasReadingFilter {
+        .find(RepoGasReadingFilter {
             person_ids: None,
             min_timestamp: filter.min_timestamp,
             max_timestamp: filter.max_timestamp,

@@ -37,9 +37,9 @@ impl Company {
         filter: Option<IncidentStatsFilter>,
     ) -> FieldResult<Vec<IncidentStats>> {
         let filter = filter.unwrap_or_default();
-        let people_ids = context
+        let person_ids = context
             .person_repo
-            .find(&PersonFilter {
+            .find(PersonFilter {
                 company_ids: Some(vec![self.id.clone()]),
             })
             .await?
@@ -49,7 +49,7 @@ impl Company {
         Ok(context
             .incident_stats_repo
             .find(&RepoIncidentStatsFilter {
-                person_ids: Some(people_ids),
+                person_ids: Some(person_ids),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
             })
@@ -62,7 +62,7 @@ impl Company {
     pub async fn people(&self, context: &Context) -> FieldResult<Vec<Person>> {
         Ok(context
             .person_repo
-            .find(&PersonFilter {
+            .find(PersonFilter {
                 company_ids: Some(vec![self.id.clone()]),
             })
             .await?
@@ -74,7 +74,7 @@ impl Company {
     pub async fn teams(&self, context: &Context) -> FieldResult<Vec<Team>> {
         Ok(context
             .team_repo
-            .find(&TeamFilter {
+            .find(TeamFilter {
                 company_ids: Some(vec![self.id.clone()]),
             })
             .await?
@@ -86,7 +86,7 @@ impl Company {
     pub async fn user_accounts(&self, context: &Context) -> FieldResult<Vec<UserAccount>> {
         Ok(context
             .user_account_repo
-            .find(&UserAccountFilter {
+            .find(UserAccountFilter {
                 company_ids: Some(vec![self.id.clone()]),
             })
             .await?

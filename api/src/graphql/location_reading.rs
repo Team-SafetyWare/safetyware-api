@@ -42,7 +42,7 @@ pub async fn list(
     let filter = filter.unwrap_or_default();
     let mut vec: Vec<LocationReading> = context
         .location_reading_repo
-        .find(&RepoLocationReadingFilter {
+        .find(RepoLocationReadingFilter {
             person_ids: None,
             min_timestamp: filter.min_timestamp,
             max_timestamp: filter.max_timestamp,

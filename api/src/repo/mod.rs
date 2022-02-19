@@ -2,6 +2,7 @@ use futures_util::Stream;
 
 pub mod company;
 pub mod device;
+pub mod filter_util;
 pub mod gas_reading;
 pub mod incident;
 pub mod incident_stats;
