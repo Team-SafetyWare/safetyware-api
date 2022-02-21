@@ -1,7 +1,7 @@
 use crate::graphql::person::Person;
 use crate::graphql::Context;
+use crate::repo;
 use crate::repo::gas_reading;
-use crate::repo::gas_reading::GasReadingFilter as RepoGasReadingFilter;
 use chrono::{DateTime, Utc};
 use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
@@ -50,7 +50,7 @@ pub async fn list(
     let filter = filter.unwrap_or_default();
     let mut vec: Vec<GasReading> = context
         .gas_reading_repo
-        .find(RepoGasReadingFilter {
+        .find(repo::gas_reading::GasReadingFilter {
             person_ids: None,
             min_timestamp: filter.min_timestamp,
             max_timestamp: filter.max_timestamp,

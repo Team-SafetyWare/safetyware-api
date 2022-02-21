@@ -56,7 +56,7 @@ impl IncidentStatsRepo for MongoIncidentStatsRepo {
     ) -> anyhow::Result<Box<dyn ItemStream<IncidentStats>>> {
         let mut mongo_filter = Document::new();
         mongo_filter.insert_opt("person_id", filter::one_of(filter.person_ids));
-        mongo_filter.insert(
+        mongo_filter.insert_opt(
             "timestamp",
             filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );

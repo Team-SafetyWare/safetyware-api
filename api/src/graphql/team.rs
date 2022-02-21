@@ -1,8 +1,9 @@
-use crate::crockford;
 use crate::graphql::company::Company;
+use crate::graphql::incident_stats::{IncidentStats, IncidentStatsFilter};
 use crate::graphql::Context;
 use crate::graphql::Person;
 use crate::repo::team;
+use crate::{crockford, repo};
 use derive_more::{Deref, DerefMut, From};
 use futures_util::StreamExt;
 use futures_util::TryStreamExt;
@@ -33,6 +34,32 @@ impl Team {
             .find_one(&self.company_id)
             .await?
             .map(Into::into))
+    }
+
+    pub async fn incident_stats(
+        &self,
+        context: &Context,
+        filter: Option<IncidentStatsFilter>,
+    ) -> FieldResult<Vec<IncidentStats>> {
+        let filter = filter.unwrap_or_default();
+        let person_ids = context
+            .team_repo
+            .find_people(&self.id)
+            .await?
+            .map_ok(|p| p.person_id)
+            .try_collect()
+            .await?;
+        Ok(context
+            .incident_stats_repo
+            .find(repo::incident_stats::IncidentStatsFilter {
+                person_ids: Some(person_ids),
+                min_timestamp: filter.min_timestamp,
+                max_timestamp: filter.max_timestamp,
+            })
+            .await?
+            .map_ok(Into::into)
+            .try_collect()
+            .await?)
     }
 
     pub async fn people(&self, context: &Context) -> FieldResult<Vec<Person>> {
