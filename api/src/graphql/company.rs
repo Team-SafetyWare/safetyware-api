@@ -1,14 +1,13 @@
-use crate::crockford;
 use crate::graphql::incident_stats::{IncidentStats, IncidentStatsFilter};
 use crate::graphql::person::Person;
 use crate::graphql::team::Team;
 use crate::graphql::user_account::UserAccount;
 use crate::graphql::Context;
 use crate::repo::company;
-use crate::repo::incident_stats::IncidentStatsFilter as RepoIncidentStatsFilter;
 use crate::repo::person::PersonFilter;
 use crate::repo::team::TeamFilter;
 use crate::repo::user_account::UserAccountFilter;
+use crate::{crockford, repo};
 use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
@@ -48,7 +47,7 @@ impl Company {
             .await?;
         Ok(context
             .incident_stats_repo
-            .find(RepoIncidentStatsFilter {
+            .find(repo::incident_stats::IncidentStatsFilter {
                 person_ids: Some(person_ids),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,

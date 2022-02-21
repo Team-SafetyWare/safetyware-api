@@ -1,7 +1,7 @@
 use crate::graphql::person::Person;
 use crate::graphql::Context;
+use crate::repo;
 use crate::repo::location_reading;
-use crate::repo::location_reading::LocationReadingFilter as RepoLocationReadingFilter;
 use chrono::{DateTime, Utc};
 use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
@@ -42,7 +42,7 @@ pub async fn list(
     let filter = filter.unwrap_or_default();
     let mut vec: Vec<LocationReading> = context
         .location_reading_repo
-        .find(RepoLocationReadingFilter {
+        .find(repo::location_reading::LocationReadingFilter {
             person_ids: None,
             min_timestamp: filter.min_timestamp,
             max_timestamp: filter.max_timestamp,
