@@ -1,6 +1,6 @@
 use crate::graphql::Context;
+use crate::repo;
 use crate::repo::incident_stats;
-use crate::repo::incident_stats::IncidentStatsFilter as RepoIncidentStatsFilter;
 use chrono::{DateTime, Utc};
 use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
@@ -34,7 +34,7 @@ pub async fn list(
     let filter = filter.unwrap_or_default();
     Ok(context
         .incident_stats_repo
-        .find(RepoIncidentStatsFilter {
+        .find(repo::incident_stats::IncidentStatsFilter {
             person_ids: None,
             min_timestamp: filter.min_timestamp,
             max_timestamp: filter.max_timestamp,
