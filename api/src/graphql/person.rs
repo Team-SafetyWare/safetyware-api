@@ -1,4 +1,3 @@
-use crate::crockford;
 use crate::graphql::company::Company;
 use crate::graphql::device::Device;
 use crate::graphql::gas_reading::GasReading;
@@ -7,11 +6,8 @@ use crate::graphql::location_reading::LocationReading;
 use crate::graphql::Context;
 use crate::graphql::GasReadingFilter;
 use crate::graphql::LocationReadingFilter;
-use crate::repo::device::DeviceFilter as RepoDeviceFilter;
-use crate::repo::gas_reading::GasReadingFilter as RepoGasReadingFilter;
-use crate::repo::incident::IncidentFilter as RepoIncidentFilter;
-use crate::repo::location_reading::LocationReadingFilter as RepoLocationReadingFilter;
 use crate::repo::person;
+use crate::{crockford, repo};
 use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
@@ -46,7 +42,7 @@ impl Person {
     pub async fn devices(&self, context: &Context) -> FieldResult<Vec<Device>> {
         Ok(context
             .device_repo
-            .find(RepoDeviceFilter {
+            .find(repo::device::DeviceFilter {
                 owner_ids: Some(vec![self.id.clone()]),
             })
             .await?
@@ -63,7 +59,7 @@ impl Person {
         let filter = filter.unwrap_or_default();
         let mut vec: Vec<GasReading> = context
             .gas_reading_repo
-            .find(RepoGasReadingFilter {
+            .find(repo::gas_reading::GasReadingFilter {
                 person_ids: Some(vec![self.id.clone()]),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
@@ -84,7 +80,7 @@ impl Person {
         let filter = filter.unwrap_or_default();
         let mut vec: Vec<Incident> = context
             .incident_repo
-            .find(RepoIncidentFilter {
+            .find(repo::incident::IncidentFilter {
                 person_ids: Some(vec![self.id.clone()]),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
@@ -105,7 +101,7 @@ impl Person {
         let filter = filter.unwrap_or_default();
         let mut vec: Vec<LocationReading> = context
             .location_reading_repo
-            .find(RepoLocationReadingFilter {
+            .find(repo::location_reading::LocationReadingFilter {
                 person_ids: Some(vec![self.id.clone()]),
                 min_timestamp: filter.min_timestamp,
                 max_timestamp: filter.max_timestamp,
