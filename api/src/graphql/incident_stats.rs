@@ -11,7 +11,6 @@ pub struct IncidentStats(pub incident_stats::IncidentStats);
 
 #[derive(juniper::GraphQLInputObject, Default)]
 pub struct IncidentStatsFilter {
-    pub person_ids: Option<Vec<String>>,
     pub min_timestamp: Option<DateTime<Utc>>,
     pub max_timestamp: Option<DateTime<Utc>>,
 }
