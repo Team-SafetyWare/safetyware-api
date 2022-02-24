@@ -2,6 +2,7 @@ use crate::graphql::company::Company;
 use crate::graphql::device::Device;
 use crate::graphql::gas_reading::GasReading;
 use crate::graphql::incident::{Incident, IncidentFilter};
+use crate::graphql::incident_stats::{IncidentStats, IncidentStatsFilter};
 use crate::graphql::location_reading::LocationReading;
 use crate::graphql::Context;
 use crate::graphql::GasReadingFilter;
@@ -112,6 +113,25 @@ impl Person {
             .await?;
         vec.sort_by_key(|l| l.timestamp);
         Ok(vec)
+    }
+
+    pub async fn incident_stats(
+        &self,
+        context: &Context,
+        filter: Option<IncidentStatsFilter>,
+    ) -> FieldResult<Vec<IncidentStats>> {
+        let filter = filter.unwrap_or_default();
+        Ok(context
+            .incident_stats_repo
+            .find(repo::incident_stats::IncidentStatsFilter {
+                person_ids: Some(vec![self.id.clone()]),
+                min_timestamp: filter.min_timestamp,
+                max_timestamp: filter.max_timestamp,
+            })
+            .await?
+            .map_ok(Into::into)
+            .try_collect()
+            .await?)
     }
 }
 
