@@ -1,2 +1,7 @@
 introspection:
   url: http://localhost:3001/graphql
+
+info:
+  x-hideIntroduction: true
+  x-hideWelcome: true
+  x-hideIntroItems: true
