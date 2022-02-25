@@ -32,7 +32,18 @@ async fn main() -> anyhow::Result<()> {
     env_logger::init();
     let settings = Settings::read();
     let db = db::connect_and_prepare(&settings.db_uri).await?;
-    let graphql_context = Context {
+    let graphql_context = graphql_context(db.clone());
+    let import_context = import_context(db.clone());
+    let route = filter(db, graphql_context, import_context)
+        .with(log())
+        .with(cors());
+    let port = get_port();
+    warp::serve(route).run((Ipv4Addr::UNSPECIFIED, port)).await;
+    Ok(())
+}
+
+fn graphql_context(db: Database) -> Context {
+    Context {
         company_repo: MongoCompanyRepo::new(db.clone()).into(),
         device_repo: MongoDeviceRepo::new(db.clone()).into(),
         gas_reading_repo: MongoGasReadingRepo::new(db.clone()).into(),
@@ -42,29 +53,26 @@ async fn main() -> anyhow::Result<()> {
         person_repo: MongoPersonRepo::new(db.clone()).into(),
         team_repo: MongoTeamRepo::new(db.clone()).into(),
         user_account_repo: MongoUserAccountRepo::new(db.clone()).into(),
-    };
-    let import_device_data_context = import::DeviceDataContext {
-        device_repo: graphql_context.device_repo.clone(),
-        gas_reading_repo: graphql_context.gas_reading_repo.clone(),
-        location_reading_repo: graphql_context.location_reading_repo.clone(),
-    };
-    let route = filter(db, graphql_context, import_device_data_context)
-        .with(log())
-        .with(cors());
-    let port = get_port();
-    warp::serve(route).run((Ipv4Addr::UNSPECIFIED, port)).await;
-    Ok(())
+    }
+}
+
+fn import_context(db: Database) -> import::DeviceDataContext {
+    import::DeviceDataContext {
+        device_repo: MongoDeviceRepo::new(db.clone()).into(),
+        gas_reading_repo: MongoGasReadingRepo::new(db.clone()).into(),
+        location_reading_repo: MongoLocationReadingRepo::new(db.clone()).into(),
+    }
 }
 
 fn filter(
     db: Database,
     graphql_context: Context,
-    import_device_data_context: import::DeviceDataContext,
+    import_context: import::DeviceDataContext,
 ) -> BoxedFilter<(impl Reply,)> {
     graphql::graphql_filter(graphql_context)
         .or(graphql::graphiql_filter())
         .or(doc())
-        .or(import::device_data_filter(import_device_data_context))
+        .or(import::device_data_filter(import_context))
         .or(health(db))
         .or(robots())
         .boxed()
