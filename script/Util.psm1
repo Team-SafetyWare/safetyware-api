@@ -48,6 +48,7 @@ function Build-ApiFunc {
 
         Push-Location $(Get-ProjectLocation)
         Copy-Item target\release\api.exe api\func\handler.exe
+        Copy-Item doc api\func -Recurse -Force
         Pop-Location
     }
 }

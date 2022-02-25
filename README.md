@@ -158,3 +158,22 @@ This section describes how to deploy the API to the cloud.
    ```
    .\script\Unpublish.ps1 -Org cap -App sw -Env dev
    ```
+   
+## Generate GraphQL documentation
+[SpectaQL](https://github.com/anvilco/spectaql) is used to automatically generate GraphQL documentation. The 
+generated documentation is saved in the repository. It should not be edited manually.
+
+1. Install [NodeJS](https://nodejs.org/en/download/).
+2. Install [SpectaQL](https://github.com/anvilco/spectaql).
+   ```
+   npm install -g spectaql@0.12
+   ```
+3. Start the API locally.
+4. Navigate to the doc directory.
+   ```
+   cd doc
+   ```
+5. Generate documentation.
+   ```
+   npx spectaql config.yml
+   ```
