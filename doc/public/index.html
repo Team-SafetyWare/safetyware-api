@@ -1,0 +1,4191 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GraphQL API Reference</title>
+    <link rel="stylesheet" href="stylesheets/spectaql.min.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="javascripts/spectaql.min.js"></script>
+  </head>
+  <body id="spectacle">
+    <div id="page" class="drawer-layout drawer-slide-right-large">
+      <div id="sidebar">
+        <button id="close-button" class="close-button" aria-label="Close menu" type="button" data-drawer-close>
+          <span aria-hidden="true">×</span>
+        </button>
+        <nav id="nav" role="navigation">
+          <h5>Operations</h5>
+          <section>
+            <a href="#tag-Queries">Queries</a>
+            <ul>
+              <li>
+                <a href="#operation-companies-Queries"> companies </a>
+              </li>
+              <li>
+                <a href="#operation-company-Queries"> company </a>
+              </li>
+              <li>
+                <a href="#operation-device-Queries"> device </a>
+              </li>
+              <li>
+                <a href="#operation-devices-Queries"> devices </a>
+              </li>
+              <li>
+                <a href="#operation-gasreadings-Queries"> gasReadings </a>
+              </li>
+              <li>
+                <a href="#operation-incident-Queries"> incident </a>
+              </li>
+              <li>
+                <a href="#operation-incidents-Queries"> incidents </a>
+              </li>
+              <li>
+                <a href="#operation-incidentstats-Queries"> incidentStats </a>
+              </li>
+              <li>
+                <a href="#operation-locationreadings-Queries"> locationReadings </a>
+              </li>
+              <li>
+                <a href="#operation-people-Queries"> people </a>
+              </li>
+              <li>
+                <a href="#operation-person-Queries"> person </a>
+              </li>
+              <li>
+                <a href="#operation-team-Queries"> team </a>
+              </li>
+              <li>
+                <a href="#operation-teams-Queries"> teams </a>
+              </li>
+              <li>
+                <a href="#operation-useraccount-Queries"> userAccount </a>
+              </li>
+              <li>
+                <a href="#operation-useraccounts-Queries"> userAccounts </a>
+              </li>
+            </ul>
+          </section>
+          <section>
+            <a href="#tag-Mutations">Mutations</a>
+            <ul>
+              <li>
+                <a href="#operation-createcompany-Mutations"> createCompany </a>
+              </li>
+              <li>
+                <a href="#operation-createdevice-Mutations"> createDevice </a>
+              </li>
+              <li>
+                <a href="#operation-createincident-Mutations"> createIncident </a>
+              </li>
+              <li>
+                <a href="#operation-createperson-Mutations"> createPerson </a>
+              </li>
+              <li>
+                <a href="#operation-createteam-Mutations"> createTeam </a>
+              </li>
+              <li>
+                <a href="#operation-createuseraccount-Mutations"> createUserAccount </a>
+              </li>
+              <li>
+                <a href="#operation-deletecompany-Mutations"> deleteCompany </a>
+              </li>
+              <li>
+                <a href="#operation-deletedevice-Mutations"> deleteDevice </a>
+              </li>
+              <li>
+                <a href="#operation-deleteincident-Mutations"> deleteIncident </a>
+              </li>
+              <li>
+                <a href="#operation-deleteperson-Mutations"> deletePerson </a>
+              </li>
+              <li>
+                <a href="#operation-deleteteam-Mutations"> deleteTeam </a>
+              </li>
+              <li>
+                <a href="#operation-deleteuseraccount-Mutations"> deleteUserAccount </a>
+              </li>
+              <li>
+                <a href="#operation-replacecompany-Mutations"> replaceCompany </a>
+              </li>
+              <li>
+                <a href="#operation-replacedevice-Mutations"> replaceDevice </a>
+              </li>
+              <li>
+                <a href="#operation-replaceincident-Mutations"> replaceIncident </a>
+              </li>
+              <li>
+                <a href="#operation-replaceperson-Mutations"> replacePerson </a>
+              </li>
+              <li>
+                <a href="#operation-replaceuseraccount-Mutations"> replaceUserAccount </a>
+              </li>
+              <li>
+                <a href="#operation-teamaddperson-Mutations"> teamAddPerson </a>
+              </li>
+              <li>
+                <a href="#operation-teamremoveperson-Mutations"> teamRemovePerson </a>
+              </li>
+            </ul>
+          </section>
+          <h5>Types</h5>
+          <a href="#definition-Boolean"> Boolean </a>
+          <a href="#definition-Company"> Company </a>
+          <a href="#definition-CompanyInput"> CompanyInput </a>
+          <a href="#definition-DateTimeUtc"> DateTimeUtc </a>
+          <a href="#definition-Device"> Device </a>
+          <a href="#definition-DeviceInput"> DeviceInput </a>
+          <a href="#definition-Float"> Float </a>
+          <a href="#definition-GasReading"> GasReading </a>
+          <a href="#definition-GasReadingFilter"> GasReadingFilter </a>
+          <a href="#definition-ID"> ID </a>
+          <a href="#definition-Incident"> Incident </a>
+          <a href="#definition-IncidentFilter"> IncidentFilter </a>
+          <a href="#definition-IncidentInput"> IncidentInput </a>
+          <a href="#definition-IncidentStats"> IncidentStats </a>
+          <a href="#definition-IncidentStatsFilter"> IncidentStatsFilter </a>
+          <a href="#definition-Int"> Int </a>
+          <a href="#definition-LocationReading"> LocationReading </a>
+          <a href="#definition-LocationReadingFilter"> LocationReadingFilter </a>
+          <a href="#definition-Person"> Person </a>
+          <a href="#definition-PersonInput"> PersonInput </a>
+          <a href="#definition-String"> String </a>
+          <a href="#definition-Team"> Team </a>
+          <a href="#definition-TeamInput"> TeamInput </a>
+          <a href="#definition-UserAccount"> UserAccount </a>
+          <a href="#definition-UserAccountInput"> UserAccountInput </a>
+        </nav>
+      </div>
+      <div id="docs" class="row collapse expanded drawer" data-drawer>
+        <button class="floating-menu-icon" type="button" data-drawer-slide="right">
+          <span class="hamburger"></span>
+        </button>
+        <div class="example-box doc-content"></div>
+        <article id="content">
+          <h1 class="doc-title"></h1>
+          <h1 id="tag-Queries" class="swagger-summary-tag tag-name" data-traverse-target="tag-Queries">Queries</h1>
+          <div id="operation-companies-Queries" class="operation panel" data-traverse-target="operation-companies-Queries">
+            <h2 class="operation-name "> <code>companies</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns
+                  <a href="#definition-Company"><code>[Company!]!</code></a>
+                </section>
+                <br> </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> companies <span class="hljs-tag">{
+  <span class="hljs-symbol">companies <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">people <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">teams <span class="hljs-tag">{
+      <span class="hljs-type">...TeamFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">userAccounts <span class="hljs-tag">{
+      <span class="hljs-type">...UserAccountFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"companies"</span>: [
+      {
+        <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+        <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+        <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+        <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>],
+        <span class="hljs-attr">"teams"</span>: [<span class="hljs-string">Team</span>],
+        <span class="hljs-attr">"userAccounts"</span>: [<span class="hljs-string">UserAccount</span>]
+      }
+    ]
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-company-Queries" class="operation panel" data-traverse-target="operation-company-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>company</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Company"><code>Company</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> company<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">company<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">people <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">teams <span class="hljs-tag">{
+      <span class="hljs-type">...TeamFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">userAccounts <span class="hljs-tag">{
+      <span class="hljs-type">...UserAccountFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"company"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+      <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>],
+      <span class="hljs-attr">"teams"</span>: [<span class="hljs-string">Team</span>],
+      <span class="hljs-attr">"userAccounts"</span>: [<span class="hljs-string">UserAccount</span>]
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-device-Queries" class="operation panel" data-traverse-target="operation-device-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>device</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Device"><code>Device</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> device<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">device<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">owner <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"device"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"owner"</span>: <span class="hljs-string">Person</span>
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-devices-Queries" class="operation panel" data-traverse-target="operation-devices-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>devices</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns
+                  <a href="#definition-Device"><code>[Device!]!</code></a>
+                </section>
+                <br> </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> devices <span class="hljs-tag">{
+  <span class="hljs-symbol">devices <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">owner <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"devices"</span>: [
+      {<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>, <span class="hljs-attr">"owner"</span>: <span class="hljs-string">Person</span>}
+    ]
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-gasreadings-Queries" class="operation panel" data-traverse-target="operation-gasreadings-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>gasReadings</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns
+                  <a href="#definition-GasReading"><code>[GasReading!]!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>filter</code> -
+                        <a href="#definition-GasReadingFilter"><code>GasReadingFilter</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> gasReadings<span class="hljs-tag">(<span class="hljs-code">$filter</span>:<span class="hljs-type"> GasReadingFilter)</span> {
+  gasReadings(filter: <span class="hljs-code">$filter</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">timestamp</span>
+    <span class="hljs-symbol">person <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">gas</span>
+    <span class="hljs-symbol">density</span>
+    <span class="hljs-symbol">coordinates</span>
+  }</span></span>
+}
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"filter"</span>: <span class="hljs-string">GasReadingFilter</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"gasReadings"</span>: [
+      {
+        <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+        <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
+        <span class="hljs-attr">"gas"</span>: <span class="hljs-string">"abc123"</span>,
+        <span class="hljs-attr">"density"</span>: <span class="hljs-number">987.65</span>,
+        <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>]
+      }
+    ]
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-incident-Queries" class="operation panel" data-traverse-target="operation-incident-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>incident</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns an
+                  <a href="#definition-Incident"><code>Incident</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> incident<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">incident<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">timestamp</span>
+    <span class="hljs-symbol">person <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">coordinates</span>
+    <span class="hljs-symbol">type</span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"incident"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+      <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
+      <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>],
+      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-incidents-Queries" class="operation panel" data-traverse-target="operation-incidents-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>incidents</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns
+                  <a href="#definition-Incident"><code>[Incident!]!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>filter</code> -
+                        <a href="#definition-IncidentFilter"><code>IncidentFilter</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> incidents<span class="hljs-tag">(<span class="hljs-code">$filter</span>:<span class="hljs-type"> IncidentFilter)</span> {
+  incidents(filter: <span class="hljs-code">$filter</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">timestamp</span>
+    <span class="hljs-symbol">person <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">coordinates</span>
+    <span class="hljs-symbol">type</span>
+  }</span></span>
+}
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"filter"</span>: <span class="hljs-string">IncidentFilter</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"incidents"</span>: [
+      {
+        <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+        <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+        <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
+        <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>],
+        <span class="hljs-attr">"type"</span>: <span class="hljs-string">"xyz789"</span>
+      }
+    ]
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-incidentstats-Queries" class="operation panel" data-traverse-target="operation-incidentstats-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>incidentStats</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns
+                  <a href="#definition-IncidentStats"><code>[IncidentStats!]!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>filter</code> -
+                        <a href="#definition-IncidentStatsFilter"><code>IncidentStatsFilter</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> incidentStats<span class="hljs-tag">(<span class="hljs-code">$filter</span>:<span class="hljs-type"> IncidentStatsFilter)</span> {
+  incidentStats(filter: <span class="hljs-code">$filter</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">type</span>
+    <span class="hljs-symbol">count</span>
+  }</span></span>
+}
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"filter"</span>: <span class="hljs-string">IncidentStatsFilter</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"data"</span>: {<span class="hljs-attr">"incidentStats"</span>: [{<span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>, <span class="hljs-attr">"count"</span>: <span class="hljs-number">123</span>}]}}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-locationreadings-Queries" class="operation panel" data-traverse-target="operation-locationreadings-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>locationReadings</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns
+                  <a href="#definition-LocationReading"><code>[LocationReading!]!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>filter</code> -
+                        <a href="#definition-LocationReadingFilter"><code>LocationReadingFilter</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> locationReadings<span class="hljs-tag">(<span class="hljs-code">$filter</span>:<span class="hljs-type"> LocationReadingFilter)</span> {
+  locationReadings(filter: <span class="hljs-code">$filter</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">timestamp</span>
+    <span class="hljs-symbol">person <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">coordinates</span>
+  }</span></span>
+}
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"filter"</span>: <span class="hljs-string">LocationReadingFilter</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"locationReadings"</span>: [
+      {
+        <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+        <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
+        <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>]
+      }
+    ]
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-people-Queries" class="operation panel" data-traverse-target="operation-people-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>people</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns
+                  <a href="#definition-Person"><code>[Person!]!</code></a>
+                </section>
+                <br> </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> people <span class="hljs-tag">{
+  <span class="hljs-symbol">people <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">devices <span class="hljs-tag">{
+      <span class="hljs-type">...DeviceFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">gasReadings <span class="hljs-tag">{
+      <span class="hljs-type">...GasReadingFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidents <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">locationReadings <span class="hljs-tag">{
+      <span class="hljs-type">...LocationReadingFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"people"</span>: [
+      {
+        <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+        <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+        <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+        <span class="hljs-attr">"devices"</span>: [<span class="hljs-string">Device</span>],
+        <span class="hljs-attr">"gasReadings"</span>: [<span class="hljs-string">GasReading</span>],
+        <span class="hljs-attr">"incidents"</span>: [<span class="hljs-string">Incident</span>],
+        <span class="hljs-attr">"locationReadings"</span>: [<span class="hljs-string">LocationReading</span>],
+        <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>]
+      }
+    ]
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-person-Queries" class="operation panel" data-traverse-target="operation-person-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>person</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Person"><code>Person</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> person<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">person<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">devices <span class="hljs-tag">{
+      <span class="hljs-type">...DeviceFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">gasReadings <span class="hljs-tag">{
+      <span class="hljs-type">...GasReadingFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidents <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">locationReadings <span class="hljs-tag">{
+      <span class="hljs-type">...LocationReadingFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"person"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+      <span class="hljs-attr">"devices"</span>: [<span class="hljs-string">Device</span>],
+      <span class="hljs-attr">"gasReadings"</span>: [<span class="hljs-string">GasReading</span>],
+      <span class="hljs-attr">"incidents"</span>: [<span class="hljs-string">Incident</span>],
+      <span class="hljs-attr">"locationReadings"</span>: [<span class="hljs-string">LocationReading</span>],
+      <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>]
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-team-Queries" class="operation panel" data-traverse-target="operation-team-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>team</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Team"><code>Team</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> team<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">team<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">people <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"team"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+      <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+      <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>]
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-teams-Queries" class="operation panel" data-traverse-target="operation-teams-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>teams</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns
+                  <a href="#definition-Team"><code>[Team!]!</code></a>
+                </section>
+                <br> </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> teams <span class="hljs-tag">{
+  <span class="hljs-symbol">teams <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">people <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"teams"</span>: [
+      {
+        <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+        <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
+        <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+        <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+        <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>]
+      }
+    ]
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-useraccount-Queries" class="operation panel" data-traverse-target="operation-useraccount-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>userAccount</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-UserAccount"><code>UserAccount</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> userAccount<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">userAccount<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">title</span>
+    <span class="hljs-symbol">email</span>
+    <span class="hljs-symbol">phone</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"userAccount"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"title"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"email"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-useraccounts-Queries" class="operation panel" data-traverse-target="operation-useraccounts-Queries">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Queries">Queries</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>userAccounts</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns
+                  <a href="#definition-UserAccount"><code>[UserAccount!]!</code></a>
+                </section>
+                <br> </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">query</span> userAccounts <span class="hljs-tag">{
+  <span class="hljs-symbol">userAccounts <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">title</span>
+    <span class="hljs-symbol">email</span>
+    <span class="hljs-symbol">phone</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"userAccounts"</span>: [
+      {
+        <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+        <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+        <span class="hljs-attr">"title"</span>: <span class="hljs-string">"xyz789"</span>,
+        <span class="hljs-attr">"email"</span>: <span class="hljs-string">"abc123"</span>,
+        <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
+        <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>
+      }
+    ]
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <h1 id="tag-Mutations" class="swagger-summary-tag tag-name" data-traverse-target="tag-Mutations">Mutations</h1>
+          <div id="operation-createcompany-Mutations" class="operation panel" data-traverse-target="operation-createcompany-Mutations">
+            <h2 class="operation-name "> <code>createCompany</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Company"><code>Company!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-CompanyInput"><code>CompanyInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> createCompany<span class="hljs-tag">(<span class="hljs-code">$input</span>:<span class="hljs-type"> CompanyInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">createCompany<span class="hljs-tag">(input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">people <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">teams <span class="hljs-tag">{
+      <span class="hljs-type">...TeamFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">userAccounts <span class="hljs-tag">{
+      <span class="hljs-type">...UserAccountFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"input"</span>: <span class="hljs-string">CompanyInput</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"createCompany"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+      <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>],
+      <span class="hljs-attr">"teams"</span>: [<span class="hljs-string">Team</span>],
+      <span class="hljs-attr">"userAccounts"</span>: [<span class="hljs-string">UserAccount</span>]
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-createdevice-Mutations" class="operation panel" data-traverse-target="operation-createdevice-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>createDevice</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Device"><code>Device!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-DeviceInput"><code>DeviceInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> createDevice<span class="hljs-tag">(<span class="hljs-code">$input</span>:<span class="hljs-type"> DeviceInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">createDevice<span class="hljs-tag">(input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">owner <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"input"</span>: <span class="hljs-string">DeviceInput</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"createDevice"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"owner"</span>: <span class="hljs-string">Person</span>
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-createincident-Mutations" class="operation panel" data-traverse-target="operation-createincident-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>createIncident</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns an
+                  <a href="#definition-Incident"><code>Incident!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-IncidentInput"><code>IncidentInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> createIncident<span class="hljs-tag">(<span class="hljs-code">$input</span>:<span class="hljs-type"> IncidentInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">createIncident<span class="hljs-tag">(input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">timestamp</span>
+    <span class="hljs-symbol">person <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">coordinates</span>
+    <span class="hljs-symbol">type</span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"input"</span>: <span class="hljs-string">IncidentInput</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"createIncident"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+      <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
+      <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>],
+      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-createperson-Mutations" class="operation panel" data-traverse-target="operation-createperson-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>createPerson</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Person"><code>Person!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-PersonInput"><code>PersonInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> createPerson<span class="hljs-tag">(<span class="hljs-code">$input</span>:<span class="hljs-type"> PersonInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">createPerson<span class="hljs-tag">(input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">devices <span class="hljs-tag">{
+      <span class="hljs-type">...DeviceFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">gasReadings <span class="hljs-tag">{
+      <span class="hljs-type">...GasReadingFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidents <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">locationReadings <span class="hljs-tag">{
+      <span class="hljs-type">...LocationReadingFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"input"</span>: <span class="hljs-string">PersonInput</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"createPerson"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+      <span class="hljs-attr">"devices"</span>: [<span class="hljs-string">Device</span>],
+      <span class="hljs-attr">"gasReadings"</span>: [<span class="hljs-string">GasReading</span>],
+      <span class="hljs-attr">"incidents"</span>: [<span class="hljs-string">Incident</span>],
+      <span class="hljs-attr">"locationReadings"</span>: [<span class="hljs-string">LocationReading</span>],
+      <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>]
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-createteam-Mutations" class="operation panel" data-traverse-target="operation-createteam-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>createTeam</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Team"><code>Team!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-TeamInput"><code>TeamInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> createTeam<span class="hljs-tag">(<span class="hljs-code">$input</span>:<span class="hljs-type"> TeamInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">createTeam<span class="hljs-tag">(input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">people <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"input"</span>: <span class="hljs-string">TeamInput</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"createTeam"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+      <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+      <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>]
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-createuseraccount-Mutations" class="operation panel" data-traverse-target="operation-createuseraccount-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>createUserAccount</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-UserAccount"><code>UserAccount!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-UserAccountInput"><code>UserAccountInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> createUserAccount<span class="hljs-tag">(<span class="hljs-code">$input</span>:<span class="hljs-type"> UserAccountInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">createUserAccount<span class="hljs-tag">(input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">title</span>
+    <span class="hljs-symbol">email</span>
+    <span class="hljs-symbol">phone</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"input"</span>: <span class="hljs-string">UserAccountInput</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"createUserAccount"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"title"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"email"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-deletecompany-Mutations" class="operation panel" data-traverse-target="operation-deletecompany-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>deleteCompany</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns an
+                  <a href="#definition-ID"><code>ID!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> deleteCompany<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">deleteCompany<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"data"</span>: {<span class="hljs-attr">"deleteCompany"</span>: <span class="hljs-string">ID</span>}}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-deletedevice-Mutations" class="operation panel" data-traverse-target="operation-deletedevice-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>deleteDevice</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns an
+                  <a href="#definition-ID"><code>ID!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> deleteDevice<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">deleteDevice<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"data"</span>: {<span class="hljs-attr">"deleteDevice"</span>: <span class="hljs-string">ID</span>}}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-deleteincident-Mutations" class="operation panel" data-traverse-target="operation-deleteincident-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>deleteIncident</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns an
+                  <a href="#definition-ID"><code>ID!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> deleteIncident<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">deleteIncident<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"data"</span>: {<span class="hljs-attr">"deleteIncident"</span>: <span class="hljs-string">ID</span>}}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-deleteperson-Mutations" class="operation panel" data-traverse-target="operation-deleteperson-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>deletePerson</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns an
+                  <a href="#definition-ID"><code>ID!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> deletePerson<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">deletePerson<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"data"</span>: {<span class="hljs-attr">"deletePerson"</span>: <span class="hljs-string">ID</span>}}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-deleteteam-Mutations" class="operation panel" data-traverse-target="operation-deleteteam-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>deleteTeam</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns an
+                  <a href="#definition-ID"><code>ID!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> deleteTeam<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">deleteTeam<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"data"</span>: {<span class="hljs-attr">"deleteTeam"</span>: <span class="hljs-string">ID</span>}}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-deleteuseraccount-Mutations" class="operation panel" data-traverse-target="operation-deleteuseraccount-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>deleteUserAccount</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns an
+                  <a href="#definition-ID"><code>ID!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> deleteUserAccount<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">deleteUserAccount<span class="hljs-tag">(id: <span class="hljs-code">$id</span>)</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"data"</span>: {<span class="hljs-attr">"deleteUserAccount"</span>: <span class="hljs-string">ID</span>}}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-replacecompany-Mutations" class="operation panel" data-traverse-target="operation-replacecompany-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>replaceCompany</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Company"><code>Company!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-CompanyInput"><code>CompanyInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> replaceCompany<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!, <span class="hljs-code">$input</span>:<span class="hljs-type"> CompanyInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">replaceCompany<span class="hljs-tag">(id: <span class="hljs-code">$id</span>, input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">people <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">teams <span class="hljs-tag">{
+      <span class="hljs-type">...TeamFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">userAccounts <span class="hljs-tag">{
+      <span class="hljs-type">...UserAccountFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>, <span class="hljs-attr">"input"</span>: <span class="hljs-string">CompanyInput</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"replaceCompany"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+      <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>],
+      <span class="hljs-attr">"teams"</span>: [<span class="hljs-string">Team</span>],
+      <span class="hljs-attr">"userAccounts"</span>: [<span class="hljs-string">UserAccount</span>]
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-replacedevice-Mutations" class="operation panel" data-traverse-target="operation-replacedevice-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>replaceDevice</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Device"><code>Device!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-DeviceInput"><code>DeviceInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> replaceDevice<span class="hljs-tag">(<span class="hljs-code">$input</span>:<span class="hljs-type"> DeviceInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">replaceDevice<span class="hljs-tag">(input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">owner <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"input"</span>: <span class="hljs-string">DeviceInput</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"replaceDevice"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"owner"</span>: <span class="hljs-string">Person</span>
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-replaceincident-Mutations" class="operation panel" data-traverse-target="operation-replaceincident-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>replaceIncident</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns an
+                  <a href="#definition-Incident"><code>Incident!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-IncidentInput"><code>IncidentInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> replaceIncident<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!, <span class="hljs-code">$input</span>:<span class="hljs-type"> IncidentInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">replaceIncident<span class="hljs-tag">(id: <span class="hljs-code">$id</span>, input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">timestamp</span>
+    <span class="hljs-symbol">person <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">coordinates</span>
+    <span class="hljs-symbol">type</span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>, <span class="hljs-attr">"input"</span>: <span class="hljs-string">IncidentInput</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"replaceIncident"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+      <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
+      <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>],
+      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-replaceperson-Mutations" class="operation panel" data-traverse-target="operation-replaceperson-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>replacePerson</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Person"><code>Person!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-PersonInput"><code>PersonInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> replacePerson<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!, <span class="hljs-code">$input</span>:<span class="hljs-type"> PersonInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">replacePerson<span class="hljs-tag">(id: <span class="hljs-code">$id</span>, input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">devices <span class="hljs-tag">{
+      <span class="hljs-type">...DeviceFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">gasReadings <span class="hljs-tag">{
+      <span class="hljs-type">...GasReadingFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidents <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">locationReadings <span class="hljs-tag">{
+      <span class="hljs-type">...LocationReadingFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>, <span class="hljs-attr">"input"</span>: <span class="hljs-string">PersonInput</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"replacePerson"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+      <span class="hljs-attr">"devices"</span>: [<span class="hljs-string">Device</span>],
+      <span class="hljs-attr">"gasReadings"</span>: [<span class="hljs-string">GasReading</span>],
+      <span class="hljs-attr">"incidents"</span>: [<span class="hljs-string">Incident</span>],
+      <span class="hljs-attr">"locationReadings"</span>: [<span class="hljs-string">LocationReading</span>],
+      <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>]
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-replaceuseraccount-Mutations" class="operation panel" data-traverse-target="operation-replaceuseraccount-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>replaceUserAccount</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-UserAccount"><code>UserAccount!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>input</code> -
+                        <a href="#definition-UserAccountInput"><code>UserAccountInput!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> replaceUserAccount<span class="hljs-tag">(<span class="hljs-code">$id</span>: ID!, <span class="hljs-code">$input</span>:<span class="hljs-type"> UserAccountInput!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">replaceUserAccount<span class="hljs-tag">(id: <span class="hljs-code">$id</span>, input: <span class="hljs-code">$input</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">title</span>
+    <span class="hljs-symbol">email</span>
+    <span class="hljs-symbol">phone</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+  <span class="hljs-attr">"input"</span>: <span class="hljs-string">UserAccountInput</span>
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"replaceUserAccount"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"title"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"email"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-teamaddperson-Mutations" class="operation panel" data-traverse-target="operation-teamaddperson-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>teamAddPerson</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Team"><code>Team</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>teamId</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>personId</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> teamAddPerson<span class="hljs-tag">(<span class="hljs-code">$teamId</span>: ID!, <span class="hljs-code">$personId</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">teamAddPerson<span class="hljs-tag">(teamId: <span class="hljs-code">$teamId</span>, personId: <span class="hljs-code">$personId</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">people <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"teamId"</span>: <span class="hljs-string">ID</span>, <span class="hljs-attr">"personId"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"teamAddPerson"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+      <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+      <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>]
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-teamremoveperson-Mutations" class="operation panel" data-traverse-target="operation-teamremoveperson-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>teamRemovePerson</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-Team"><code>Team</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>teamId</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>personId</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> teamRemovePerson<span class="hljs-tag">(<span class="hljs-code">$teamId</span>: ID!, <span class="hljs-code">$personId</span>: ID!)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">teamRemovePerson<span class="hljs-tag">(teamId: <span class="hljs-code">$teamId</span>, personId: <span class="hljs-code">$personId</span>)</span> <span class="hljs-tag">{
+    <span class="hljs-symbol">id</span>
+    <span class="hljs-symbol">name</span>
+    <span class="hljs-symbol">company <span class="hljs-tag">{
+      <span class="hljs-type">...CompanyFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">incidentStats <span class="hljs-tag">{
+      <span class="hljs-type">...IncidentStatsFragment</span>
+    }</span></span>
+    <span class="hljs-symbol">people <span class="hljs-tag">{
+      <span class="hljs-type">...PersonFragment</span>
+    }</span></span>
+  }</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"teamId"</span>: <span class="hljs-string">ID</span>, <span class="hljs-attr">"personId"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"teamRemovePerson"</span>: {
+      <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+      <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+      <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>]
+    }
+  }
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <span id="tag-types"></span>
+          <h1>Types</h1>
+          <div id="definition-Boolean" class="definition panel" data-traverse-target="definition-Boolean">
+            <h2 class="panel-title">
+              <a name="/definitions/Boolean"></a>
+              <p><code>Boolean</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-literal">false</span></span>
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-Company" class="definition panel" data-traverse-target="definition-Company">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/Company"></a>
+              <p><code>Company</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Field Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td data-property-name="id"> <code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="name"> <code>name</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="incidentStats"> <code>incidentStats</code> -
+                        <a href="#definition-IncidentStats"><code>[IncidentStats!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="no-top-border">
+                        <div class="field-arguments">
+                          <p class="field-arguments-header"> Arguments </p>
+                          <div class="field-argument">
+                            <p class="field-argument-name"><code>filter</code> -
+                              <a href="#definition-IncidentStatsFilter"><code>IncidentStatsFilter</code></a>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="people"> <code>people</code> -
+                        <a href="#definition-Person"><code>[Person!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="teams"> <code>teams</code> -
+                        <a href="#definition-Team"><code>[Team!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="userAccounts"> <code>userAccounts</code> -
+                        <a href="#definition-UserAccount"><code>[UserAccount!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
+  <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+  <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>],
+  <span class="hljs-attr">"teams"</span>: [<span class="hljs-string">Team</span>],
+  <span class="hljs-attr">"userAccounts"</span>: [<span class="hljs-string">UserAccount</span>]
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-CompanyInput" class="definition panel" data-traverse-target="definition-CompanyInput">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/CompanyInput"></a>
+              <p><code>CompanyInput</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Input Field</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>name</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-DateTimeUtc" class="definition panel" data-traverse-target="definition-DateTimeUtc">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/DateTimeUtc"></a>
+              <p><code>DateTimeUtc</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-description">
+                  <p>DateTime</p>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol">object</span>
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-Device" class="definition panel" data-traverse-target="definition-Device">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/Device"></a>
+              <p><code>Device</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Field Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td data-property-name="id"> <code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="owner"> <code>owner</code> -
+                        <a href="#definition-Person"><code>Person</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>, <span class="hljs-attr">"owner"</span>: <span class="hljs-string">Person</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-DeviceInput" class="definition panel" data-traverse-target="definition-DeviceInput">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/DeviceInput"></a>
+              <p><code>DeviceInput</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Input Field</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>ownerId</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>, <span class="hljs-attr">"ownerId"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-Float" class="definition panel" data-traverse-target="definition-Float">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/Float"></a>
+              <p><code>Float</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol">987.65</span>
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-GasReading" class="definition panel" data-traverse-target="definition-GasReading">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/GasReading"></a>
+              <p><code>GasReading</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Field Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td data-property-name="timestamp"> <code>timestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="person"> <code>person</code> -
+                        <a href="#definition-Person"><code>Person</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="gas"> <code>gas</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="density"> <code>density</code> -
+                        <a href="#definition-Float"><code>Float!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="coordinates"> <code>coordinates</code> -
+                        <a href="#definition-Float"><code>[Float!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+  <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
+  <span class="hljs-attr">"gas"</span>: <span class="hljs-string">"abc123"</span>,
+  <span class="hljs-attr">"density"</span>: <span class="hljs-number">123.45</span>,
+  <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>]
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-GasReadingFilter" class="definition panel" data-traverse-target="definition-GasReadingFilter">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/GasReadingFilter"></a>
+              <p><code>GasReadingFilter</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Input Field</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>minTimestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>maxTimestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"minTimestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+  <span class="hljs-attr">"maxTimestamp"</span>: <span class="hljs-string">DateTimeUtc</span>
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-ID" class="definition panel" data-traverse-target="definition-ID">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/ID"></a>
+              <p><code>ID</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol">object</span>
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-Incident" class="definition panel" data-traverse-target="definition-Incident">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/Incident"></a>
+              <p><code>Incident</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Field Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td data-property-name="id"> <code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="timestamp"> <code>timestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="person"> <code>person</code> -
+                        <a href="#definition-Person"><code>Person</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="coordinates"> <code>coordinates</code> -
+                        <a href="#definition-Float"><code>[Float!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="type"> <code>type</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+  <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+  <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
+  <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>],
+  <span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-IncidentFilter" class="definition panel" data-traverse-target="definition-IncidentFilter">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/IncidentFilter"></a>
+              <p><code>IncidentFilter</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Input Field</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>minTimestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>maxTimestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"minTimestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+  <span class="hljs-attr">"maxTimestamp"</span>: <span class="hljs-string">DateTimeUtc</span>
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-IncidentInput" class="definition panel" data-traverse-target="definition-IncidentInput">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/IncidentInput"></a>
+              <p><code>IncidentInput</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Input Field</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>timestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>personId</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>coordinates</code> -
+                        <a href="#definition-Float"><code>[Float!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>type</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+  <span class="hljs-attr">"personId"</span>: <span class="hljs-string">ID</span>,
+  <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>],
+  <span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-IncidentStats" class="definition panel" data-traverse-target="definition-IncidentStats">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/IncidentStats"></a>
+              <p><code>IncidentStats</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Field Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td data-property-name="type"> <code>type</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="count"> <code>count</code> -
+                        <a href="#definition-Int"><code>Int!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>, <span class="hljs-attr">"count"</span>: <span class="hljs-number">123</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-IncidentStatsFilter" class="definition panel" data-traverse-target="definition-IncidentStatsFilter">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/IncidentStatsFilter"></a>
+              <p><code>IncidentStatsFilter</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Input Field</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>minTimestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>maxTimestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"minTimestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+  <span class="hljs-attr">"maxTimestamp"</span>: <span class="hljs-string">DateTimeUtc</span>
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-Int" class="definition panel" data-traverse-target="definition-Int">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/Int"></a>
+              <p><code>Int</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol">987</span>
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-LocationReading" class="definition panel" data-traverse-target="definition-LocationReading">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/LocationReading"></a>
+              <p><code>LocationReading</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Field Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td data-property-name="timestamp"> <code>timestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="person"> <code>person</code> -
+                        <a href="#definition-Person"><code>Person</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="coordinates"> <code>coordinates</code> -
+                        <a href="#definition-Float"><code>[Float!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+  <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
+  <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>]
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-LocationReadingFilter" class="definition panel" data-traverse-target="definition-LocationReadingFilter">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/LocationReadingFilter"></a>
+              <p><code>LocationReadingFilter</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Input Field</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>minTimestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>maxTimestamp</code> -
+                        <a href="#definition-DateTimeUtc"><code>DateTimeUtc</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"minTimestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
+  <span class="hljs-attr">"maxTimestamp"</span>: <span class="hljs-string">DateTimeUtc</span>
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-Person" class="definition panel" data-traverse-target="definition-Person">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/Person"></a>
+              <p><code>Person</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Field Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td data-property-name="id"> <code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="name"> <code>name</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="company"> <code>company</code> -
+                        <a href="#definition-Company"><code>Company</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="devices"> <code>devices</code> -
+                        <a href="#definition-Device"><code>[Device!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="gasReadings"> <code>gasReadings</code> -
+                        <a href="#definition-GasReading"><code>[GasReading!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="no-top-border">
+                        <div class="field-arguments">
+                          <p class="field-arguments-header"> Arguments </p>
+                          <div class="field-argument">
+                            <p class="field-argument-name"><code>filter</code> -
+                              <a href="#definition-GasReadingFilter"><code>GasReadingFilter</code></a>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="incidents"> <code>incidents</code> -
+                        <a href="#definition-Incident"><code>[Incident!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="no-top-border">
+                        <div class="field-arguments">
+                          <p class="field-arguments-header"> Arguments </p>
+                          <div class="field-argument">
+                            <p class="field-argument-name"><code>filter</code> -
+                              <a href="#definition-IncidentFilter"><code>IncidentFilter</code></a>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="locationReadings"> <code>locationReadings</code> -
+                        <a href="#definition-LocationReading"><code>[LocationReading!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="no-top-border">
+                        <div class="field-arguments">
+                          <p class="field-arguments-header"> Arguments </p>
+                          <div class="field-argument">
+                            <p class="field-argument-name"><code>filter</code> -
+                              <a href="#definition-LocationReadingFilter"><code>LocationReadingFilter</code></a>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="incidentStats"> <code>incidentStats</code> -
+                        <a href="#definition-IncidentStats"><code>[IncidentStats!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="no-top-border">
+                        <div class="field-arguments">
+                          <p class="field-arguments-header"> Arguments </p>
+                          <div class="field-argument">
+                            <p class="field-argument-name"><code>filter</code> -
+                              <a href="#definition-IncidentStatsFilter"><code>IncidentStatsFilter</code></a>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+  <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+  <span class="hljs-attr">"devices"</span>: [<span class="hljs-string">Device</span>],
+  <span class="hljs-attr">"gasReadings"</span>: [<span class="hljs-string">GasReading</span>],
+  <span class="hljs-attr">"incidents"</span>: [<span class="hljs-string">Incident</span>],
+  <span class="hljs-attr">"locationReadings"</span>: [<span class="hljs-string">LocationReading</span>],
+  <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>]
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-PersonInput" class="definition panel" data-traverse-target="definition-PersonInput">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/PersonInput"></a>
+              <p><code>PersonInput</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Input Field</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>name</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>companyId</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>, <span class="hljs-attr">"companyId"</span>: <span class="hljs-string">ID</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-String" class="definition panel" data-traverse-target="definition-String">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/String"></a>
+              <p><code>String</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+            </div>
+          </div>
+          <div id="definition-Team" class="definition panel" data-traverse-target="definition-Team">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/Team"></a>
+              <p><code>Team</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Field Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td data-property-name="id"> <code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="name"> <code>name</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="company"> <code>company</code> -
+                        <a href="#definition-Company"><code>Company</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="incidentStats"> <code>incidentStats</code> -
+                        <a href="#definition-IncidentStats"><code>[IncidentStats!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2" class="no-top-border">
+                        <div class="field-arguments">
+                          <p class="field-arguments-header"> Arguments </p>
+                          <div class="field-argument">
+                            <p class="field-argument-name"><code>filter</code> -
+                              <a href="#definition-IncidentStatsFilter"><code>IncidentStatsFilter</code></a>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="people"> <code>people</code> -
+                        <a href="#definition-Person"><code>[Person!]!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+  <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
+  <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
+  <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>]
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-TeamInput" class="definition panel" data-traverse-target="definition-TeamInput">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/TeamInput"></a>
+              <p><code>TeamInput</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Input Field</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>name</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>companyId</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>, <span class="hljs-attr">"companyId"</span>: <span class="hljs-string">"abc123"</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-UserAccount" class="definition panel" data-traverse-target="definition-UserAccount">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/UserAccount"></a>
+              <p><code>UserAccount</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Field Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td data-property-name="id"> <code>id</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="name"> <code>name</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="title"> <code>title</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="email"> <code>email</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="phone"> <code>phone</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td data-property-name="company"> <code>company</code> -
+                        <a href="#definition-Company"><code>Company</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
+  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+  <span class="hljs-attr">"title"</span>: <span class="hljs-string">"xyz789"</span>,
+  <span class="hljs-attr">"email"</span>: <span class="hljs-string">"xyz789"</span>,
+  <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"xyz789"</span>,
+  <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="definition-UserAccountInput" class="definition panel" data-traverse-target="definition-UserAccountInput">
+            <div class="definition-tags">
+              <a class="label" href="#tag-types">Types</a>
+            </div>
+            <h2 class="panel-title">
+              <a name="/definitions/UserAccountInput"></a>
+              <p><code>UserAccountInput</code></p>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="json-schema-properties-blank">
+                  <table>
+                    <tr>
+                      <th>Input Field</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>name</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>title</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>email</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>phone</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>companyId</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Example</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{
+  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+  <span class="hljs-attr">"title"</span>: <span class="hljs-string">"abc123"</span>,
+  <span class="hljs-attr">"email"</span>: <span class="hljs-string">"abc123"</span>,
+  <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
+  <span class="hljs-attr">"companyId"</span>: <span class="hljs-string">ID</span>
+}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div class="doc-row no-margin">
+            <div class="doc-copy doc-separator">
+              <a class="powered-by" href="https://github.com/anvilco/spectaql">Documentation by
+                <span>Anvil SpectaQL</span>
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </body>
+</html>
