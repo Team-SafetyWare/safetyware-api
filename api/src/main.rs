@@ -52,7 +52,7 @@ fn graphql_context(db: Database) -> Context {
         location_reading_repo: MongoLocationReadingRepo::new(db.clone()).into(),
         person_repo: MongoPersonRepo::new(db.clone()).into(),
         team_repo: MongoTeamRepo::new(db.clone()).into(),
-        user_account_repo: MongoUserAccountRepo::new(db.clone()).into(),
+        user_account_repo: MongoUserAccountRepo::new(db).into(),
     }
 }
 
@@ -60,7 +60,7 @@ fn import_context(db: Database) -> import::DeviceDataContext {
     import::DeviceDataContext {
         device_repo: MongoDeviceRepo::new(db.clone()).into(),
         gas_reading_repo: MongoGasReadingRepo::new(db.clone()).into(),
-        location_reading_repo: MongoLocationReadingRepo::new(db.clone()).into(),
+        location_reading_repo: MongoLocationReadingRepo::new(db).into(),
     }
 }
 
