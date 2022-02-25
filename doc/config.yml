@@ -1,2 +1,2 @@
 introspection:
-  url: https://func-api-nmisvbwuqreyq.azurewebsites.net/graphql
+  url: http://localhost:3001/graphql
