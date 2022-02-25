@@ -63,6 +63,7 @@ fn filter(
 ) -> BoxedFilter<(impl Reply,)> {
     graphql::graphql_filter(graphql_context)
         .or(graphql::graphiql_filter())
+        .or(warp::path("doc").and(warp::fs::dir("doc/public")))
         .or(import::device_data_filter(import_device_data_context))
         .or(health(db))
         .or(robots())
