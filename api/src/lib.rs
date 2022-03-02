@@ -1,4 +1,3 @@
-pub mod blackline;
 pub mod crockford;
 pub mod db;
 pub mod graphql;

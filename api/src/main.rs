@@ -1,4 +1,3 @@
-pub mod blackline;
 pub mod crockford;
 pub mod db;
 pub mod graphql;
@@ -6,7 +5,6 @@ pub mod repo;
 pub mod settings;
 pub mod warp_ext;
 
-use crate::blackline::import;
 use crate::graphql::Context;
 use crate::repo::company::MongoCompanyRepo;
 use crate::repo::device::MongoDeviceRepo;
@@ -33,10 +31,7 @@ async fn main() -> anyhow::Result<()> {
     let settings = Settings::read();
     let db = db::connect_and_prepare(&settings.db_uri).await?;
     let graphql_context = graphql_context(db.clone());
-    let import_context = import_context(db.clone());
-    let route = filter(db, graphql_context, import_context)
-        .with(log())
-        .with(cors());
+    let route = filter(db, graphql_context).with(log()).with(cors());
     let port = get_port();
     warp::serve(route).run((Ipv4Addr::UNSPECIFIED, port)).await;
     Ok(())
@@ -56,23 +51,10 @@ fn graphql_context(db: Database) -> Context {
     }
 }
 
-fn import_context(db: Database) -> import::DeviceDataContext {
-    import::DeviceDataContext {
-        device_repo: MongoDeviceRepo::new(db.clone()).into(),
-        gas_reading_repo: MongoGasReadingRepo::new(db.clone()).into(),
-        location_reading_repo: MongoLocationReadingRepo::new(db).into(),
-    }
-}
-
-fn filter(
-    db: Database,
-    graphql_context: Context,
-    import_context: import::DeviceDataContext,
-) -> BoxedFilter<(impl Reply,)> {
+fn filter(db: Database, graphql_context: Context) -> BoxedFilter<(impl Reply,)> {
     graphql::graphql_filter(graphql_context)
         .or(graphql::graphiql_filter())
         .or(doc())
-        .or(import::device_data_filter(import_context))
         .or(health(db))
         .or(robots())
         .boxed()
