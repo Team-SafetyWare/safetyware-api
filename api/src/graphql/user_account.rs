@@ -5,6 +5,7 @@ use crate::repo::user_account;
 use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
+use std::io::Cursor;
 
 #[derive(Clone, From, Deref, DerefMut)]
 pub struct UserAccount(pub user_account::UserAccount);
@@ -103,4 +104,20 @@ pub async fn delete(context: &Context, id: ID) -> FieldResult<ID> {
         .delete_one(&id.clone().to_string())
         .await?;
     Ok(id)
+}
+
+pub async fn set_profile_image(
+    context: &Context,
+    user_account_id: ID,
+    image_base64: String,
+) -> FieldResult<String> {
+    let image_bytes = base64::decode(image_base64)?;
+    let image = image::io::Reader::new(Cursor::new(image_bytes))
+        .with_guessed_format()?
+        .decode()?;
+    context
+        .user_account_repo
+        .set_profile_image(&user_account_id, image)
+        .await?;
+    Ok(format!("/v1/userAccount/{}/profile.jpg", user_account_id))
 }

@@ -15,6 +15,7 @@ pub mod coll {
     pub const TEAM: &str = "team";
     pub const TEAM_PERSON: &str = "team_person";
     pub const USER_ACCOUNT: &str = "user_account";
+    pub const USER_ACCOUNT_PROFILE_IMAGE: &str = "user_account_profile_image";
 }
 
 pub mod err_code {
@@ -46,6 +47,7 @@ pub async fn prepare(db: &Database) -> anyhow::Result<()> {
     prepare_coll_location_reading(db).await?;
     prepare_coll_person(db).await?;
     prepare_coll_team_person(db).await?;
+    prepare_coll_user_account_profile_image(db).await?;
     Ok(())
 }
 
@@ -80,6 +82,12 @@ pub async fn prepare_coll_person(db: &Database) -> anyhow::Result<()> {
 pub async fn prepare_coll_team_person(db: &Database) -> anyhow::Result<()> {
     let collection = db.collection(coll::TEAM_PERSON);
     create_simple_compound_index(&collection, "team_id", "person_id", true).await?;
+    Ok(())
+}
+
+pub async fn prepare_coll_user_account_profile_image(db: &Database) -> anyhow::Result<()> {
+    let collection = db.collection(coll::USER_ACCOUNT_PROFILE_IMAGE);
+    create_simple_index(&collection, "user_account_id", true).await?;
     Ok(())
 }
 

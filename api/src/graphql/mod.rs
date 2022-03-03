@@ -283,4 +283,12 @@ impl Mutation {
     async fn delete_user_account(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
         user_account::delete(context, id).await
     }
+
+    async fn set_user_account_profile_image(
+        #[graphql(context)] context: &Context,
+        user_account_id: ID,
+        image_base64: String,
+    ) -> FieldResult<String> {
+        user_account::set_profile_image(context, user_account_id, image_base64).await
+    }
 }
