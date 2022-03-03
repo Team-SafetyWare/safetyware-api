@@ -2,10 +2,16 @@ use crate::db::coll;
 use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
 use crate::repo::DeleteResult;
 use crate::repo::{ItemStream, ReplaceResult};
+use bson::spec::BinarySubtype;
 use bson::Document;
+use image::{DynamicImage, ImageOutputFormat};
+use mongodb::options::UpdateOptions;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
+use std::io::Cursor;
 use std::sync::Arc;
+
+const PROFILE_IMAGE_QUALITY: u8 = 100;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct UserAccount {
@@ -16,6 +22,12 @@ pub struct UserAccount {
     pub email: String,
     pub phone: String,
     pub company_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProfileImage {
+    pub user_account_id: String,
+    pub image_jpg: bson::Binary,
 }
 
 #[derive(Default, Debug, Clone)]
@@ -33,6 +45,11 @@ pub trait UserAccountRepo {
         filter: UserAccountFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
+    async fn set_profile_image(
+        &self,
+        user_account_id: &str,
+        image: DynamicImage,
+    ) -> anyhow::Result<()>;
 }
 
 pub type DynUserAccountRepo = dyn UserAccountRepo + Send + Sync + 'static;
@@ -51,6 +68,10 @@ impl MongoUserAccountRepo {
 
     pub fn collection(&self) -> Collection<UserAccount> {
         self.db.collection(coll::USER_ACCOUNT)
+    }
+
+    pub fn profile_image_collection(&self) -> Collection<ProfileImage> {
+        self.db.collection(coll::USER_ACCOUNT_PROFILE_IMAGE)
     }
 }
 
@@ -93,6 +114,33 @@ impl UserAccountRepo for MongoUserAccountRepo {
             .await
             .map_err(anyhow::Error::from)?;
         DeleteResult::from_deleted_count(res.deleted_count)
+    }
+
+    async fn set_profile_image(
+        &self,
+        user_account_id: &str,
+        image: DynamicImage,
+    ) -> anyhow::Result<()> {
+        let mut image_bytes = Cursor::new(Vec::<u8>::new());
+        image.write_to(
+            &mut image_bytes,
+            ImageOutputFormat::Jpeg(PROFILE_IMAGE_QUALITY),
+        )?;
+        let image_bson = bson::Binary {
+            subtype: BinarySubtype::Generic,
+            bytes: image_bytes.into_inner(),
+        };
+        self.profile_image_collection()
+            .update_one(
+                bson::doc! {"user_account_id": user_account_id},
+                bson::to_document(&ProfileImage {
+                    user_account_id: user_account_id.to_string(),
+                    image_jpg: image_bson,
+                })?,
+                UpdateOptions::builder().upsert(true).build(),
+            )
+            .await?;
+        Ok(())
     }
 }
 
