@@ -2,10 +2,10 @@ pub mod crockford;
 pub mod db;
 pub mod graphql;
 pub mod repo;
+pub mod rest;
 pub mod settings;
 pub mod warp_ext;
 
-use crate::graphql::Context;
 use crate::repo::company::MongoCompanyRepo;
 use crate::repo::device::MongoDeviceRepo;
 use crate::repo::gas_reading::MongoGasReadingRepo;
@@ -31,14 +31,17 @@ async fn main() -> anyhow::Result<()> {
     let settings = Settings::read();
     let db = db::connect_and_prepare(&settings.db_uri).await?;
     let graphql_context = graphql_context(db.clone());
-    let route = filter(db, graphql_context).with(log()).with(cors());
+    let rest_context = rest_context(db.clone());
+    let route = filter(graphql_context, rest_context)
+        .with(log())
+        .with(cors());
     let port = get_port();
     warp::serve(route).run((Ipv4Addr::UNSPECIFIED, port)).await;
     Ok(())
 }
 
-fn graphql_context(db: Database) -> Context {
-    Context {
+fn graphql_context(db: Database) -> graphql::Context {
+    graphql::Context {
         company_repo: MongoCompanyRepo::new(db.clone()).into(),
         device_repo: MongoDeviceRepo::new(db.clone()).into(),
         gas_reading_repo: MongoGasReadingRepo::new(db.clone()).into(),
@@ -51,33 +54,32 @@ fn graphql_context(db: Database) -> Context {
     }
 }
 
-fn filter(db: Database, graphql_context: Context) -> BoxedFilter<(impl Reply,)> {
+fn rest_context(db: Database) -> rest::Context {
+    rest::Context {
+        user_account_repo: MongoUserAccountRepo::new(db.clone()).into(),
+        db,
+    }
+}
+
+fn filter(
+    graphql_context: graphql::Context,
+    rest_context: rest::Context,
+) -> BoxedFilter<(impl Reply,)> {
     graphql::graphql_filter(graphql_context)
         .or(graphql::graphiql_filter())
-        .or(doc())
-        .or(health(db))
+        .or(graphql_doc())
+        .or(rest::v1(rest_context))
         .or(robots())
         .boxed()
 }
 
-fn doc() -> BoxedFilter<(impl Reply,)> {
+fn graphql_doc() -> BoxedFilter<(impl Reply,)> {
     warp::path("doc").and(warp::fs::dir("doc/public")).boxed()
 }
 
 fn robots() -> BoxedFilter<(impl Reply,)> {
     warp::path("robots.txt")
         .map(|| "User-agent: *\nDisallow: /")
-        .boxed()
-}
-
-fn health(db: Database) -> BoxedFilter<(impl Reply,)> {
-    warp::path("health")
-        .and(warp_ext::with_clone(db))
-        .then(move |db: Database| async move {
-            db::test_connection(&db).await?;
-            Ok(warp::reply())
-        })
-        .map(warp_ext::convert_err)
         .boxed()
 }
 
