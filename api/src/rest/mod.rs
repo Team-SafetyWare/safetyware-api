@@ -12,6 +12,22 @@ use warp::{Filter, Reply};
 const DEFAULT_PROFILE_IMAGE_SIZE: u32 = 512;
 const DEFAULT_PROFILE_IMAGE_SHADE: u8 = 128;
 
+lazy_static::lazy_static! {
+    static ref DEFAULT_PROFILE_IMAGE_PNG_BYTES: Vec<u8> = {
+        let pixels = vec![
+            DEFAULT_PROFILE_IMAGE_SHADE;
+            DEFAULT_PROFILE_IMAGE_SIZE.pow(2) as usize * 3
+        ];
+        let buffer = RgbImage::from_raw(
+            DEFAULT_PROFILE_IMAGE_SIZE,
+            DEFAULT_PROFILE_IMAGE_SIZE,
+            pixels,
+        )
+        .unwrap();
+        DynamicImage::ImageRgb8(buffer).png_bytes().unwrap()
+    };
+}
+
 #[derive(Clone)]
 pub struct Context {
     pub user_account_repo: ArcUserAccountRepo,
@@ -40,21 +56,10 @@ fn user_account_profile_image(user_account_repo: ArcUserAccountRepo) -> BoxedFil
         .and(warp_ext::with_clone(user_account_repo))
         .then(
             move |user_account_id: String, user_account_repo: ArcUserAccountRepo| async move {
-                let default_pixels = vec![
-                    DEFAULT_PROFILE_IMAGE_SHADE;
-                    DEFAULT_PROFILE_IMAGE_SIZE.pow(2) as usize * 3
-                ];
-                let default_buffer = RgbImage::from_raw(
-                    DEFAULT_PROFILE_IMAGE_SIZE,
-                    DEFAULT_PROFILE_IMAGE_SIZE,
-                    default_pixels,
-                )
-                .unwrap();
-                let default_png_bytes = DynamicImage::ImageRgb8(default_buffer).png_bytes()?;
                 let png_bytes = user_account_repo
                     .profile_image_png(&user_account_id)
                     .await?
-                    .unwrap_or(default_png_bytes);
+                    .unwrap_or_else(|| DEFAULT_PROFILE_IMAGE_PNG_BYTES.clone());
                 let mut response = Response::new(png_bytes.into());
                 response
                     .headers_mut()

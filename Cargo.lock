@@ -70,6 +70,7 @@ dependencies = [
  "json_dotpath",
  "juniper",
  "juniper_warp",
+ "lazy_static",
  "log",
  "mongodb",
  "rand 0.8.4",
