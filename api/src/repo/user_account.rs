@@ -133,10 +133,10 @@ impl UserAccountRepo for MongoUserAccountRepo {
         self.profile_image_collection()
             .update_one(
                 bson::doc! {"user_account_id": user_account_id},
-                bson::to_document(&ProfileImage {
+                bson::doc! { "$set" : bson::to_document(&ProfileImage {
                     user_account_id: user_account_id.to_string(),
                     image_jpg: image_bson,
-                })?,
+                })? },
                 UpdateOptions::builder().upsert(true).build(),
             )
             .await?;
