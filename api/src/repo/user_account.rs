@@ -1,15 +1,12 @@
 use crate::db::coll;
-use crate::image::PngBytes;
 use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedCount, InsertOpt};
 use crate::repo::DeleteResult;
 use crate::repo::{ItemStream, ReplaceResult};
 use bson::spec::BinarySubtype;
 use bson::Document;
-use image::DynamicImage;
 use mongodb::options::UpdateOptions;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
-use std::io::Cursor;
 use std::sync::Arc;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -44,11 +41,11 @@ pub trait UserAccountRepo {
         filter: UserAccountFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
-    async fn profile_image(&self, user_account_id: &str) -> anyhow::Result<Option<DynamicImage>>;
-    async fn set_profile_image(
+    async fn profile_image_png(&self, user_account_id: &str) -> anyhow::Result<Option<Vec<u8>>>;
+    async fn set_profile_image_png(
         &self,
         user_account_id: &str,
-        image: DynamicImage,
+        png_bytes: Vec<u8>,
     ) -> anyhow::Result<()>;
 }
 
@@ -116,26 +113,21 @@ impl UserAccountRepo for MongoUserAccountRepo {
         DeleteResult::from_deleted_count(res.deleted_count)
     }
 
-    async fn profile_image(&self, user_account_id: &str) -> anyhow::Result<Option<DynamicImage>> {
-        let image_opt = self
+    async fn profile_image_png(&self, user_account_id: &str) -> anyhow::Result<Option<Vec<u8>>> {
+        let opt = self
             .profile_image_collection()
             .find_one(bson::doc! {"user_account_id": user_account_id}, None)
             .await?;
-        let image_doc = match image_opt {
-            None => return Ok(None),
-            Some(image) => image,
-        };
-        let image_bytes = image_doc.image_png.bytes;
-        let image = image::io::Reader::new(Cursor::new(image_bytes))
-            .with_guessed_format()?
-            .decode()?;
-        Ok(Some(image))
+        match opt {
+            None => Ok(None),
+            Some(doc) => Ok(Some(doc.image_png.bytes)),
+        }
     }
 
-    async fn set_profile_image(
+    async fn set_profile_image_png(
         &self,
         user_account_id: &str,
-        image: DynamicImage,
+        png_bytes: Vec<u8>,
     ) -> anyhow::Result<()> {
         self.profile_image_collection()
             .update_one(
@@ -144,7 +136,7 @@ impl UserAccountRepo for MongoUserAccountRepo {
                     user_account_id: user_account_id.to_string(),
                     image_png: bson::Binary {
                         subtype: BinarySubtype::Generic,
-                        bytes: image.png_bytes()?,
+                        bytes: png_bytes,
                     },
                 })? },
                 UpdateOptions::builder().upsert(true).build(),

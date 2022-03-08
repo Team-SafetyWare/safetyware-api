@@ -1,4 +1,3 @@
-use crate::image::JpegBytes;
 use crate::repo::user_account::ArcUserAccountRepo;
 use crate::warp_ext;
 use mongodb::Database;
@@ -7,8 +6,6 @@ use warp::http::header::CONTENT_TYPE;
 use warp::http::HeaderValue;
 use warp::reply::Response;
 use warp::{Filter, Reply};
-
-const PROFILE_IMAGE_QUALITY: u8 = 100;
 
 #[derive(Clone)]
 pub struct Context {
@@ -34,19 +31,19 @@ fn health(db: Database) -> BoxedFilter<(impl Reply,)> {
 }
 
 fn user_account_profile_image(user_account_repo: ArcUserAccountRepo) -> BoxedFilter<(impl Reply,)> {
-    warp::path!("userAccount" / String / "profile.jpg")
+    warp::path!("userAccount" / String / "profile.png")
         .and(warp_ext::with_clone(user_account_repo))
         .then(
             move |user_account_id: String, user_account_repo: ArcUserAccountRepo| async move {
-                let image = user_account_repo.profile_image(&user_account_id).await?;
                 // Todo: Use default image if none.
-                let jpg_bytes = image
-                    .expect("profile image missing")
-                    .jpeg_bytes(PROFILE_IMAGE_QUALITY)?;
-                let mut response = Response::new(jpg_bytes.into());
+                let png_bytes = user_account_repo
+                    .profile_image_png(&user_account_id)
+                    .await?
+                    .expect("profile image missing");
+                let mut response = Response::new(png_bytes.into());
                 response
                     .headers_mut()
-                    .insert(CONTENT_TYPE, HeaderValue::from_static("image/jpeg"));
+                    .insert(CONTENT_TYPE, HeaderValue::from_static("image/png"));
                 Ok(response)
             },
         )
