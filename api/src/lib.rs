@@ -1,6 +1,7 @@
 pub mod crockford;
 pub mod db;
 pub mod graphql;
+pub mod image;
 pub mod repo;
 pub mod rest;
 pub mod settings;
