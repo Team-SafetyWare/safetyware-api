@@ -38,10 +38,6 @@ impl GasReading {
         self.density
     }
 
-    pub fn density_units(&self) -> &str {
-        &self.density_units
-    }
-
     pub fn coordinates(&self) -> &Vec<f64> {
         &self.coordinates
     }
