@@ -123,6 +123,9 @@
                 <a href="#operation-replaceuseraccount-Mutations"> replaceUserAccount </a>
               </li>
               <li>
+                <a href="#operation-setuseraccountprofileimage-Mutations"> setUserAccountProfileImage </a>
+              </li>
+              <li>
                 <a href="#operation-teamaddperson-Mutations"> teamAddPerson </a>
               </li>
               <li>
@@ -216,7 +219,7 @@
     <span class="hljs-attr">"companies"</span>: [
       {
         <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
-        <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+        <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
         <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
         <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>],
         <span class="hljs-attr">"teams"</span>: [<span class="hljs-string">Team</span>],
@@ -309,7 +312,7 @@
   <span class="hljs-attr">"data"</span>: {
     <span class="hljs-attr">"company"</span>: {
       <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
-      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
       <span class="hljs-attr">"incidentStats"</span>: [<span class="hljs-string">IncidentStats</span>],
       <span class="hljs-attr">"people"</span>: [<span class="hljs-string">Person</span>],
       <span class="hljs-attr">"teams"</span>: [<span class="hljs-string">Team</span>],
@@ -503,6 +506,7 @@
     }</span></span>
     <span class="hljs-symbol">gas</span>
     <span class="hljs-symbol">density</span>
+    <span class="hljs-symbol">densityUnits</span>
     <span class="hljs-symbol">coordinates</span>
   }</span></span>
 }
@@ -530,9 +534,10 @@
       {
         <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
         <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
-        <span class="hljs-attr">"gas"</span>: <span class="hljs-string">"abc123"</span>,
+        <span class="hljs-attr">"gas"</span>: <span class="hljs-string">"xyz789"</span>,
         <span class="hljs-attr">"density"</span>: <span class="hljs-number">987.65</span>,
-        <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>]
+        <span class="hljs-attr">"densityUnits"</span>: <span class="hljs-string">"xyz789"</span>,
+        <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>]
       }
     ]
   }
@@ -616,7 +621,7 @@
       <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
       <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
       <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
-      <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>],
+      <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>],
       <span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>
     }
   }
@@ -701,8 +706,8 @@
         <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
         <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
         <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
-        <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>],
-        <span class="hljs-attr">"type"</span>: <span class="hljs-string">"xyz789"</span>
+        <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>],
+        <span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>
       }
     ]
   }
@@ -853,7 +858,7 @@
       {
         <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
         <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
-        <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>]
+        <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>]
       }
     ]
   }
@@ -1274,10 +1279,10 @@
   <span class="hljs-attr">"data"</span>: {
     <span class="hljs-attr">"userAccount"</span>: {
       <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
-      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
       <span class="hljs-attr">"title"</span>: <span class="hljs-string">"xyz789"</span>,
-      <span class="hljs-attr">"email"</span>: <span class="hljs-string">"abc123"</span>,
-      <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"email"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"xyz789"</span>,
       <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>
     }
   }
@@ -1340,9 +1345,9 @@
     <span class="hljs-attr">"userAccounts"</span>: [
       {
         <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
-        <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
-        <span class="hljs-attr">"title"</span>: <span class="hljs-string">"xyz789"</span>,
-        <span class="hljs-attr">"email"</span>: <span class="hljs-string">"abc123"</span>,
+        <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
+        <span class="hljs-attr">"title"</span>: <span class="hljs-string">"abc123"</span>,
+        <span class="hljs-attr">"email"</span>: <span class="hljs-string">"xyz789"</span>,
         <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
         <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>
       }
@@ -1686,7 +1691,7 @@
   <span class="hljs-attr">"data"</span>: {
     <span class="hljs-attr">"createPerson"</span>: {
       <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
-      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
       <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
       <span class="hljs-attr">"devices"</span>: [<span class="hljs-string">Device</span>],
       <span class="hljs-attr">"gasReadings"</span>: [<span class="hljs-string">GasReading</span>],
@@ -1863,8 +1868,8 @@
     <span class="hljs-attr">"createUserAccount"</span>: {
       <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
       <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
-      <span class="hljs-attr">"title"</span>: <span class="hljs-string">"abc123"</span>,
-      <span class="hljs-attr">"email"</span>: <span class="hljs-string">"abc123"</span>,
+      <span class="hljs-attr">"title"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"email"</span>: <span class="hljs-string">"xyz789"</span>,
       <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
       <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>
     }
@@ -2527,7 +2532,7 @@
       <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
       <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
       <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
-      <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>],
+      <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>],
       <span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>
     }
   }
@@ -2726,13 +2731,85 @@
     <span class="hljs-attr">"replaceUserAccount"</span>: {
       <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
       <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
-      <span class="hljs-attr">"title"</span>: <span class="hljs-string">"abc123"</span>,
-      <span class="hljs-attr">"email"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"title"</span>: <span class="hljs-string">"xyz789"</span>,
+      <span class="hljs-attr">"email"</span>: <span class="hljs-string">"abc123"</span>,
       <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
       <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>
     }
   }
 }
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div id="operation-setuseraccountprofileimage-Mutations" class="operation panel" data-traverse-target="operation-setuseraccountprofileimage-Mutations">
+            <!-- <section class="operation-tags row"> -->
+            <!-- <div class="doc-copy"> -->
+            <div class="operation-tags">
+              <a class="label" href="#tag-Mutations">Mutations</a>
+              <!---->
+            </div>
+            <!-- </div> -->
+            <!-- </section> -->
+            <h2 class="operation-name "> <code>setUserAccountProfileImage</code> </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <section class="swagger-request-body"> </section>
+                <section class="swagger-responses"> Returns a
+                  <a href="#definition-String"><code>String!</code></a>
+                </section>
+                <br>
+                <section class="swagger-request-params">
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                    <tr>
+                      <td><code>userAccountId</code> -
+                        <a href="#definition-ID"><code>ID!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
+                      <td><code>imageBase64</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </table>
+                </section>
+              </div>
+              <div class="doc-examples">
+                <section>
+                  <h4>Example</h4>
+                  <h5>Query</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-keyword">mutation</span> setUserAccountProfileImage<span class="hljs-tag">(<span class="hljs-code">$userAccountId</span>: ID!, <span class="hljs-code">$imageBase64</span>:<span class="hljs-type"> String!</span>)</span> <span class="hljs-tag">{
+  <span class="hljs-symbol">setUserAccountProfileImage<span class="hljs-tag">(userAccountId: <span class="hljs-code">$userAccountId</span>, imageBase64: <span class="hljs-code">$imageBase64</span>)</span></span>
+}</span></span>
+</code></pre> </body>
+                  </html>
+                  <h5>Variables</h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"userAccountId"</span>: <span class="hljs-string">ID</span>, <span class="hljs-attr">"imageBase64"</span>: <span class="hljs-string">"abc123"</span>}
+</code></pre> </body>
+                  </html>
+                </section>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy"> </div>
+              <div class="doc-examples">
+                <section>
+                  <h5>Response </h5>
+                  <html>
+                  <head></head>
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"data"</span>: {<span class="hljs-attr">"setUserAccountProfileImage"</span>: <span class="hljs-string">"xyz789"</span>}}
 </code></pre> </body>
                   </html>
                 </section>
@@ -2941,7 +3018,7 @@
                   <h5>Example</h5>
                   <html>
                   <head></head>
-                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-literal">false</span></span>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol"><span class="hljs-literal">true</span></span>
 </code></pre> </body>
                   </html>
                 </section>
@@ -3198,7 +3275,7 @@
                   <h5>Example</h5>
                   <html>
                   <head></head>
-                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol">987.65</span>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol">123.45</span>
 </code></pre> </body>
                   </html>
                 </section>
@@ -3246,6 +3323,12 @@
                       <td> </td>
                     </tr>
                     <tr>
+                      <td data-property-name="densityUnits"> <code>densityUnits</code> -
+                        <a href="#definition-String"><code>String!</code></a>
+                      </td>
+                      <td> </td>
+                    </tr>
+                    <tr>
                       <td data-property-name="coordinates"> <code>coordinates</code> -
                         <a href="#definition-Float"><code>[Float!]!</code></a>
                       </td>
@@ -3263,8 +3346,9 @@
   <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
   <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
   <span class="hljs-attr">"gas"</span>: <span class="hljs-string">"abc123"</span>,
-  <span class="hljs-attr">"density"</span>: <span class="hljs-number">123.45</span>,
-  <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>]
+  <span class="hljs-attr">"density"</span>: <span class="hljs-number">987.65</span>,
+  <span class="hljs-attr">"densityUnits"</span>: <span class="hljs-string">"abc123"</span>,
+  <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>]
 }
 </code></pre> </body>
                   </html>
@@ -3398,7 +3482,7 @@
   <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
   <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">DateTimeUtc</span>,
   <span class="hljs-attr">"person"</span>: <span class="hljs-string">Person</span>,
-  <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">123.45</span>],
+  <span class="hljs-attr">"coordinates"</span>: [<span class="hljs-number">987.65</span>],
   <span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>
 }
 </code></pre> </body>
@@ -3549,7 +3633,7 @@
                   <h5>Example</h5>
                   <html>
                   <head></head>
-                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"type"</span>: <span class="hljs-string">"abc123"</span>, <span class="hljs-attr">"count"</span>: <span class="hljs-number">123</span>}
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"type"</span>: <span class="hljs-string">"xyz789"</span>, <span class="hljs-attr">"count"</span>: <span class="hljs-number">987</span>}
 </code></pre> </body>
                   </html>
                 </section>
@@ -3617,7 +3701,7 @@
                   <h5>Example</h5>
                   <html>
                   <head></head>
-                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol">987</span>
+                  <body><pre><code class="hljs language-gql"><span class="hljs-symbol">123</span>
 </code></pre> </body>
                   </html>
                 </section>
@@ -3845,7 +3929,7 @@
                   <head></head>
                   <body><pre><code class="hljs language-json">{
   <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
-  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
+  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
   <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>,
   <span class="hljs-attr">"devices"</span>: [<span class="hljs-string">Device</span>],
   <span class="hljs-attr">"gasReadings"</span>: [<span class="hljs-string">GasReading</span>],
@@ -3895,7 +3979,7 @@
                   <h5>Example</h5>
                   <html>
                   <head></head>
-                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>, <span class="hljs-attr">"companyId"</span>: <span class="hljs-string">ID</span>}
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>, <span class="hljs-attr">"companyId"</span>: <span class="hljs-string">ID</span>}
 </code></pre> </body>
                   </html>
                 </section>
@@ -4029,7 +4113,7 @@
                   <h5>Example</h5>
                   <html>
                   <head></head>
-                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>, <span class="hljs-attr">"companyId"</span>: <span class="hljs-string">"abc123"</span>}
+                  <body><pre><code class="hljs language-json">{<span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>, <span class="hljs-attr">"companyId"</span>: <span class="hljs-string">"xyz789"</span>}
 </code></pre> </body>
                   </html>
                 </section>
@@ -4098,10 +4182,10 @@
                   <head></head>
                   <body><pre><code class="hljs language-json">{
   <span class="hljs-attr">"id"</span>: <span class="hljs-string">ID</span>,
-  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
-  <span class="hljs-attr">"title"</span>: <span class="hljs-string">"xyz789"</span>,
-  <span class="hljs-attr">"email"</span>: <span class="hljs-string">"xyz789"</span>,
-  <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"xyz789"</span>,
+  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"abc123"</span>,
+  <span class="hljs-attr">"title"</span>: <span class="hljs-string">"abc123"</span>,
+  <span class="hljs-attr">"email"</span>: <span class="hljs-string">"abc123"</span>,
+  <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
   <span class="hljs-attr">"company"</span>: <span class="hljs-string">Company</span>
 }
 </code></pre> </body>
@@ -4166,8 +4250,8 @@
                   <head></head>
                   <body><pre><code class="hljs language-json">{
   <span class="hljs-attr">"name"</span>: <span class="hljs-string">"xyz789"</span>,
-  <span class="hljs-attr">"title"</span>: <span class="hljs-string">"abc123"</span>,
-  <span class="hljs-attr">"email"</span>: <span class="hljs-string">"abc123"</span>,
+  <span class="hljs-attr">"title"</span>: <span class="hljs-string">"xyz789"</span>,
+  <span class="hljs-attr">"email"</span>: <span class="hljs-string">"xyz789"</span>,
   <span class="hljs-attr">"phone"</span>: <span class="hljs-string">"abc123"</span>,
   <span class="hljs-attr">"companyId"</span>: <span class="hljs-string">ID</span>
 }
