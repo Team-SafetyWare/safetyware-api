@@ -14,6 +14,7 @@ pub struct DbGasReading {
     pub person_id: String,
     pub gas: String,
     pub density: f64,
+    pub density_units: String,
     pub location: DbLocation,
 }
 
@@ -29,6 +30,7 @@ pub struct GasReading {
     pub person_id: String,
     pub gas: String,
     pub density: f64,
+    pub density_units: String,
     pub coordinates: Vec<f64>,
 }
 
@@ -39,6 +41,7 @@ impl From<DbGasReading> for GasReading {
             person_id: value.person_id,
             gas: value.gas,
             density: value.density,
+            density_units: value.density_units,
             coordinates: value.location.coordinates,
         }
     }
@@ -51,6 +54,7 @@ impl From<GasReading> for DbGasReading {
             person_id: value.person_id,
             gas: value.gas,
             density: value.density,
+            density_units: value.density_units,
             location: DbLocation {
                 r#type: "Point".to_string(),
                 coordinates: value.coordinates,
