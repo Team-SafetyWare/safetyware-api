@@ -3,6 +3,7 @@ use crate::repo::mongo_util::{filter, FindStream, InsertOpt};
 use crate::repo::ItemStream;
 use bson::Document;
 use chrono::{DateTime, Utc};
+use mongodb::options::FindOptions;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -106,7 +107,14 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
             "timestamp",
             filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );
-        self.collection().find_stream(mongo_filter, None).await
+        self.collection()
+            .find_stream(
+                mongo_filter,
+                FindOptions::builder()
+                    .sort(bson::doc! {"timestamp": 1})
+                    .build(),
+            )
+            .await
     }
 }
 
