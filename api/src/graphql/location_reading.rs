@@ -40,7 +40,7 @@ pub async fn list(
     filter: Option<LocationReadingFilter>,
 ) -> FieldResult<Vec<LocationReading>> {
     let filter = filter.unwrap_or_default();
-    let mut vec: Vec<LocationReading> = context
+    Ok(context
         .location_reading_repo
         .find(repo::location_reading::LocationReadingFilter {
             person_ids: None,
@@ -50,7 +50,5 @@ pub async fn list(
         .await?
         .map_ok(Into::into)
         .try_collect()
-        .await?;
-    vec.sort_by_key(|l| l.timestamp);
-    Ok(vec)
+        .await?)
 }

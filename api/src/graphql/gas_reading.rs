@@ -52,7 +52,7 @@ pub async fn list(
     filter: Option<GasReadingFilter>,
 ) -> FieldResult<Vec<GasReading>> {
     let filter = filter.unwrap_or_default();
-    let mut vec: Vec<GasReading> = context
+    Ok(context
         .gas_reading_repo
         .find(repo::gas_reading::GasReadingFilter {
             person_ids: None,
@@ -62,7 +62,5 @@ pub async fn list(
         .await?
         .map_ok(Into::into)
         .try_collect()
-        .await?;
-    vec.sort_by_key(|l| l.timestamp);
-    Ok(vec)
+        .await?)
 }
