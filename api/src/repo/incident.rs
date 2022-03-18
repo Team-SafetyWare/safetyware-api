@@ -3,6 +3,7 @@ use crate::repo::mongo_util::{filter, FindStream, FromDeletedCount, FromMatchedC
 use crate::repo::{DeleteResult, ItemStream, ReplaceResult};
 use bson::Document;
 use chrono::{DateTime, Utc};
+use mongodb::options::FindOptions;
 use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -135,7 +136,14 @@ impl IncidentRepo for MongoIncidentRepo {
             "timestamp",
             filter::clamp(filter.min_timestamp, filter.max_timestamp),
         );
-        self.collection().find_stream(mongo_filter, None).await
+        self.collection()
+            .find_stream(
+                mongo_filter,
+                FindOptions::builder()
+                    .sort(bson::doc! {"timestamp": 1})
+                    .build(),
+            )
+            .await
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
