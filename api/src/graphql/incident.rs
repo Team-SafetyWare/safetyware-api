@@ -57,7 +57,7 @@ pub async fn get(context: &Context, id: ID) -> FieldResult<Option<Incident>> {
 
 pub async fn list(context: &Context, filter: Option<IncidentFilter>) -> FieldResult<Vec<Incident>> {
     let filter = filter.unwrap_or_default();
-    let mut vec: Vec<Incident> = context
+    Ok(context
         .incident_repo
         .find(repo::incident::IncidentFilter {
             person_ids: None,
@@ -67,9 +67,7 @@ pub async fn list(context: &Context, filter: Option<IncidentFilter>) -> FieldRes
         .await?
         .map_ok(Into::into)
         .try_collect()
-        .await?;
-    vec.sort_by_key(|l| l.timestamp);
-    Ok(vec)
+        .await?)
 }
 
 pub async fn create(context: &Context, input: IncidentInput) -> FieldResult<Incident> {
