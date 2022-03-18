@@ -58,7 +58,7 @@ impl Person {
         filter: Option<GasReadingFilter>,
     ) -> FieldResult<Vec<GasReading>> {
         let filter = filter.unwrap_or_default();
-        let mut vec: Vec<GasReading> = context
+        Ok(context
             .gas_reading_repo
             .find(repo::gas_reading::GasReadingFilter {
                 person_ids: Some(vec![self.id.clone()]),
@@ -68,9 +68,7 @@ impl Person {
             .await?
             .map_ok(Into::into)
             .try_collect()
-            .await?;
-        vec.sort_by_key(|l| l.timestamp);
-        Ok(vec)
+            .await?)
     }
 
     pub async fn incidents(
@@ -79,7 +77,7 @@ impl Person {
         filter: Option<IncidentFilter>,
     ) -> FieldResult<Vec<Incident>> {
         let filter = filter.unwrap_or_default();
-        let mut vec: Vec<Incident> = context
+        Ok(context
             .incident_repo
             .find(repo::incident::IncidentFilter {
                 person_ids: Some(vec![self.id.clone()]),
@@ -89,9 +87,7 @@ impl Person {
             .await?
             .map_ok(Into::into)
             .try_collect()
-            .await?;
-        vec.sort_by_key(|l| l.timestamp);
-        Ok(vec)
+            .await?)
     }
 
     pub async fn location_readings(
@@ -100,7 +96,7 @@ impl Person {
         filter: Option<LocationReadingFilter>,
     ) -> FieldResult<Vec<LocationReading>> {
         let filter = filter.unwrap_or_default();
-        let mut vec: Vec<LocationReading> = context
+        Ok(context
             .location_reading_repo
             .find(repo::location_reading::LocationReadingFilter {
                 person_ids: Some(vec![self.id.clone()]),
@@ -110,9 +106,7 @@ impl Person {
             .await?
             .map_ok(Into::into)
             .try_collect()
-            .await?;
-        vec.sort_by_key(|l| l.timestamp);
-        Ok(vec)
+            .await?)
     }
 
     pub async fn incident_stats(
