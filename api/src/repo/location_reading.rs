@@ -102,6 +102,7 @@ impl LocationReadingRepo for MongoLocationReadingRepo {
         filter: LocationReadingFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<LocationReading>>> {
         let mut mongo_filter = Document::new();
+        mongo_filter.insert("hidden", filter::not_true());
         mongo_filter.insert_opt("person_id", filter::one_of(filter.person_ids));
         mongo_filter.insert_opt(
             "timestamp",

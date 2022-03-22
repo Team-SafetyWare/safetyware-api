@@ -105,4 +105,8 @@ pub mod filter {
     pub fn one_of<T: Into<Bson>>(values: Option<Vec<T>>) -> Option<Bson> {
         values.map(|v| (bson::doc! { "$in":  v }).into())
     }
+
+    pub fn not_true() -> Bson {
+        (bson::doc! { "$ne":  true }).into()
+    }
 }
