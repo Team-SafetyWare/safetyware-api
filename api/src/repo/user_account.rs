@@ -25,6 +25,20 @@ pub struct Creds {
     pub password_hash: String,
 }
 
+#[derive(Debug, Clone)]
+pub struct DbCreds {
+    pub user_account_id: String,
+    pub password_hash: String,
+}
+
+impl From<DbCreds> for Creds {
+    fn from(value: DbCreds) -> Self {
+        Self {
+            password_hash: value.password_hash,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProfileImage {
     pub user_account_id: String,
@@ -74,7 +88,7 @@ impl MongoUserAccountRepo {
         self.db.collection(coll::USER_ACCOUNT)
     }
 
-    pub fn creds_collection(&self) -> Collection<ProfileImage> {
+    pub fn creds_collection(&self) -> Collection<DbCreds> {
         self.db.collection(coll::USER_ACCOUNT_CREDS)
     }
 
