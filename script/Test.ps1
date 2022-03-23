@@ -19,6 +19,7 @@ try {
     Confirm-LastExitCode
 
     $env:SW_DB_URI="mongodb://localhost:42781"
+    $env:SW_PRIVATE_KEY="secret"
     $env:RUST_LOG="info"
     $env:RUST_BACKTRACE="1"
     $server_job = Start-Job -ScriptBlock { cargo run }
