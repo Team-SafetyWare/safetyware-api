@@ -370,25 +370,15 @@ function ConvertTo-DatabaseUriWithCredential {
 }
 
 function New-RandomPassword {
-    param(
-        [int]
-        $Length
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [int] $Length
     )
 
-    $symbols = '!@#$%^&*'.ToCharArray()
-    $character_list = 'a'..'z' + 'A'..'Z' + '0'..'9' + $symbols
-
-    do {
-        $password = -join (0..$Length | ForEach-Object { $character_list | Get-Random })
-        [int]$has_lower_char = $password -cmatch '[a-z]'
-        [int]$has_upper_char = $password -cmatch '[A-Z]'
-        [int]$has_digit = $password -match '[0-9]'
-        [int]$has_symbol = $password.IndexOfAny($symbols) -ne -1
-
+    Process {
+        return -join (((48..57)+(65..90)+(97..122)) * 80 |Get-Random -Count $Length |ForEach-Object{[char]$_})
     }
-    until (($has_lower_char + $has_upper_char + $has_digit + $has_symbol) -ge 3)
-
-    $password
 }
 
 function Publish-Database {
@@ -627,6 +617,28 @@ function Update-AzureAppConfig {
     }
 }
 
+function Set-AzureKeyVaultPolicy {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $VaultName,
+        [Parameter(Mandatory = $true)]
+        [string] $ResourceGroup
+    )
+
+    Process {
+        $user_info = Get-AzureUserInfo
+
+        az keyvault set-policy `
+            --name $VaultName `
+            --object-id $user_info.objectId `
+            --resource-group $ResourceGroup `
+            --secret-permissions all `
+        | Out-Null
+        Confirm-LastExitCode
+    }
+}
+
 function Set-AzureKeyVaultSecret {
     [CmdletBinding()]
     Param(
@@ -641,15 +653,7 @@ function Set-AzureKeyVaultSecret {
     )
 
     Process {
-        $user_info = Get-AzureUserInfo
-
-        az keyvault set-policy `
-            --name $VaultName `
-            --object-id $user_info.objectId `
-            --resource-group $ResourceGroup `
-            --secret-permissions set `
-        | Out-Null
-        Confirm-LastExitCode
+        Set-AzureKeyVaultPolicy -VaultName $VaultName -ResourceGroup $ResourceGroup
 
         az keyvault secret set `
             --name $Name `
@@ -657,6 +661,36 @@ function Set-AzureKeyVaultSecret {
             --value $Value `
         | Out-Null
         Confirm-LastExitCode
+    }
+}
+
+function Test-AzureKeyVaultSecretDefinitelyNotExist {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name,
+        [Parameter(Mandatory = $true)]
+        [string] $VaultName
+    )
+
+    Process {
+        Set-AzureKeyVaultPolicy -VaultName $VaultName -ResourceGroup $ResourceGroup
+
+        & az keyvault secret show `
+            --name $Name `
+            --vault-name $VaultName `
+            2>&1 `
+            | Tee-Object -Variable showOutput | Out-Null
+
+        $error_record = $showOutput[0]
+        $definitely_not_exist = $error_record.ToString().StartsWith("ERROR: (SecretNotFound)")
+
+        if (-Not $definitely_not_exist) {
+            Write-Error $error_record
+            Confirm-LastExitCode
+        }
+
+        return $definitely_not_exist
     }
 }
 
@@ -698,6 +732,45 @@ function Publish-DatabaseUri {
         Set-AzureKeyVaultSecret `
             -Name "db-uri" `
             -Value $db_uri `
+            -VaultName $vault_name `
+            -ResourceGroup $ResourceGroup `
+        | Out-Null
+
+        $func_name = "func-api-$EnvHash"
+        Update-AzureAppConfig `
+            -AppName $func_name `
+            -ResourceGroup $ResourceGroup `
+        | Out-Null
+    }
+}
+
+function Publish-PrivateKey {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string] $ResourceGroup,
+        [Parameter(Mandatory = $true)]
+        [string] $EnvHash
+    )
+
+    Process {
+        $vault_name = "kv-$EnvHash"
+        $secret_name = "private-key"
+
+        $definitely_not_exist = Test-AzureKeyVaultSecretDefinitelyNotExist `
+            -VaultName $vault_name `
+            -Name $secret_name
+
+        if (-Not $definitely_not_exist) {
+            return;
+        }
+
+        Write-Output "Publishing private key."
+
+        $private_key = New-RandomPassword -Length 128
+        Set-AzureKeyVaultSecret `
+            -Name $secret_name `
+            -Value $private_key `
             -VaultName $vault_name `
             -ResourceGroup $ResourceGroup `
         | Out-Null

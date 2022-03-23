@@ -82,6 +82,10 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
           name: 'SW_DB_URI'
           value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=db-uri)'
         }
+        {
+          name: 'SW_PRIVATE_KEY'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=private-key)'
+        }
       ]
     }
   }

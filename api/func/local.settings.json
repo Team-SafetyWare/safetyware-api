@@ -4,6 +4,7 @@
     "FUNCTIONS_WORKER_RUNTIME": "custom",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "SW_DB_URI": "mongodb://localhost:42781",
+    "SW_PRIVATE_KEY": "secret",
     "RUST_LOG": "info"
   },
   "Host": {
