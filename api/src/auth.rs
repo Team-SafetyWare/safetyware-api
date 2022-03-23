@@ -1,4 +1,4 @@
-use crate::repo::user_account::Creds;
+use crate::repo::user_account::{ArcUserAccountRepo, Creds};
 use data_encoding::HEXLOWER_PERMISSIVE;
 use ring::digest::SHA512_OUTPUT_LEN;
 use ring::pbkdf2;
@@ -7,6 +7,38 @@ use std::num::NonZeroU32;
 
 const N_ITER: u32 = 100_000;
 const CREDENTIAL_LEN: usize = SHA512_OUTPUT_LEN;
+
+pub struct AuthProvider {
+    pub user_account_repo: ArcUserAccountRepo,
+}
+
+impl AuthProvider {
+    pub async fn set_password(&self, user_account_id: &str, password: &str) -> anyhow::Result<()> {
+        let creds = create_creds(password);
+        self.user_account_repo
+            .set_creds(user_account_id, creds)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn verify_password(
+        &self,
+        user_account_id: &str,
+        password: &str,
+    ) -> anyhow::Result<Result<(), ()>> {
+        let creds = self.user_account_repo.creds(user_account_id).await?;
+        Ok(match creds {
+            None => {
+                if password.is_empty() {
+                    Ok(())
+                } else {
+                    Err(())
+                }
+            }
+            Some(creds) => verify_password(password, &creds),
+        })
+    }
+}
 
 fn create_creds(password: &str) -> Creds {
     let rng = SystemRandom::new();
