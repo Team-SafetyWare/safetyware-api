@@ -32,6 +32,7 @@ Publish-Database -App $app -EnvName $env_name
 New-AzureResourceGroup -Name $rg_name
 Publish-AzureTemplate -ResourceGroup $rg_name -EnvHash $env_hash
 Publish-DatabaseUri -ResourceGroup $rg_name -App $app -EnvName $env_name -EnvHash $env_hash
+Publish-PrivateKey -ResourceGroup $rg_name -EnvHash $env_hash
 Publish-ApiFunc -EnvHash $env_hash
 
 $elapsed_time = $(get-date) - $start_time
