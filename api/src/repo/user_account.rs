@@ -20,13 +20,13 @@ pub struct UserAccount {
     pub company_id: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Creds {
     pub password_hash: String,
     pub salt: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DbCreds {
     pub user_account_id: String,
     pub password_hash: String,
@@ -142,11 +142,26 @@ impl UserAccountRepo for MongoUserAccountRepo {
     }
 
     async fn creds(&self, user_account_id: &str) -> anyhow::Result<Option<Creds>> {
-        unimplemented!()
+        Ok(self
+            .creds_collection()
+            .find_one(bson::doc! {"user_account_id": user_account_id}, None)
+            .await?
+            .map(Into::into))
     }
 
     async fn set_creds(&self, user_account_id: &str, creds: Creds) -> anyhow::Result<()> {
-        unimplemented!()
+        self.creds_collection()
+            .update_one(
+                bson::doc! {"user_account_id": user_account_id},
+                bson::doc! { "$set" : bson::to_document(&DbCreds {
+                    user_account_id: user_account_id.to_string(),
+                    password_hash: creds.password_hash,
+                    salt: creds.salt,
+                })? },
+                UpdateOptions::builder().upsert(true).build(),
+            )
+            .await?;
+        Ok(())
     }
 
     async fn profile_image_png(&self, user_account_id: &str) -> anyhow::Result<Option<Vec<u8>>> {
