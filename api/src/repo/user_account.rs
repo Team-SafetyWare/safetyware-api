@@ -20,6 +20,11 @@ pub struct UserAccount {
     pub company_id: String,
 }
 
+#[derive(Debug, Clone)]
+pub struct Creds {
+    pub password_hash: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProfileImage {
     pub user_account_id: String,
@@ -41,6 +46,8 @@ pub trait UserAccountRepo {
         filter: UserAccountFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
+    async fn credentials(&self, user_account_id: &str) -> anyhow::Result<Option<Creds>>;
+    async fn set_creds(&self, user_account_id: &str, creds: Creds) -> anyhow::Result<()>;
     async fn profile_image_png(&self, user_account_id: &str) -> anyhow::Result<Option<Vec<u8>>>;
     async fn set_profile_image_png(
         &self,
@@ -65,6 +72,10 @@ impl MongoUserAccountRepo {
 
     pub fn collection(&self) -> Collection<UserAccount> {
         self.db.collection(coll::USER_ACCOUNT)
+    }
+
+    pub fn creds_collection(&self) -> Collection<ProfileImage> {
+        self.db.collection(coll::USER_ACCOUNT_CREDS)
     }
 
     pub fn profile_image_collection(&self) -> Collection<ProfileImage> {
@@ -111,6 +122,14 @@ impl UserAccountRepo for MongoUserAccountRepo {
             .await
             .map_err(anyhow::Error::from)?;
         DeleteResult::from_deleted_count(res.deleted_count)
+    }
+
+    async fn credentials(&self, user_account_id: &str) -> anyhow::Result<Option<Creds>> {
+        unimplemented!()
+    }
+
+    async fn set_creds(&self, user_account_id: &str, creds: Creds) -> anyhow::Result<()> {
+        unimplemented!()
     }
 
     async fn profile_image_png(&self, user_account_id: &str) -> anyhow::Result<Option<Vec<u8>>> {
