@@ -664,7 +664,7 @@ function Set-AzureKeyVaultSecret {
     }
 }
 
-function Test-AzureKeyVaultSecretDefinitelyNotExists {
+function Test-AzureKeyVaultSecretDefinitelyNotExist {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]
@@ -683,14 +683,14 @@ function Test-AzureKeyVaultSecretDefinitelyNotExists {
             | Tee-Object -Variable showOutput | Out-Null
 
         $error_record = $showOutput[0]
-        $definitely_not_exists = $error_record.ToString().StartsWith("ERROR: (SecretNotFound)")
+        $definitely_not_exist = $error_record.ToString().StartsWith("ERROR: (SecretNotFound)")
 
-        if (-Not $definitely_not_exists) {
+        if (-Not $definitely_not_exist) {
             Write-Error $error_record
             Confirm-LastExitCode
         }
 
-        return $definitely_not_exists
+        return $definitely_not_exist
     }
 }
 
@@ -757,11 +757,11 @@ function Publish-PrivateKey {
         $vault_name = "kv-$EnvHash"
         $secret_name = "private-key"
 
-        $definitely_not_exists = Test-AzureKeyVaultSecretDefinitelyNotExists `
+        $definitely_not_exist = Test-AzureKeyVaultSecretDefinitelyNotExist `
             -VaultName $vault_name `
             -Name $secret_name
 
-        if (-Not $definitely_not_exists) {
+        if (-Not $definitely_not_exist) {
             return;
         }
 
