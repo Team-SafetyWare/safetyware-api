@@ -8,7 +8,7 @@ use std::num::NonZeroU32;
 const N_ITER: u32 = 100_000;
 const CREDENTIAL_LEN: usize = SHA512_OUTPUT_LEN;
 
-fn create_creds(password: String) -> Creds {
+fn create_creds(password: &str) -> Creds {
     let rng = SystemRandom::new();
     let mut salt = [0u8; CREDENTIAL_LEN];
     rng.fill(&mut salt).unwrap();
@@ -26,7 +26,7 @@ fn create_creds(password: String) -> Creds {
     }
 }
 
-fn verify_password(password: String, creds: Creds) -> Result<(), ()> {
+fn verify_password(password: &str, creds: &Creds) -> Result<(), ()> {
     let password_hash = HEXLOWER_PERMISSIVE
         .decode(creds.password_hash.as_bytes())
         .map_err(|_| ())?;
@@ -41,4 +41,35 @@ fn verify_password(password: String, creds: Creds) -> Result<(), ()> {
         &password_hash,
     )
     .map_err(|_| ())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_verify_correct() {
+        // Arrange.
+        let password = "rightpass";
+        let creds = create_creds(password);
+
+        // Act.
+        let res = verify_password(&password, &creds);
+
+        // Assert.
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn test_verify_incorrect() {
+        // Arrange.
+        let password = "rightpass";
+        let creds = create_creds(password);
+
+        // Act.
+        let res = verify_password("wrongpass", &creds);
+
+        // Assert.
+        assert!(res.is_err());
+    }
 }
