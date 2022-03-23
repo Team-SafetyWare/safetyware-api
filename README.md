@@ -74,6 +74,7 @@ This section describes how to make code changes.
 2. Set environmental variables.
    ```
    $env:SW_DB_URI="mongodb://localhost:42781"
+   $env:SW_PRIVATE_KEY="secret"
    $env:RUST_LOG="info"
    $env:RUST_BACKTRACE="1"
    ```
