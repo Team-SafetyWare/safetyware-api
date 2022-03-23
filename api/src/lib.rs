@@ -1,3 +1,4 @@
+pub mod auth;
 pub mod crockford;
 pub mod db;
 pub mod graphql;

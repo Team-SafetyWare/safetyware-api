@@ -3,6 +3,7 @@ use crate::graphql::company::Company;
 use crate::graphql::Context;
 use crate::image::PngBytes;
 use crate::repo::user_account;
+use data_encoding::BASE64;
 use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
@@ -111,7 +112,7 @@ pub async fn set_profile_image(
     user_account_id: ID,
     image_base64: String,
 ) -> FieldResult<String> {
-    let image_bytes = base64::decode(image_base64)?;
+    let image_bytes = BASE64.decode(image_base64.as_bytes())?;
     let image = image::load_from_memory(&image_bytes)?;
     let png_bytes = image.png_bytes()?;
     context

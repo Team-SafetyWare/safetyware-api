@@ -23,18 +23,21 @@ pub struct UserAccount {
 #[derive(Debug, Clone)]
 pub struct Creds {
     pub password_hash: String,
+    pub salt: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct DbCreds {
     pub user_account_id: String,
     pub password_hash: String,
+    pub salt: String,
 }
 
 impl From<DbCreds> for Creds {
     fn from(value: DbCreds) -> Self {
         Self {
             password_hash: value.password_hash,
+            salt: value.salt,
         }
     }
 }
