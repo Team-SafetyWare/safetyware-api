@@ -63,7 +63,7 @@ pub trait UserAccountRepo {
         filter: UserAccountFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
-    async fn credentials(&self, user_account_id: &str) -> anyhow::Result<Option<Creds>>;
+    async fn creds(&self, user_account_id: &str) -> anyhow::Result<Option<Creds>>;
     async fn set_creds(&self, user_account_id: &str, creds: Creds) -> anyhow::Result<()>;
     async fn profile_image_png(&self, user_account_id: &str) -> anyhow::Result<Option<Vec<u8>>>;
     async fn set_profile_image_png(
@@ -141,7 +141,7 @@ impl UserAccountRepo for MongoUserAccountRepo {
         DeleteResult::from_deleted_count(res.deleted_count)
     }
 
-    async fn credentials(&self, user_account_id: &str) -> anyhow::Result<Option<Creds>> {
+    async fn creds(&self, user_account_id: &str) -> anyhow::Result<Option<Creds>> {
         unimplemented!()
     }
 
