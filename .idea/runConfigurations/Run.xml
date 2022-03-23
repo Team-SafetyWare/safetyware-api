@@ -10,6 +10,7 @@
     <option name="backtrace" value="SHORT" />
     <envs>
       <env name="SW_DB_URI" value="mongodb://localhost:42781" />
+      <env name="SW_PRIVATE_KEY" value="secret" />
       <env name="RUST_LOG" value="info" />
       <env name="RUST_BACKTRACE" value="1" />
     </envs>
