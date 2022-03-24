@@ -117,8 +117,8 @@ pub async fn login(
         .verify_password(&user_account_id, &password)
         .await?
         .map_err(|_| "Incorrect password")?;
-    // Todo: Return bearer token.
-    Ok("[token goes here]".to_string())
+    let token = context.token_provider.create_token(&user_account_id)?;
+    Ok(token)
 }
 
 pub async fn set_password(

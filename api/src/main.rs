@@ -8,7 +8,7 @@ pub mod rest;
 pub mod settings;
 pub mod warp_ext;
 
-use crate::auth::AuthProvider;
+use crate::auth::{AuthProvider, TokenProvider};
 use crate::repo::company::MongoCompanyRepo;
 use crate::repo::device::MongoDeviceRepo;
 use crate::repo::gas_reading::MongoGasReadingRepo;
@@ -33,7 +33,7 @@ async fn main() -> anyhow::Result<()> {
     env_logger::init();
     let settings = Settings::read();
     let db = db::connect_and_prepare(&settings.db_uri).await?;
-    let graphql_context = graphql_context(db.clone());
+    let graphql_context = graphql_context(db.clone(), &settings.private_key);
     let rest_context = rest_context(db.clone());
     let route = filter(graphql_context, rest_context)
         .with(log())
@@ -43,7 +43,7 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn graphql_context(db: Database) -> graphql::Context {
+fn graphql_context(db: Database, private_key: &str) -> graphql::Context {
     graphql::Context {
         company_repo: MongoCompanyRepo::new(db.clone()).into(),
         device_repo: MongoDeviceRepo::new(db.clone()).into(),
@@ -56,6 +56,9 @@ fn graphql_context(db: Database) -> graphql::Context {
         user_account_repo: MongoUserAccountRepo::new(db.clone()).into(),
         auth_provider: AuthProvider {
             user_account_repo: MongoUserAccountRepo::new(db).into(),
+        },
+        token_provider: TokenProvider {
+            private_key: private_key.to_string(),
         },
     }
 }
