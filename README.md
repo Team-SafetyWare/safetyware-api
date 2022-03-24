@@ -178,3 +178,4 @@ generated documentation is saved in the repository. It should not be edited manu
    ```
    npx spectaql config.yml
    ```
+6. Navigate to `/doc/` to see documentation.
