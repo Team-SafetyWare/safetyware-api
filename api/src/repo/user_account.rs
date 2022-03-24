@@ -9,11 +9,26 @@ use mongodb::{Collection, Database};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum AccessLevel {
+    View,
+    Admin,
+}
+
+impl Default for AccessLevel {
+    fn default() -> Self {
+        Self::View
+    }
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct UserAccount {
     #[serde(rename = "_id")]
     pub id: String,
     pub name: String,
+    #[serde(default)]
+    pub access: AccessLevel,
     pub title: String,
     pub email: String,
     pub phone: String,

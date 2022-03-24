@@ -11,9 +11,34 @@ use juniper::{FieldResult, ID};
 #[derive(Clone, From, Deref, DerefMut)]
 pub struct UserAccount(pub user_account::UserAccount);
 
+#[derive(Debug, Copy, Clone, juniper::GraphQLEnum)]
+pub enum AccessLevel {
+    View,
+    Admin,
+}
+
+impl From<AccessLevel> for user_account::AccessLevel {
+    fn from(value: AccessLevel) -> Self {
+        match value {
+            AccessLevel::View => Self::View,
+            AccessLevel::Admin => Self::Admin,
+        }
+    }
+}
+
+impl From<user_account::AccessLevel> for AccessLevel {
+    fn from(value: user_account::AccessLevel) -> Self {
+        match value {
+            user_account::AccessLevel::View => Self::View,
+            user_account::AccessLevel::Admin => Self::Admin,
+        }
+    }
+}
+
 #[derive(juniper::GraphQLInputObject)]
 pub struct UserAccountInput {
     pub name: String,
+    pub access: AccessLevel,
     pub title: String,
     pub email: String,
     pub phone: String,
@@ -28,6 +53,10 @@ impl UserAccount {
 
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    pub fn access(&self) -> AccessLevel {
+        self.access.into()
     }
 
     pub fn title(&self) -> &str {
@@ -73,6 +102,7 @@ pub async fn create(context: &Context, input: UserAccountInput) -> FieldResult<U
     let item = user_account::UserAccount {
         id: crockford::random_id(),
         name: input.name,
+        access: input.access.into(),
         title: input.title,
         email: input.email,
         phone: input.phone,
@@ -90,6 +120,7 @@ pub async fn replace(
     let item = user_account::UserAccount {
         id: id.to_string(),
         name: input.name,
+        access: input.access.into(),
         title: input.title,
         email: input.email,
         phone: input.phone,
