@@ -21,6 +21,28 @@ pub struct UserAccount {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Creds {
+    pub password_hash: String,
+    pub salt: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DbCreds {
+    pub user_account_id: String,
+    pub password_hash: String,
+    pub salt: String,
+}
+
+impl From<DbCreds> for Creds {
+    fn from(value: DbCreds) -> Self {
+        Self {
+            password_hash: value.password_hash,
+            salt: value.salt,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProfileImage {
     pub user_account_id: String,
     pub image_png: bson::Binary,
@@ -41,6 +63,8 @@ pub trait UserAccountRepo {
         filter: UserAccountFilter,
     ) -> anyhow::Result<Box<dyn ItemStream<UserAccount>>>;
     async fn delete_one(&self, id: &str) -> DeleteResult;
+    async fn creds(&self, user_account_id: &str) -> anyhow::Result<Option<Creds>>;
+    async fn set_creds(&self, user_account_id: &str, creds: Creds) -> anyhow::Result<()>;
     async fn profile_image_png(&self, user_account_id: &str) -> anyhow::Result<Option<Vec<u8>>>;
     async fn set_profile_image_png(
         &self,
@@ -65,6 +89,10 @@ impl MongoUserAccountRepo {
 
     pub fn collection(&self) -> Collection<UserAccount> {
         self.db.collection(coll::USER_ACCOUNT)
+    }
+
+    pub fn creds_collection(&self) -> Collection<DbCreds> {
+        self.db.collection(coll::USER_ACCOUNT_CREDS)
     }
 
     pub fn profile_image_collection(&self) -> Collection<ProfileImage> {
@@ -111,6 +139,29 @@ impl UserAccountRepo for MongoUserAccountRepo {
             .await
             .map_err(anyhow::Error::from)?;
         DeleteResult::from_deleted_count(res.deleted_count)
+    }
+
+    async fn creds(&self, user_account_id: &str) -> anyhow::Result<Option<Creds>> {
+        Ok(self
+            .creds_collection()
+            .find_one(bson::doc! {"user_account_id": user_account_id}, None)
+            .await?
+            .map(Into::into))
+    }
+
+    async fn set_creds(&self, user_account_id: &str, creds: Creds) -> anyhow::Result<()> {
+        self.creds_collection()
+            .update_one(
+                bson::doc! {"user_account_id": user_account_id},
+                bson::doc! { "$set" : bson::to_document(&DbCreds {
+                    user_account_id: user_account_id.to_string(),
+                    password_hash: creds.password_hash,
+                    salt: creds.salt,
+                })? },
+                UpdateOptions::builder().upsert(true).build(),
+            )
+            .await?;
+        Ok(())
     }
 
     async fn profile_image_png(&self, user_account_id: &str) -> anyhow::Result<Option<Vec<u8>>> {
