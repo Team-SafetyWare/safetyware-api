@@ -45,10 +45,10 @@ pub fn graphql_filter(context: Context) -> BoxedFilter<(Box<dyn Reply>,)> {
         .boxed()
 }
 
-pub fn graphiql_filter() -> BoxedFilter<(Box<dyn Reply>,)> {
+pub fn playground_filter() -> BoxedFilter<(Box<dyn Reply>,)> {
     warp::get()
-        .and(warp::path("graphiql"))
-        .and(juniper_warp::graphiql_filter("/graphql", None))
+        .and(warp::path("playground"))
+        .and(juniper_warp::playground_filter("/graphql", None))
         .map(|r: Response<Vec<u8>>| r.boxed())
         .boxed()
 }
