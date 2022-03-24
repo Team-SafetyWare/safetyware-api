@@ -1,8 +1,10 @@
 use crate::repo::user_account::{ArcUserAccountRepo, Creds};
 use data_encoding::HEXLOWER_PERMISSIVE;
+use jsonwebtoken::{EncodingKey, Header};
 use ring::digest::SHA512_OUTPUT_LEN;
 use ring::pbkdf2;
 use ring::rand::{SecureRandom, SystemRandom};
+use serde::{Deserialize, Serialize};
 use std::num::NonZeroU32;
 
 const N_ITER: u32 = 100_000;
@@ -41,7 +43,7 @@ impl AuthProvider {
     }
 }
 
-fn create_creds(password: &str) -> Creds {
+pub fn create_creds(password: &str) -> Creds {
     let rng = SystemRandom::new();
     let mut salt = [0u8; CREDENTIAL_LEN];
     rng.fill(&mut salt).unwrap();
@@ -59,7 +61,7 @@ fn create_creds(password: &str) -> Creds {
     }
 }
 
-fn verify_password(password: &str, creds: &Creds) -> Result<(), ()> {
+pub fn verify_password(password: &str, creds: &Creds) -> Result<(), ()> {
     let password_hash = HEXLOWER_PERMISSIVE
         .decode(creds.password_hash.as_bytes())
         .map_err(|_| ())?;
@@ -74,6 +76,30 @@ fn verify_password(password: &str, creds: &Creds) -> Result<(), ()> {
         &password_hash,
     )
     .map_err(|_| ())
+}
+
+/// A user account bearer token. The token is missing recommended fields like exp and iat for simplicity.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Claims {
+    /// Subject is user account ID.
+    sub: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct TokenProvider {
+    pub private_key: String,
+}
+
+impl TokenProvider {
+    pub fn create_token(&self, user_account_id: &str) -> anyhow::Result<String> {
+        Ok(jsonwebtoken::encode(
+            &Header::default(),
+            &Claims {
+                sub: user_account_id.to_string(),
+            },
+            &EncodingKey::from_secret(self.private_key.as_bytes()),
+        )?)
+    }
 }
 
 #[cfg(test)]

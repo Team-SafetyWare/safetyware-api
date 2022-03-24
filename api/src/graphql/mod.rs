@@ -8,7 +8,7 @@ pub mod person;
 pub mod team;
 pub mod user_account;
 
-use crate::auth::AuthProvider;
+use crate::auth::{AuthProvider, TokenProvider};
 use crate::graphql::company::{Company, CompanyInput};
 use crate::graphql::device::Device;
 use crate::graphql::device::DeviceInput;
@@ -71,6 +71,7 @@ pub struct Context {
     pub team_repo: ArcTeamRepo,
     pub user_account_repo: ArcUserAccountRepo,
     pub auth_provider: AuthProvider,
+    pub token_provider: TokenProvider,
 }
 
 impl juniper::Context for Context {}
