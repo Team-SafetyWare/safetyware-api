@@ -75,7 +75,7 @@ fn filter(
     rest_context: rest::Context,
 ) -> BoxedFilter<(impl Reply,)> {
     graphql::graphql_filter(graphql_context)
-        .or(graphql::graphiql_filter())
+        .or(graphql::playground_filter())
         .or(graphql_doc())
         .or(rest::v1(rest_context))
         .or(robots())
