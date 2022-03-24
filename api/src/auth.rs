@@ -8,6 +8,7 @@ use std::num::NonZeroU32;
 const N_ITER: u32 = 100_000;
 const CREDENTIAL_LEN: usize = SHA512_OUTPUT_LEN;
 
+#[derive(Clone)]
 pub struct AuthProvider {
     pub user_account_repo: ArcUserAccountRepo,
 }

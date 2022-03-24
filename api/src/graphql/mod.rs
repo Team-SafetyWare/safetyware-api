@@ -8,6 +8,7 @@ pub mod person;
 pub mod team;
 pub mod user_account;
 
+use crate::auth::AuthProvider;
 use crate::graphql::company::{Company, CompanyInput};
 use crate::graphql::device::Device;
 use crate::graphql::device::DeviceInput;
@@ -69,6 +70,7 @@ pub struct Context {
     pub person_repo: ArcPersonRepo,
     pub team_repo: ArcTeamRepo,
     pub user_account_repo: ArcUserAccountRepo,
+    pub auth_provider: AuthProvider,
 }
 
 impl juniper::Context for Context {}
@@ -282,6 +284,22 @@ impl Mutation {
 
     async fn delete_user_account(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
         user_account::delete(context, id).await
+    }
+
+    async fn login(
+        #[graphql(context)] context: &Context,
+        user_account_id: ID,
+        password: String,
+    ) -> FieldResult<String> {
+        user_account::login(context, user_account_id, password).await
+    }
+
+    async fn set_user_account_password(
+        #[graphql(context)] context: &Context,
+        user_account_id: ID,
+        password: String,
+    ) -> FieldResult<bool> {
+        user_account::set_password(context, user_account_id, password).await
     }
 
     async fn set_user_account_profile_image(
