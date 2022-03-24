@@ -103,6 +103,7 @@ fn cors() -> Cors {
             "Access-Control-Request-Headers",
             "User-Agent",
             "Sec-Fetch-Mode",
+            "Authorization",
         ])
         .allow_methods(vec!["POST", "GET"])
         .build()
