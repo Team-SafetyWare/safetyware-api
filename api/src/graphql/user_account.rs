@@ -3,6 +3,7 @@ use crate::graphql::company::Company;
 use crate::graphql::Context;
 use crate::image::PngBytes;
 use crate::repo::user_account;
+use data_encoding::BASE64;
 use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
 use juniper::{FieldResult, ID};
@@ -106,12 +107,38 @@ pub async fn delete(context: &Context, id: ID) -> FieldResult<ID> {
     Ok(id)
 }
 
+pub async fn login(
+    context: &Context,
+    user_account_id: ID,
+    password: String,
+) -> FieldResult<String> {
+    context
+        .auth_provider
+        .verify_password(&user_account_id, &password)
+        .await?
+        .map_err(|_| "Incorrect password")?;
+    let token = context.token_provider.create_token(&user_account_id)?;
+    Ok(token)
+}
+
+pub async fn set_password(
+    context: &Context,
+    user_account_id: ID,
+    password: String,
+) -> FieldResult<bool> {
+    context
+        .auth_provider
+        .set_password(&user_account_id, &password)
+        .await?;
+    Ok(true)
+}
+
 pub async fn set_profile_image(
     context: &Context,
     user_account_id: ID,
     image_base64: String,
 ) -> FieldResult<String> {
-    let image_bytes = base64::decode(image_base64)?;
+    let image_bytes = BASE64.decode(image_base64.as_bytes())?;
     let image = image::load_from_memory(&image_bytes)?;
     let png_bytes = image.png_bytes()?;
     context
