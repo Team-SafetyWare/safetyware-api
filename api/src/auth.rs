@@ -10,6 +10,14 @@ use std::num::NonZeroU32;
 const N_ITER: u32 = 100_000;
 const CREDENTIAL_LEN: usize = SHA512_OUTPUT_LEN;
 
+#[derive(thiserror::Error, Debug)]
+pub enum VerifyError {
+    #[error("incorrect password")]
+    IncorrectPassword,
+    #[error(transparent)]
+    Other(#[from] anyhow::Error),
+}
+
 #[derive(Clone)]
 pub struct AuthProvider {
     pub user_account_repo: ArcUserAccountRepo,
@@ -28,14 +36,14 @@ impl AuthProvider {
         &self,
         user_account_id: &str,
         password: &str,
-    ) -> anyhow::Result<Result<(), ()>> {
+    ) -> anyhow::Result<Result<(), VerifyError>> {
         let creds = self.user_account_repo.creds(user_account_id).await?;
         Ok(match creds {
             None => {
                 if password.is_empty() {
                     Ok(())
                 } else {
-                    Err(())
+                    Err(VerifyError::IncorrectPassword)
                 }
             }
             Some(creds) => verify_password(password, &creds),
@@ -61,13 +69,13 @@ pub fn create_creds(password: &str) -> Creds {
     }
 }
 
-pub fn verify_password(password: &str, creds: &Creds) -> Result<(), ()> {
+pub fn verify_password(password: &str, creds: &Creds) -> Result<(), VerifyError> {
     let password_hash = HEXLOWER_PERMISSIVE
         .decode(creds.password_hash.as_bytes())
-        .map_err(|_| ())?;
+        .map_err(anyhow::Error::from)?;
     let salt = HEXLOWER_PERMISSIVE
         .decode(creds.salt.as_bytes())
-        .map_err(|_| ())?;
+        .map_err(anyhow::Error::from)?;
     pbkdf2::verify(
         pbkdf2::PBKDF2_HMAC_SHA512,
         NonZeroU32::new(N_ITER).unwrap(),
@@ -75,7 +83,7 @@ pub fn verify_password(password: &str, creds: &Creds) -> Result<(), ()> {
         password.as_bytes(),
         &password_hash,
     )
-    .map_err(|_| ())
+    .map_err(|_| VerifyError::IncorrectPassword)
 }
 
 /// A user account bearer token. The token is missing recommended fields like exp and iat for simplicity.
@@ -113,7 +121,7 @@ mod tests {
         let creds = create_creds(password);
 
         // Act.
-        let res = verify_password(&password, &creds);
+        let res = verify_password(password, &creds);
 
         // Assert.
         assert!(res.is_ok());
@@ -129,6 +137,6 @@ mod tests {
         let res = verify_password("wrongpass", &creds);
 
         // Assert.
-        assert!(res.is_err());
+        assert!(matches!(res, Err(VerifyError::IncorrectPassword)));
     }
 }
