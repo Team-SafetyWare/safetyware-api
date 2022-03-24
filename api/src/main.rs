@@ -8,6 +8,7 @@ pub mod rest;
 pub mod settings;
 pub mod warp_ext;
 
+use crate::auth::AuthProvider;
 use crate::repo::company::MongoCompanyRepo;
 use crate::repo::device::MongoDeviceRepo;
 use crate::repo::gas_reading::MongoGasReadingRepo;
@@ -52,7 +53,10 @@ fn graphql_context(db: Database) -> graphql::Context {
         location_reading_repo: MongoLocationReadingRepo::new(db.clone()).into(),
         person_repo: MongoPersonRepo::new(db.clone()).into(),
         team_repo: MongoTeamRepo::new(db.clone()).into(),
-        user_account_repo: MongoUserAccountRepo::new(db).into(),
+        user_account_repo: MongoUserAccountRepo::new(db.clone()).into(),
+        auth_provider: AuthProvider {
+            user_account_repo: MongoUserAccountRepo::new(db).into(),
+        },
     }
 }
 

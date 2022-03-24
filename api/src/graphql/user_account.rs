@@ -107,6 +107,32 @@ pub async fn delete(context: &Context, id: ID) -> FieldResult<ID> {
     Ok(id)
 }
 
+pub async fn login(
+    context: &Context,
+    user_account_id: ID,
+    password: String,
+) -> FieldResult<String> {
+    context
+        .auth_provider
+        .verify_password(&user_account_id, &password)
+        .await?
+        .map_err(|_| "Incorrect password")?;
+    // Todo: Return bearer token.
+    Ok("[token goes here]".to_string())
+}
+
+pub async fn set_password(
+    context: &Context,
+    user_account_id: ID,
+    password: String,
+) -> FieldResult<bool> {
+    context
+        .auth_provider
+        .set_password(&user_account_id, &password)
+        .await?;
+    Ok(true)
+}
+
 pub async fn set_profile_image(
     context: &Context,
     user_account_id: ID,
