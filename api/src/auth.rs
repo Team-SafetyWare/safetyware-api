@@ -1,6 +1,6 @@
-use crate::repo::user_account::{ArcUserAccountRepo, Creds};
+use crate::repo::user_account::{Access, ArcUserAccountRepo, Creds, UserAccount};
 use data_encoding::HEXLOWER_PERMISSIVE;
-use jsonwebtoken::{EncodingKey, Header};
+use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use ring::digest::SHA512_OUTPUT_LEN;
 use ring::pbkdf2;
 use ring::rand::{SecureRandom, SystemRandom};
@@ -87,26 +87,40 @@ pub fn verify_password(password: &str, creds: &Creds) -> Result<(), VerifyError>
 }
 
 /// A user account bearer token. The token is missing recommended fields like exp and iat for simplicity.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
     /// Subject is user account ID.
-    sub: String,
+    pub sub: String,
+    pub access: Access,
 }
 
 #[derive(Debug, Clone)]
-pub struct TokenProvider {
+pub struct ClaimsProvider {
     pub private_key: String,
 }
 
-impl TokenProvider {
-    pub fn create_token(&self, user_account_id: &str) -> anyhow::Result<String> {
+impl ClaimsProvider {
+    pub fn create_token(&self, user_account: &UserAccount) -> anyhow::Result<String> {
         Ok(jsonwebtoken::encode(
             &Header::default(),
             &Claims {
-                sub: user_account_id.to_string(),
+                sub: user_account.id.to_string(),
+                access: user_account.access,
             },
             &EncodingKey::from_secret(self.private_key.as_bytes()),
         )?)
+    }
+
+    pub fn verify_token(&self, token: &str) -> anyhow::Result<Claims> {
+        let mut validation = Validation::default();
+        validation.validate_exp = false;
+        validation.required_spec_claims.remove("exp");
+        Ok(jsonwebtoken::decode(
+            token,
+            &DecodingKey::from_secret(self.private_key.as_bytes()),
+            &validation,
+        )?
+        .claims)
     }
 }
 

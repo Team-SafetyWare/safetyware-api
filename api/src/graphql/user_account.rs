@@ -3,6 +3,7 @@ use crate::graphql::company::Company;
 use crate::graphql::Context;
 use crate::image::PngBytes;
 use crate::repo::user_account;
+use anyhow::Context as AnyhowContext;
 use data_encoding::BASE64;
 use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
@@ -11,9 +12,34 @@ use juniper::{FieldResult, ID};
 #[derive(Clone, From, Deref, DerefMut)]
 pub struct UserAccount(pub user_account::UserAccount);
 
+#[derive(Debug, Copy, Clone, juniper::GraphQLEnum)]
+pub enum Access {
+    View,
+    Admin,
+}
+
+impl From<Access> for user_account::Access {
+    fn from(value: Access) -> Self {
+        match value {
+            Access::View => Self::View,
+            Access::Admin => Self::Admin,
+        }
+    }
+}
+
+impl From<user_account::Access> for Access {
+    fn from(value: user_account::Access) -> Self {
+        match value {
+            user_account::Access::View => Self::View,
+            user_account::Access::Admin => Self::Admin,
+        }
+    }
+}
+
 #[derive(juniper::GraphQLInputObject)]
 pub struct UserAccountInput {
     pub name: String,
+    pub access: Access,
     pub title: String,
     pub email: String,
     pub phone: String,
@@ -28,6 +54,10 @@ impl UserAccount {
 
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    pub fn access(&self) -> Access {
+        self.access.into()
     }
 
     pub fn title(&self) -> &str {
@@ -73,6 +103,7 @@ pub async fn create(context: &Context, input: UserAccountInput) -> FieldResult<U
     let item = user_account::UserAccount {
         id: crockford::random_id(),
         name: input.name,
+        access: input.access.into(),
         title: input.title,
         email: input.email,
         phone: input.phone,
@@ -90,6 +121,7 @@ pub async fn replace(
     let item = user_account::UserAccount {
         id: id.to_string(),
         name: input.name,
+        access: input.access.into(),
         title: input.title,
         email: input.email,
         phone: input.phone,
@@ -117,7 +149,12 @@ pub async fn login(
         .verify_password(&user_account_id, &password)
         .await?
         .map_err(|_| "Incorrect password")?;
-    let token = context.token_provider.create_token(&user_account_id)?;
+    let user_account = context
+        .user_account_repo
+        .find_one(&user_account_id)
+        .await?
+        .context("User account not found")?;
+    let token = context.claims_provider.create_token(&user_account)?;
     Ok(token)
 }
 
