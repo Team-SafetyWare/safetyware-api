@@ -96,7 +96,10 @@ pub fn claims_filter(claims_provider: ClaimsProvider) -> BoxedFilter<(Option<Cla
                 let res = claims_provider.verify_token(token);
                 match res {
                     Ok(claims) => Ok(Some(claims)),
-                    Err(_) => Err(warp::reject()),
+                    Err(e) => {
+                        log::warn!("Invalid token: {}", e);
+                        Err(warp::reject())
+                    }
                 }
             },
         )
