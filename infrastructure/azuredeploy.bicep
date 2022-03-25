@@ -2,7 +2,7 @@
 param envHash string
 
 @description('Maximum number of workers functions can scale out to.')
-param scaleLimit int = 1
+param scaleLimit int = 3
 
 var location = resourceGroup().location
 var keyVaultName = 'kv-${envHash}'
