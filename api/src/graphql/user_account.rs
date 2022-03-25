@@ -3,6 +3,7 @@ use crate::graphql::company::Company;
 use crate::graphql::Context;
 use crate::image::PngBytes;
 use crate::repo::user_account;
+use anyhow::Context as AnyhowContext;
 use data_encoding::BASE64;
 use derive_more::{Deref, DerefMut, From};
 use futures_util::TryStreamExt;
@@ -12,25 +13,25 @@ use juniper::{FieldResult, ID};
 pub struct UserAccount(pub user_account::UserAccount);
 
 #[derive(Debug, Copy, Clone, juniper::GraphQLEnum)]
-pub enum AccessLevel {
+pub enum Access {
     View,
     Admin,
 }
 
-impl From<AccessLevel> for user_account::AccessLevel {
-    fn from(value: AccessLevel) -> Self {
+impl From<Access> for user_account::Access {
+    fn from(value: Access) -> Self {
         match value {
-            AccessLevel::View => Self::View,
-            AccessLevel::Admin => Self::Admin,
+            Access::View => Self::View,
+            Access::Admin => Self::Admin,
         }
     }
 }
 
-impl From<user_account::AccessLevel> for AccessLevel {
-    fn from(value: user_account::AccessLevel) -> Self {
+impl From<user_account::Access> for Access {
+    fn from(value: user_account::Access) -> Self {
         match value {
-            user_account::AccessLevel::View => Self::View,
-            user_account::AccessLevel::Admin => Self::Admin,
+            user_account::Access::View => Self::View,
+            user_account::Access::Admin => Self::Admin,
         }
     }
 }
@@ -38,7 +39,7 @@ impl From<user_account::AccessLevel> for AccessLevel {
 #[derive(juniper::GraphQLInputObject)]
 pub struct UserAccountInput {
     pub name: String,
-    pub access: AccessLevel,
+    pub access: Access,
     pub title: String,
     pub email: String,
     pub phone: String,
@@ -55,7 +56,7 @@ impl UserAccount {
         &self.name
     }
 
-    pub fn access(&self) -> AccessLevel {
+    pub fn access(&self) -> Access {
         self.access.into()
     }
 
@@ -148,7 +149,12 @@ pub async fn login(
         .verify_password(&user_account_id, &password)
         .await?
         .map_err(|_| "Incorrect password")?;
-    let token = context.token_provider.create_token(&user_account_id)?;
+    let user_account = context
+        .user_account_repo
+        .find_one(&user_account_id)
+        .await?
+        .context("User account not found")?;
+    let token = context.token_provider.create_token(&user_account)?;
     Ok(token)
 }
 
