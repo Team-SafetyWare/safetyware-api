@@ -159,10 +159,11 @@ This section describes how to deploy the API to the cloud.
    ```
    .\script\Unpublish.ps1 -Org cap -App sw -Env dev
    ```
-   
+
 ## Generate GraphQL documentation
-[SpectaQL](https://github.com/anvilco/spectaql) is used to automatically generate GraphQL documentation. The 
-generated documentation is saved in the repository. It should not be edited manually.
+
+[SpectaQL](https://github.com/anvilco/spectaql) is used to automatically generate GraphQL documentation. The generated
+documentation is saved in the repository. It should not be edited manually.
 
 1. Install [NodeJS](https://nodejs.org/en/download/).
 2. Install [SpectaQL](https://github.com/anvilco/spectaql).
@@ -179,3 +180,63 @@ generated documentation is saved in the repository. It should not be edited manu
    npx spectaql config.yml
    ```
 6. Navigate to `/doc/` to see documentation.
+
+## Create an admin user
+
+When the application starts for the first time, there may be no users. An admin user is required to create other users
+through the API. The first admin user can be created manually. By default, accounts have no password.
+
+1. Insert a temporary account into the database using [MongoDB Shell](https://www.mongodb.com/docs/mongodb-shell/).
+   ```
+   db.user_account.insertOne({
+     _id: 'tempAdmin',
+     name: '',
+     access: 'admin',
+     title: '',
+     email: '',
+     phone: '',
+     company_id: '',
+   })
+   ```
+2. Login with the temporary account using the GraphQL interface at `/playground`. Take note of the returned bearer
+   token.
+   ```
+   mutation {
+     login(userAccountId: "tempAdmin", password: "")
+   }
+   ```
+3. In the HTTP headers tab at the bottom of the page, set the HTTP authorization header to the bearer token.
+   ```
+   {"Authorization": "Bearer {token}"}
+   ```
+4. Create a genuine admin account. Take note of the returned user account ID.
+   ```
+   mutation {
+     createUserAccount(input: {
+       name: "User A",
+       access: ADMIN,
+       title: "Chief Observer",
+       email: "user.a@example.com",
+       phone: "(111) 111-1111",
+       companyId: ""
+     }) {
+       id
+       name
+     }
+   }
+   ```
+5. Set a password for the new admin account.
+   ```
+   mutation {
+     setUserAccountPassword(
+       userAccountId: "{user account ID}",
+       password: "{password}"
+     )
+   }
+   ```
+6. Delete the temporary admin account.
+   ```
+   mutation {
+     deleteUserAccount(id: "tempAdmin")
+   }
+   ```
