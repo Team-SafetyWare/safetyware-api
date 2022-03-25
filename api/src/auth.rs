@@ -1,4 +1,4 @@
-use crate::repo::user_account::{ArcUserAccountRepo, Creds};
+use crate::repo::user_account::{Access, ArcUserAccountRepo, Creds, UserAccount};
 use data_encoding::HEXLOWER_PERMISSIVE;
 use jsonwebtoken::{EncodingKey, Header};
 use ring::digest::SHA512_OUTPUT_LEN;
@@ -91,6 +91,7 @@ pub fn verify_password(password: &str, creds: &Creds) -> Result<(), VerifyError>
 pub struct Claims {
     /// Subject is user account ID.
     sub: String,
+    access: Access,
 }
 
 #[derive(Debug, Clone)]
@@ -99,11 +100,12 @@ pub struct TokenProvider {
 }
 
 impl TokenProvider {
-    pub fn create_token(&self, user_account_id: &str) -> anyhow::Result<String> {
+    pub fn create_token(&self, user_account: &UserAccount) -> anyhow::Result<String> {
         Ok(jsonwebtoken::encode(
             &Header::default(),
             &Claims {
-                sub: user_account_id.to_string(),
+                sub: user_account.id.to_string(),
+                access: user_account.access,
             },
             &EncodingKey::from_secret(self.private_key.as_bytes()),
         )?)

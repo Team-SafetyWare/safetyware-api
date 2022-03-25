@@ -11,12 +11,12 @@ use std::sync::Arc;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
-pub enum AccessLevel {
+pub enum Access {
     View,
     Admin,
 }
 
-impl Default for AccessLevel {
+impl Default for Access {
     fn default() -> Self {
         Self::View
     }
@@ -28,7 +28,7 @@ pub struct UserAccount {
     pub id: String,
     pub name: String,
     #[serde(default)]
-    pub access: AccessLevel,
+    pub access: Access,
     pub title: String,
     pub email: String,
     pub phone: String,
