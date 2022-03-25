@@ -230,12 +230,10 @@ impl Query {
         #[graphql(context)] context: &Context,
         id: ID,
     ) -> FieldResult<Option<UserAccount>> {
-        verify_view(&context.claims)?;
         user_account::get(context, id).await
     }
 
     async fn user_accounts(#[graphql(context)] context: &Context) -> FieldResult<Vec<UserAccount>> {
-        verify_view(&context.claims)?;
         user_account::list(context).await
     }
 }
