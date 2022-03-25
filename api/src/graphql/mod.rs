@@ -83,13 +83,16 @@ pub fn state_filter(deps: Deps) -> BoxedFilter<(Context,)> {
     // Todo: Extract claims on each request.
     (warp::header(AUTHORIZATION.as_str())
         .and(warp_ext::with_clone(deps.claims_provider.clone()))
-        .map(|token: String, claims_provider: ClaimsProvider| {
-            let token = token.trim_start_matches("Bearer ");
-            log::error!("Authorization header: {}", token);
-            drop(claims_provider);
-            drop(token);
-            None
-        })
+        .and_then(
+            |token: String, claims_provider: ClaimsProvider| async move {
+                let token = token.trim_start_matches("Bearer ");
+                let res = claims_provider.verify_token(token);
+                match res {
+                    Ok(claims) => Ok(Some(claims)),
+                    Err(_) => Err(warp::reject()),
+                }
+            },
+        )
         .or(warp::any().map(|| None))
         .unify())
     .and(warp_ext::with_clone(deps))
