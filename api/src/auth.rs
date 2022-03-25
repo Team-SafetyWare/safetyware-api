@@ -90,8 +90,8 @@ pub fn verify_password(password: &str, creds: &Creds) -> Result<(), VerifyError>
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
     /// Subject is user account ID.
-    sub: String,
-    access: Access,
+    pub sub: String,
+    pub access: Access,
 }
 
 #[derive(Debug, Clone)]

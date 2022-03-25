@@ -27,10 +27,10 @@ use crate::repo::incident_stats::ArcIncidentStatsRepo;
 use crate::repo::location_reading::ArcLocationReadingRepo;
 use crate::repo::person::ArcPersonRepo;
 use crate::repo::team::ArcTeamRepo;
-use crate::repo::user_account::ArcUserAccountRepo;
+use crate::repo::user_account::{Access, ArcUserAccountRepo};
 use crate::warp_ext;
 use crate::warp_ext::BoxReply;
-use juniper::{graphql_object, EmptySubscription, FieldResult, RootNode, ID};
+use juniper::{graphql_object, EmptySubscription, FieldError, FieldResult, RootNode, ID};
 use warp::filters::BoxedFilter;
 use warp::http::header::AUTHORIZATION;
 use warp::http::Response;
@@ -147,18 +147,22 @@ impl Query {
         #[graphql(context)] context: &Context,
         id: ID,
     ) -> FieldResult<Option<Company>> {
+        verify_view(&context.claims)?;
         company::get(context, id).await
     }
 
     async fn companies(#[graphql(context)] context: &Context) -> FieldResult<Vec<Company>> {
+        verify_view(&context.claims)?;
         company::list(context).await
     }
 
     async fn device(#[graphql(context)] context: &Context, id: ID) -> FieldResult<Option<Device>> {
+        verify_view(&context.claims)?;
         device::get(context, id).await
     }
 
     async fn devices(#[graphql(context)] context: &Context) -> FieldResult<Vec<Device>> {
+        verify_view(&context.claims)?;
         device::list(context).await
     }
 
@@ -166,6 +170,7 @@ impl Query {
         #[graphql(context)] context: &Context,
         filter: Option<GasReadingFilter>,
     ) -> FieldResult<Vec<GasReading>> {
+        verify_view(&context.claims)?;
         gas_reading::list(context, filter).await
     }
 
@@ -173,6 +178,7 @@ impl Query {
         #[graphql(context)] context: &Context,
         id: ID,
     ) -> FieldResult<Option<Incident>> {
+        verify_view(&context.claims)?;
         incident::get(context, id).await
     }
 
@@ -180,6 +186,7 @@ impl Query {
         #[graphql(context)] context: &Context,
         filter: Option<IncidentFilter>,
     ) -> FieldResult<Vec<Incident>> {
+        verify_view(&context.claims)?;
         incident::list(context, filter).await
     }
 
@@ -187,6 +194,7 @@ impl Query {
         #[graphql(context)] context: &Context,
         filter: Option<IncidentStatsFilter>,
     ) -> FieldResult<Vec<IncidentStats>> {
+        verify_view(&context.claims)?;
         incident_stats::list(context, filter).await
     }
 
@@ -194,22 +202,27 @@ impl Query {
         #[graphql(context)] context: &Context,
         filter: Option<LocationReadingFilter>,
     ) -> FieldResult<Vec<LocationReading>> {
+        verify_view(&context.claims)?;
         location_reading::list(context, filter).await
     }
 
     async fn person(#[graphql(context)] context: &Context, id: ID) -> FieldResult<Option<Person>> {
+        verify_view(&context.claims)?;
         person::get(context, id).await
     }
 
     async fn people(#[graphql(context)] context: &Context) -> FieldResult<Vec<Person>> {
+        verify_view(&context.claims)?;
         person::list(context).await
     }
 
     async fn team(#[graphql(context)] context: &Context, id: ID) -> FieldResult<Option<Team>> {
+        verify_view(&context.claims)?;
         team::get(context, id).await
     }
 
     async fn teams(#[graphql(context)] context: &Context) -> FieldResult<Vec<Team>> {
+        verify_view(&context.claims)?;
         team::list(context).await
     }
 
@@ -217,10 +230,12 @@ impl Query {
         #[graphql(context)] context: &Context,
         id: ID,
     ) -> FieldResult<Option<UserAccount>> {
+        verify_view(&context.claims)?;
         user_account::get(context, id).await
     }
 
     async fn user_accounts(#[graphql(context)] context: &Context) -> FieldResult<Vec<UserAccount>> {
+        verify_view(&context.claims)?;
         user_account::list(context).await
     }
 }
@@ -233,6 +248,7 @@ impl Mutation {
         #[graphql(context)] context: &Context,
         input: CompanyInput,
     ) -> FieldResult<Company> {
+        verify_admin(&context.claims)?;
         company::create(context, input).await
     }
 
@@ -241,10 +257,12 @@ impl Mutation {
         id: ID,
         input: CompanyInput,
     ) -> FieldResult<Company> {
+        verify_admin(&context.claims)?;
         company::replace(context, id, input).await
     }
 
     async fn delete_company(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        verify_admin(&context.claims)?;
         company::delete(context, id).await
     }
 
@@ -252,6 +270,7 @@ impl Mutation {
         #[graphql(context)] context: &Context,
         input: DeviceInput,
     ) -> FieldResult<Device> {
+        verify_admin(&context.claims)?;
         device::create(context, input).await
     }
 
@@ -259,10 +278,12 @@ impl Mutation {
         #[graphql(context)] context: &Context,
         input: DeviceInput,
     ) -> FieldResult<Device> {
+        verify_admin(&context.claims)?;
         device::replace(context, input).await
     }
 
     async fn delete_device(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        verify_admin(&context.claims)?;
         device::delete(context, id).await
     }
 
@@ -270,6 +291,7 @@ impl Mutation {
         #[graphql(context)] context: &Context,
         input: IncidentInput,
     ) -> FieldResult<Incident> {
+        verify_admin(&context.claims)?;
         incident::create(context, input).await
     }
 
@@ -278,10 +300,12 @@ impl Mutation {
         id: ID,
         input: IncidentInput,
     ) -> FieldResult<Incident> {
+        verify_admin(&context.claims)?;
         incident::replace(context, id, input).await
     }
 
     async fn delete_incident(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        verify_admin(&context.claims)?;
         incident::delete(context, id).await
     }
 
@@ -289,6 +313,7 @@ impl Mutation {
         #[graphql(context)] context: &Context,
         input: PersonInput,
     ) -> FieldResult<Person> {
+        verify_admin(&context.claims)?;
         person::create(context, input).await
     }
 
@@ -297,10 +322,12 @@ impl Mutation {
         id: ID,
         input: PersonInput,
     ) -> FieldResult<Person> {
+        verify_admin(&context.claims)?;
         person::replace(context, id, input).await
     }
 
     async fn delete_person(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        verify_admin(&context.claims)?;
         person::delete(context, id).await
     }
 
@@ -308,10 +335,12 @@ impl Mutation {
         #[graphql(context)] context: &Context,
         input: TeamInput,
     ) -> FieldResult<Team> {
+        verify_admin(&context.claims)?;
         team::create(context, input).await
     }
 
     async fn delete_team(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        verify_admin(&context.claims)?;
         team::delete(context, id).await
     }
 
@@ -320,6 +349,7 @@ impl Mutation {
         team_id: ID,
         person_id: ID,
     ) -> FieldResult<Option<Team>> {
+        verify_admin(&context.claims)?;
         team::add_person(context, team_id, person_id).await
     }
 
@@ -328,6 +358,7 @@ impl Mutation {
         team_id: ID,
         person_id: ID,
     ) -> FieldResult<Option<Team>> {
+        verify_admin(&context.claims)?;
         team::remove_person(context, team_id, person_id).await
     }
 
@@ -335,6 +366,7 @@ impl Mutation {
         #[graphql(context)] context: &Context,
         input: UserAccountInput,
     ) -> FieldResult<UserAccount> {
+        verify_admin(&context.claims)?;
         user_account::create(context, input).await
     }
 
@@ -343,10 +375,12 @@ impl Mutation {
         id: ID,
         input: UserAccountInput,
     ) -> FieldResult<UserAccount> {
+        verify_admin(&context.claims)?;
         user_account::replace(context, id, input).await
     }
 
     async fn delete_user_account(#[graphql(context)] context: &Context, id: ID) -> FieldResult<ID> {
+        verify_admin(&context.claims)?;
         user_account::delete(context, id).await
     }
 
@@ -363,6 +397,7 @@ impl Mutation {
         user_account_id: ID,
         password: String,
     ) -> FieldResult<bool> {
+        verify_admin(&context.claims)?;
         user_account::set_password(context, user_account_id, password).await
     }
 
@@ -371,6 +406,28 @@ impl Mutation {
         user_account_id: ID,
         image_base64: String,
     ) -> FieldResult<String> {
+        verify_admin(&context.claims)?;
         user_account::set_profile_image(context, user_account_id, image_base64).await
     }
+}
+
+fn verify_view(claims: &Option<Claims>) -> Result<(), FieldError> {
+    // Any authenticated user has at least view authorization.
+    if claims.is_some() {
+        Ok(())
+    } else {
+        Err(unauthorized_error())
+    }
+}
+
+fn verify_admin(claims: &Option<Claims>) -> Result<(), FieldError> {
+    if matches!(claims.as_ref().map(|c| c.access), Some(Access::Admin)) {
+        Ok(())
+    } else {
+        Err(unauthorized_error())
+    }
+}
+
+fn unauthorized_error() -> FieldError {
+    anyhow::Error::msg("Unauthorized").into()
 }
