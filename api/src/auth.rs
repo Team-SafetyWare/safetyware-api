@@ -95,11 +95,11 @@ pub struct Claims {
 }
 
 #[derive(Debug, Clone)]
-pub struct TokenProvider {
+pub struct ClaimsProvider {
     pub private_key: String,
 }
 
-impl TokenProvider {
+impl ClaimsProvider {
     pub fn create_token(&self, user_account: &UserAccount) -> anyhow::Result<String> {
         Ok(jsonwebtoken::encode(
             &Header::default(),

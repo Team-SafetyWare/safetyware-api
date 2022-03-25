@@ -8,7 +8,7 @@ pub mod rest;
 pub mod settings;
 pub mod warp_ext;
 
-use crate::auth::{AuthProvider, TokenProvider};
+use crate::auth::{AuthProvider, ClaimsProvider};
 use crate::repo::company::MongoCompanyRepo;
 use crate::repo::device::MongoDeviceRepo;
 use crate::repo::gas_reading::MongoGasReadingRepo;
@@ -55,7 +55,7 @@ fn graphql_deps(db: Database, private_key: &str) -> graphql::Deps {
         auth_provider: AuthProvider {
             user_account_repo: MongoUserAccountRepo::new(db).into(),
         },
-        token_provider: TokenProvider {
+        claims_provider: ClaimsProvider {
             private_key: private_key.to_string(),
         },
     }
