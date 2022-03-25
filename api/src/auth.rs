@@ -1,6 +1,6 @@
 use crate::repo::user_account::{Access, ArcUserAccountRepo, Creds, UserAccount};
 use data_encoding::HEXLOWER_PERMISSIVE;
-use jsonwebtoken::{EncodingKey, Header};
+use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use ring::digest::SHA512_OUTPUT_LEN;
 use ring::pbkdf2;
 use ring::rand::{SecureRandom, SystemRandom};
@@ -109,6 +109,17 @@ impl ClaimsProvider {
             },
             &EncodingKey::from_secret(self.private_key.as_bytes()),
         )?)
+    }
+
+    pub fn verify_token(&self, token: &str) -> anyhow::Result<Claims> {
+        let mut validation = Validation::default();
+        validation.validate_exp = false;
+        Ok(jsonwebtoken::decode(
+            token,
+            &DecodingKey::from_secret(self.private_key.as_bytes()),
+            &validation,
+        )?
+        .claims)
     }
 }
 
