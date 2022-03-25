@@ -33,18 +33,16 @@ async fn main() -> anyhow::Result<()> {
     env_logger::init();
     let settings = Settings::read();
     let db = db::connect_and_prepare(&settings.db_uri).await?;
-    let graphql_context = graphql_context(db.clone(), &settings.private_key);
+    let graphql_deps = graphql_deps(db.clone(), &settings.private_key);
     let rest_context = rest_context(db.clone());
-    let route = filter(graphql_context, rest_context)
-        .with(log())
-        .with(cors());
+    let route = filter(graphql_deps, rest_context).with(log()).with(cors());
     let port = get_port();
     warp::serve(route).run((Ipv4Addr::UNSPECIFIED, port)).await;
     Ok(())
 }
 
-fn graphql_context(db: Database, private_key: &str) -> graphql::Context {
-    graphql::Context {
+fn graphql_deps(db: Database, private_key: &str) -> graphql::Deps {
+    graphql::Deps {
         company_repo: MongoCompanyRepo::new(db.clone()).into(),
         device_repo: MongoDeviceRepo::new(db.clone()).into(),
         gas_reading_repo: MongoGasReadingRepo::new(db.clone()).into(),
@@ -70,11 +68,8 @@ fn rest_context(db: Database) -> rest::Context {
     }
 }
 
-fn filter(
-    graphql_context: graphql::Context,
-    rest_context: rest::Context,
-) -> BoxedFilter<(impl Reply,)> {
-    graphql::graphql_filter(graphql_context)
+fn filter(graphql_deps: graphql::Deps, rest_context: rest::Context) -> BoxedFilter<(impl Reply,)> {
+    graphql::graphql_filter(graphql_deps)
         .or(graphql::playground_filter())
         .or(graphql_doc())
         .or(rest::v1(rest_context))

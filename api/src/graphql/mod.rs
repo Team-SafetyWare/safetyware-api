@@ -8,7 +8,7 @@ pub mod person;
 pub mod team;
 pub mod user_account;
 
-use crate::auth::{AuthProvider, TokenProvider};
+use crate::auth::{AuthProvider, Claims, TokenProvider};
 use crate::graphql::company::{Company, CompanyInput};
 use crate::graphql::device::Device;
 use crate::graphql::device::DeviceInput;
@@ -35,7 +35,42 @@ use warp::filters::BoxedFilter;
 use warp::http::Response;
 use warp::{Filter, Reply};
 
-pub fn graphql_filter(context: Context) -> BoxedFilter<(Box<dyn Reply>,)> {
+#[derive(Clone)]
+pub struct Deps {
+    pub company_repo: ArcCompanyRepo,
+    pub device_repo: ArcDeviceRepo,
+    pub gas_reading_repo: ArcGasReadingRepo,
+    pub incident_repo: ArcIncidentRepo,
+    pub incident_stats_repo: ArcIncidentStatsRepo,
+    pub location_reading_repo: ArcLocationReadingRepo,
+    pub person_repo: ArcPersonRepo,
+    pub team_repo: ArcTeamRepo,
+    pub user_account_repo: ArcUserAccountRepo,
+    pub auth_provider: AuthProvider,
+    pub token_provider: TokenProvider,
+}
+
+#[derive(Clone)]
+pub struct Context {
+    pub claims: Option<Claims>,
+    pub company_repo: ArcCompanyRepo,
+    pub device_repo: ArcDeviceRepo,
+    pub gas_reading_repo: ArcGasReadingRepo,
+    pub incident_repo: ArcIncidentRepo,
+    pub incident_stats_repo: ArcIncidentStatsRepo,
+    pub location_reading_repo: ArcLocationReadingRepo,
+    pub person_repo: ArcPersonRepo,
+    pub team_repo: ArcTeamRepo,
+    pub user_account_repo: ArcUserAccountRepo,
+    pub auth_provider: AuthProvider,
+    pub token_provider: TokenProvider,
+}
+
+impl juniper::Context for Context {}
+
+pub fn graphql_filter(deps: Deps) -> BoxedFilter<(Box<dyn Reply>,)> {
+    // Todo: Extract claims on each request.
+    let context = create_context(deps, None);
     let state = warp_ext::with_clone(context).boxed();
     let schema = schema();
     (warp::get().or(warp::post()).unify())
@@ -59,22 +94,22 @@ fn schema() -> Schema {
     Schema::new(Query, Mutation, EmptySubscription::<Context>::new())
 }
 
-#[derive(Clone)]
-pub struct Context {
-    pub company_repo: ArcCompanyRepo,
-    pub device_repo: ArcDeviceRepo,
-    pub gas_reading_repo: ArcGasReadingRepo,
-    pub incident_repo: ArcIncidentRepo,
-    pub incident_stats_repo: ArcIncidentStatsRepo,
-    pub location_reading_repo: ArcLocationReadingRepo,
-    pub person_repo: ArcPersonRepo,
-    pub team_repo: ArcTeamRepo,
-    pub user_account_repo: ArcUserAccountRepo,
-    pub auth_provider: AuthProvider,
-    pub token_provider: TokenProvider,
+fn create_context(deps: Deps, claims: Option<Claims>) -> Context {
+    Context {
+        claims,
+        company_repo: deps.company_repo,
+        device_repo: deps.device_repo,
+        gas_reading_repo: deps.gas_reading_repo,
+        incident_repo: deps.incident_repo,
+        incident_stats_repo: deps.incident_stats_repo,
+        location_reading_repo: deps.location_reading_repo,
+        person_repo: deps.person_repo,
+        team_repo: deps.team_repo,
+        user_account_repo: deps.user_account_repo,
+        auth_provider: deps.auth_provider,
+        token_provider: deps.token_provider,
+    }
 }
-
-impl juniper::Context for Context {}
 
 pub struct Query;
 
