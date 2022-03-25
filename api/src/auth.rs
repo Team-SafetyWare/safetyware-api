@@ -114,6 +114,7 @@ impl ClaimsProvider {
     pub fn verify_token(&self, token: &str) -> anyhow::Result<Claims> {
         let mut validation = Validation::default();
         validation.validate_exp = false;
+        validation.required_spec_claims.remove("exp");
         Ok(jsonwebtoken::decode(
             token,
             &DecodingKey::from_secret(self.private_key.as_bytes()),
