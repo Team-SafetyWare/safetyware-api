@@ -8,7 +8,7 @@ pub mod person;
 pub mod team;
 pub mod user_account;
 
-use crate::auth::{AuthProvider, Claims, TokenProvider};
+use crate::auth::{AuthProvider, Claims, ClaimsProvider};
 use crate::graphql::company::{Company, CompanyInput};
 use crate::graphql::device::Device;
 use crate::graphql::device::DeviceInput;
@@ -48,7 +48,7 @@ pub struct Deps {
     pub team_repo: ArcTeamRepo,
     pub user_account_repo: ArcUserAccountRepo,
     pub auth_provider: AuthProvider,
-    pub token_provider: TokenProvider,
+    pub claims_provider: ClaimsProvider,
 }
 
 #[derive(Clone)]
@@ -64,7 +64,7 @@ pub struct Context {
     pub team_repo: ArcTeamRepo,
     pub user_account_repo: ArcUserAccountRepo,
     pub auth_provider: AuthProvider,
-    pub token_provider: TokenProvider,
+    pub claims_provider: ClaimsProvider,
 }
 
 impl juniper::Context for Context {}
@@ -82,8 +82,11 @@ pub fn graphql_filter(deps: Deps) -> BoxedFilter<(Box<dyn Reply>,)> {
 pub fn state_filter(deps: Deps) -> BoxedFilter<(Context,)> {
     // Todo: Extract claims on each request.
     (warp::header(AUTHORIZATION.as_str())
-        .map(|token: String| {
-            // Todo: Attempt to extract token.
+        .and(warp_ext::with_clone(deps.claims_provider.clone()))
+        .map(|token: String, claims_provider: ClaimsProvider| {
+            let token = token.trim_start_matches("Bearer ");
+            log::error!("Authorization header: {}", token);
+            drop(claims_provider);
             drop(token);
             None
         })
@@ -121,7 +124,7 @@ fn create_context(deps: Deps, claims: Option<Claims>) -> Context {
         team_repo: deps.team_repo,
         user_account_repo: deps.user_account_repo,
         auth_provider: deps.auth_provider,
-        token_provider: deps.token_provider,
+        claims_provider: deps.claims_provider,
     }
 }
 

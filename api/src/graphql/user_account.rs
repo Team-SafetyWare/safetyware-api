@@ -154,7 +154,7 @@ pub async fn login(
         .find_one(&user_account_id)
         .await?
         .context("User account not found")?;
-    let token = context.token_provider.create_token(&user_account)?;
+    let token = context.claims_provider.create_token(&user_account)?;
     Ok(token)
 }
 
