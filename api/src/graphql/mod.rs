@@ -69,15 +69,19 @@ pub struct Context {
 impl juniper::Context for Context {}
 
 pub fn graphql_filter(deps: Deps) -> BoxedFilter<(Box<dyn Reply>,)> {
-    // Todo: Extract claims on each request.
-    let context = create_context(deps, None);
-    let state = warp_ext::with_clone(context).boxed();
+    let state = state_filter(deps);
     let schema = schema();
     (warp::get().or(warp::post()).unify())
         .and(warp::path("graphql"))
         .and(juniper_warp::make_graphql_filter(schema, state))
         .map(|r: Response<Vec<u8>>| r.boxed())
         .boxed()
+}
+
+pub fn state_filter(deps: Deps) -> BoxedFilter<(Context,)> {
+    // Todo: Extract claims on each request.
+    let context = create_context(deps, None);
+    warp_ext::with_clone(context).boxed()
 }
 
 pub fn playground_filter() -> BoxedFilter<(Box<dyn Reply>,)> {
