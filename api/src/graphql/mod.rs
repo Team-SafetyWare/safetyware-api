@@ -32,6 +32,7 @@ use crate::warp_ext;
 use crate::warp_ext::BoxReply;
 use juniper::{graphql_object, EmptySubscription, FieldResult, RootNode, ID};
 use warp::filters::BoxedFilter;
+use warp::http::header::AUTHORIZATION;
 use warp::http::Response;
 use warp::{Filter, Reply};
 
@@ -80,8 +81,17 @@ pub fn graphql_filter(deps: Deps) -> BoxedFilter<(Box<dyn Reply>,)> {
 
 pub fn state_filter(deps: Deps) -> BoxedFilter<(Context,)> {
     // Todo: Extract claims on each request.
-    let context = create_context(deps, None);
-    warp_ext::with_clone(context).boxed()
+    (warp::header(AUTHORIZATION.as_str())
+        .map(|token: String| {
+            // Todo: Attempt to extract token.
+            drop(token);
+            None
+        })
+        .or(warp::any().map(|| None))
+        .unify())
+    .and(warp_ext::with_clone(deps))
+    .map(|claims: Option<Claims>, deps: Deps| create_context(deps, claims))
+    .boxed()
 }
 
 pub fn playground_filter() -> BoxedFilter<(Box<dyn Reply>,)> {
