@@ -81,8 +81,15 @@ pub fn graphql_filter(deps: Deps) -> BoxedFilter<(Box<dyn Reply>,)> {
 
 pub fn state_filter(deps: Deps) -> BoxedFilter<(Context,)> {
     // Todo: Extract claims on each request.
-    (warp::header(AUTHORIZATION.as_str())
-        .and(warp_ext::with_clone(deps.claims_provider.clone()))
+    claims_filter(deps.claims_provider.clone())
+        .and(warp_ext::with_clone(deps))
+        .map(|claims: Option<Claims>, deps: Deps| create_context(deps, claims))
+        .boxed()
+}
+
+pub fn claims_filter(claims_provider: ClaimsProvider) -> BoxedFilter<(Option<Claims>,)> {
+    warp::header(AUTHORIZATION.as_str())
+        .and(warp_ext::with_clone(claims_provider))
         .and_then(
             |token: String, claims_provider: ClaimsProvider| async move {
                 let token = token.trim_start_matches("Bearer ");
@@ -94,10 +101,8 @@ pub fn state_filter(deps: Deps) -> BoxedFilter<(Context,)> {
             },
         )
         .or(warp::any().map(|| None))
-        .unify())
-    .and(warp_ext::with_clone(deps))
-    .map(|claims: Option<Claims>, deps: Deps| create_context(deps, claims))
-    .boxed()
+        .unify()
+        .boxed()
 }
 
 pub fn playground_filter() -> BoxedFilter<(Box<dyn Reply>,)> {
