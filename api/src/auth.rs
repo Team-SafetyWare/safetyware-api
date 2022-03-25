@@ -87,7 +87,7 @@ pub fn verify_password(password: &str, creds: &Creds) -> Result<(), VerifyError>
 }
 
 /// A user account bearer token. The token is missing recommended fields like exp and iat for simplicity.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
     /// Subject is user account ID.
     sub: String,
