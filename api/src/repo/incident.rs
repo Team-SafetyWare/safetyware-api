@@ -113,24 +113,31 @@ impl IncidentRepo for MongoIncidentRepo {
 
     async fn replace_one(&self, incident: Incident) -> ReplaceResult {
         let db_incident: DbIncident = incident.into();
+        let mut mongo_query = Document::new();
+        mongo_query.insert("_id", &db_incident.id);
+        mongo_query.insert("hidden", filter::not_true());
         let res = self
             .collection()
-            .replace_one(bson::doc! {"_id": &db_incident.id}, db_incident, None)
+            .replace_one(mongo_query, db_incident, None)
             .await
             .map_err(anyhow::Error::from)?;
         ReplaceResult::from_matched_count(res.matched_count)
     }
 
     async fn find_one(&self, id: &str) -> anyhow::Result<Option<Incident>> {
+        let mut mongo_filter = Document::new();
+        mongo_filter.insert("_id", id);
+        mongo_filter.insert("hidden", filter::not_true());
         Ok(self
             .collection()
-            .find_one(bson::doc! {"_id": id}, None)
+            .find_one(mongo_filter, None)
             .await?
             .map(Into::into))
     }
 
     async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>> {
         let mut mongo_filter = Document::new();
+        mongo_filter.insert("hidden", filter::not_true());
         mongo_filter.insert_opt("person_id", filter::one_of(filter.person_ids));
         mongo_filter.insert_opt(
             "timestamp",
@@ -147,9 +154,12 @@ impl IncidentRepo for MongoIncidentRepo {
     }
 
     async fn delete_one(&self, id: &str) -> DeleteResult {
+        let mut mongo_query = Document::new();
+        mongo_query.insert("_id", id);
+        mongo_query.insert("hidden", filter::not_true());
         let res = self
             .collection()
-            .delete_one(bson::doc! {"_id": id}, None)
+            .delete_one(mongo_query, None)
             .await
             .map_err(anyhow::Error::from)?;
         DeleteResult::from_deleted_count(res.deleted_count)
