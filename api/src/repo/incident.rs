@@ -116,6 +116,7 @@ impl IncidentRepo for MongoIncidentRepo {
         let mut mongo_query = Document::new();
         mongo_query.insert("_id", &db_incident.id);
         mongo_query.insert("hidden", filter::not_true());
+        mongo_query.insert("type", filter::not_hidden_incident());
         let res = self
             .collection()
             .replace_one(mongo_query, db_incident, None)
@@ -128,6 +129,7 @@ impl IncidentRepo for MongoIncidentRepo {
         let mut mongo_filter = Document::new();
         mongo_filter.insert("_id", id);
         mongo_filter.insert("hidden", filter::not_true());
+        mongo_filter.insert("type", filter::not_hidden_incident());
         Ok(self
             .collection()
             .find_one(mongo_filter, None)
@@ -138,6 +140,7 @@ impl IncidentRepo for MongoIncidentRepo {
     async fn find(&self, filter: IncidentFilter) -> anyhow::Result<Box<dyn ItemStream<Incident>>> {
         let mut mongo_filter = Document::new();
         mongo_filter.insert("hidden", filter::not_true());
+        mongo_filter.insert("type", filter::not_hidden_incident());
         mongo_filter.insert_opt("person_id", filter::one_of(filter.person_ids));
         mongo_filter.insert_opt(
             "timestamp",
@@ -157,6 +160,7 @@ impl IncidentRepo for MongoIncidentRepo {
         let mut mongo_query = Document::new();
         mongo_query.insert("_id", id);
         mongo_query.insert("hidden", filter::not_true());
+        mongo_query.insert("type", filter::not_hidden_incident());
         let res = self
             .collection()
             .delete_one(mongo_query, None)
