@@ -5,6 +5,8 @@ use mongodb::options::FindOptions;
 use mongodb::Collection;
 use serde::de::DeserializeOwned;
 
+pub const HIDDEN_INCIDENTS: [&str; 1] = ["Logged off"];
+
 pub trait InsertOpt {
     fn insert_opt<KT: Into<String>, BT: Into<Bson>>(
         &mut self,
@@ -86,6 +88,7 @@ impl FromDeletedCount for DeleteResult {
 }
 
 pub mod filter {
+    use crate::repo::mongo_util::HIDDEN_INCIDENTS;
     use bson::{Bson, Document};
 
     pub fn clamp<T: Into<Bson>>(
@@ -108,5 +111,9 @@ pub mod filter {
 
     pub fn not_true() -> Bson {
         (bson::doc! { "$ne":  true }).into()
+    }
+
+    pub fn not_hidden_incident() -> Bson {
+        (bson::doc! { "$nin":  HIDDEN_INCIDENTS.to_vec() }).into()
     }
 }
