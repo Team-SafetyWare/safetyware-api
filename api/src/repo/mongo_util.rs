@@ -110,7 +110,11 @@ pub mod filter {
     }
 
     pub fn not_true() -> Bson {
-        (bson::doc! { "$ne":  true }).into()
+        not(true)
+    }
+
+    pub fn not<T: Into<Bson>>(value: T) -> Bson {
+        (bson::doc! { "$ne":  value.into() }).into()
     }
 
     pub fn not_hidden_incident() -> Bson {
