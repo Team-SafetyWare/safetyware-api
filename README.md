@@ -4,7 +4,7 @@ This repository contains the API of the SafetyWare application.
 
 ## Architecture
 
-The following informal architecture diagram shows data flow and the relationship between the API and other components.
+The following informal diagram shows data flow and the relationship between the API and other components.
 
 ![Architecture diagram](architecture-diagram.png)
 
