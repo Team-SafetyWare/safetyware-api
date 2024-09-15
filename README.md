@@ -1,6 +1,6 @@
 # SafetyWare API
 
-This repository contains the API of the SafetyWare application.
+This repository contains the API of the [SafetyWare application](https://www.safetyware.ca/).
 
 ## Architecture
 
