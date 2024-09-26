@@ -1,6 +1,7 @@
 # SafetyWare API
 
 This repository contains the API of the [SafetyWare application](https://www.safetyware.ca/).
+The frontend is in [another repository](https://github.com/Team-SafetyWare/safetyware-ui).
 
 ## Architecture
 
